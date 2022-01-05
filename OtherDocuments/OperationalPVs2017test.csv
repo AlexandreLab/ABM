@@ -1,0 +1,1145 @@
+,Name,Type,TypeID,SiteID,Renewable,Capacity(MW),Capacity(kW),StartYear,EndYear
+0,Fen Farm Solar Park,Solar,7,1018,1,1.0,1000,2011,2036
+1,Manor Farm,Solar,7,1019,1,4.7,4700,2011,2036
+2,Nanterrow Farm,Solar,7,1020,1,4.7,4700,2011,2036
+3,Howton Farm,Solar,7,1021,1,4.4,4400,2011,2036
+4,East Langford Farm,Solar,7,1022,1,5.0,5000,2011,2036
+5,Trevemper solar farm,Solar,7,1023,1,1.7,1700,2011,2036
+6,Chester Energy (East Woolley Farm),Solar,7,1024,1,5.0,5000,2012,2037
+7,Chynoweth Farm,Solar,7,1028,1,2.9,2900,2011,2036
+8,Carlton Farm Solar farm,Solar,7,1029,1,5.0,5000,2011,2036
+9,Wheal Jane,Solar,7,1032,1,1.4,1400,2011,2036
+10,Cantelupe Solar Farm,Solar,7,1034,1,5.0,5000,2013,2038
+11,Benbole Farm,Solar,7,1035,1,2.0,2000,2011,2036
+12,Langage Solar Farm,Solar,7,1039,1,5.0,5000,2011,2036
+13,Grange Solar Farm,Solar,7,1040,1,4.6,4600,2011,2036
+14,Ebbsfleet Farm Solar Farm,Solar,7,1041,1,4.9,4900,2011,2036
+15,Westcott Venture Park Phase 2 & 3,Solar,7,1042,1,1.3,1300,2012,2037
+16,Summerway Drove,Solar,7,1046,1,2.0,2000,2011,2036
+17,Puriton Solar Farm,Solar,7,1047,1,4.6,4600,2011,2036
+18,Toyota Solar Farm,Solar,7,1048,1,4.6,4600,2011,2036
+19,Long Sutton Butterfly And Wildlife Park,Solar,7,1049,1,1.7,1700,2011,2036
+20,Long Sutton Butterfly And Wildlife Park (extension),Solar,7,1050,1,1.0,1000,2011,2036
+21,Springhill Solar Park (Northwick),Solar,7,1053,1,5.0,5000,2013,2038
+22,Westmill Farm - PV,Solar,7,1054,1,5.0,5000,2011,2036
+23,Rhosygilwen Solar Farm,Solar,7,1055,1,1.0,1000,2011,2036
+24,Llancayo Solar Farm,Solar,7,1056,1,3.9,3900,2011,2036
+25,Shacks Barn Solar Farm,Solar,7,1058,1,5.0,5000,2013,2038
+26,Carines Farm Solar Array,Solar,7,1059,1,1.0,1000,2013,2038
+27,Trigon Solar Farm,Solar,7,1060,1,7.0,7000,2013,2038
+28,Chittering Solar Farm Extension,Solar,7,1062,1,6.3,6300,2013,2038
+29,Tredinnick Fields,Solar,7,1064,1,5.8,5800,2013,2038
+30,Summercourt Solar Farm (Glebe Farm),Solar,7,1065,1,1.1,1100,2013,2038
+31,Higher Trevartha Farm,Solar,7,1067,1,3.0,3000,2013,2038
+32,Beechgrove Farm,Solar,7,1070,1,4.0,4000,2011,2036
+33,PARK WOOD SOLAR FARM,Solar,7,1076,1,5.0,5000,2011,2036
+34,Promens Solar,Solar,7,1078,1,1.7,1700,2011,2036
+35,Malmesbury Solar,Solar,7,1079,1,5.0,5000,2011,2036
+36,Trefullock Solar Farm,Solar,7,1080,1,5.0,5000,2011,2036
+37,Lower Coombe Farm Solar,Solar,7,1081,1,1.0,1000,2011,2036
+38,Durrants Farm Solar,Solar,7,1082,1,4.5,4500,2011,2036
+39,Dunsfold Park Solar Farm,Solar,7,1084,1,2.0,2000,2011,2036
+40,Alan Bartlett & Sons Solar,Solar,7,1085,1,1.2,1200,2013,2038
+41,Tavells Lane Solar Farm,Solar,7,1086,1,5.3,5300,2013,2038
+42,LITTLE TREVEASE SOLAR PARK,Solar,7,1088,1,5.3,5300,2013,2038
+43,Cobbs Cross Solar Park,Solar,7,1089,1,5.0,5000,2013,2038
+44,NOTTINGTON LANE SOLAR FARM,Solar,7,1090,1,5.0,5000,2013,2038
+45,RUDGE FARM SOLAR FARM,Solar,7,1091,1,7.0,7000,2013,2038
+46,CRINACOTT SOLAR FARM (Pyworthy),Solar,7,1094,1,6.7,6700,2013,2038
+47,Chawton Farm Solar Farm,Solar,7,1095,1,3.2,3200,2013,2038
+48,VENTNOR ROAD SOLAR PARK,Solar,7,1096,1,4.8,4800,2013,2038
+49,ROOKERY FARM SOLAR FARM,Solar,7,1097,1,5.3,5300,2013,2038
+50,Little White Alice Solar Park,Solar,7,1098,1,1.3,1300,2013,2038
+51,Park Wall Solar Park,Solar,7,1103,1,5.0,5000,2013,2038
+52,Hall Farm Solar park,Solar,7,1108,1,15.0,15000,2016,2041
+53,Oulton Airfield Solar Farm (Phase 1),Solar,7,1128,1,5.0,5000,2016,2041
+54,Chalcroft Solar Park,Solar,7,1157,1,6.3,6300,2013,2038
+55,Bradford Solar Park,Solar,7,1158,1,5.3,5300,2013,2038
+56,Lower Coombe Farm (Bean Field),Solar,7,1160,1,1.0,1000,2012,2037
+57,Ffos Las Racecourse,Solar,7,1161,1,5.5,5500,2012,2037
+58,Woodforde Farm,Solar,7,1163,1,9.0,9000,2013,2038
+59,Kingston Farm,Solar,7,1165,1,5.0,5000,2011,2036
+60,Spriggs Farm,Solar,7,1166,1,12.0,12000,2013,2038
+61,Rotherdale Farm,Solar,7,1169,1,5.0,5000,2015,2040
+62,Turves Solar Farm (Resubmission),Solar,7,1171,1,5.0,5000,2013,2038
+63,Rexton Cross,Solar,7,1173,1,2.0,2000,2013,2038
+64,Hatchlands Farm,Solar,7,1176,1,5.2,5200,2013,2038
+65,Land At Potash Farm,Solar,7,1184,1,7.0,7000,2013,2038
+66,Land at Upper Clayhill Farm,Solar,7,1198,1,4.9,4900,2015,2040
+67,Towerbrook Farm (Banwell Solar Farm),Solar,7,1203,1,7.2,7200,2015,2040
+68,Twin Elm Solar Farm,Solar,7,1208,1,1.0,1000,2012,2037
+69,Hardingham Solar Farm,Solar,7,1223,1,14.8,14800,2014,2039
+70,Hollamoor Farm (PV),Solar,7,1226,1,2.0,2000,2013,2038
+71,Langlands Solar Farm,Solar,7,1229,1,2.1,2100,2013,2038
+72,Langunnett Solar Farm,Solar,7,1230,1,6.2,6200,2013,2038
+73,Manston Solar Farm,Solar,7,1232,1,9.9,9900,2013,2038
+74,Marsh House Solar Park,Solar,7,1233,1,5.5,5500,2015,2040
+75,Morrisons roof mounted solar,Solar,7,1237,1,2.0,2000,2013,2038
+76,Rickfield Farm solar park,Solar,7,1240,1,1.0,1000,2014,2039
+77,Tump Solar Farm,Solar,7,1243,1,5.0,5000,2017,2042
+78,West Farm (Solar),Solar,7,1244,1,7.7,7700,2013,2038
+79,Owls Lodge Farm,Solar,7,1247,1,5.0,5000,2013,2038
+80,Beckley Solar Farm,Solar,7,1252,1,1.7,1700,2012,2037
+81,Oakham Farm,Solar,7,1269,1,8.0,8000,2016,2041
+82,Limberlost Farm,Solar,7,1272,1,1.5,1500,2013,2038
+83,Office Field,Solar,7,1273,1,7.2,7200,2013,2038
+84,Sandys Moor Road,Solar,7,1274,1,2.9,2900,2013,2038
+85,Skylark Meadow Solar park,Solar,7,1275,1,5.0,5000,2013,2038
+86,Aldi Distribution Centre - Darlington,Solar,7,1278,1,1.2,1200,2014,2039
+87,Bishops Sutton,Solar,7,1282,1,12.0,12000,2014,2039
+88,Blackawton Solar Farm,Solar,7,1283,1,3.0,3000,2014,2039
+89,BMW UK Manufacturing Ltd,Solar,7,1284,1,3.0,3000,2014,2039
+90,Land to the East of Burton Lane,Solar,7,1285,1,2.6,2600,2016,2041
+91,Land west of Hawkspur Green (Hill Hall Solar),Solar,7,1292,1,4.9,4900,2016,2041
+92,Kingspan Insulation Solar Installation,Solar,7,1294,1,5.0,5000,2014,2039
+93,Langley Hall Farm,Solar,7,1298,1,2.4,2400,2014,2039
+94,Pond Farm,Solar,7,1299,1,3.6,3600,2014,2039
+95,Nether Mill Farm (resubmission),Solar,7,1303,1,3.1,3100,2014,2039
+96,NEWNTON DAIRY FARM,Solar,7,1304,1,7.2,7200,2014,2039
+97,Pierces Farm - resubmission,Solar,7,1306,1,1.7,1700,2015,2040
+98,Rew Farm Solar Farm,Solar,7,1308,1,6.1,6100,2014,2039
+99,Westbury (Closed) Landfill Site,Solar,7,1314,1,3.5,3500,2014,2039
+100,Wiggin Hill Solar Farm - Phase 2,Solar,7,1315,1,4.1,4100,2015,2040
+101,Grain Harvesters Ltd,Solar,7,1320,1,1.0,1000,2014,2039
+102,Hyde Farm,Solar,7,1322,1,10.8,10800,2014,2039
+103,St Francis Farm,Solar,7,1324,1,4.0,4000,2015,2040
+104,Bishop?s Waltham Solar Farm,Solar,7,1325,1,12.0,12000,2017,2042
+105,Nova Scotia Farm solar park,Solar,7,1328,1,13.9,13900,2014,2039
+106,"Hall Farm, East Beckham",Solar,7,1329,1,10.2,10200,2014,2039
+107,Cefn Betingau Farm,Solar,7,1330,1,9.0,9000,2014,2039
+108,Hill Farm Solar Park (VoWH),Solar,7,1331,1,14.8,14800,2014,2039
+109,Wix Lodge,Solar,7,1332,1,18.7,18700,2014,2039
+110,Saxley Farm,Solar,7,1333,1,5.0,5000,2014,2039
+111,Snarlton Farm (Melksham solar farm),Solar,7,1335,1,49.6,49600,2016,2041
+112,Lackford Estate Solar Park,Solar,7,1338,1,20.9,20900,2014,2039
+113,Colpmans Farm,Solar,7,1339,1,5.0,5000,2012,2037
+114,Porvair International Ltd,Solar,7,1340,1,1.8,1800,2012,2037
+115,Willsland Solar farm,Solar,7,1341,1,3.2,3200,2013,2038
+116,Frying Down Copse Solar Farm,Solar,7,1342,1,5.0,5000,2012,2037
+117,Wilmingham Lane Solar Farm,Solar,7,1343,1,7.0,7000,2013,2038
+118,Chilton Cantelo Solar Farm,Solar,7,1344,1,5.0,5000,2013,2038
+119,Beaford Brook Solar Park,Solar,7,1346,1,5.2,5200,2013,2038
+120,Hayford Farm,Solar,7,1348,1,8.9,8900,2014,2039
+121,Halse Farm,Solar,7,1349,1,8.2,8200,2013,2038
+122,STRETE FARM SOLAR FARM,Solar,7,1352,1,4.8,4800,2013,2038
+123,Tregassow Farm - Solar Modules,Solar,7,1353,1,6.0,6000,2013,2038
+124,Higher Hatherleigh Solar Farm extension,Solar,7,1355,1,1.5,1500,2013,2038
+125,Pont Andrew Solar Farm,Solar,7,1356,1,1.5,1500,2012,2037
+126,Cairnhill Farm solar park,Solar,7,1358,1,2.4,2400,2015,2040
+127,Manston Solar Farm extension (Westwood),Solar,7,1359,1,9.2,9200,2014,2039
+128,Newlands Farm Solar - resubmission,Solar,7,1362,1,20.5,20500,2014,2039
+129,Fen Road,Solar,7,1367,1,1.4,1400,2014,2039
+130,Long Meadow Farm,Solar,7,1374,1,4.1,4100,2015,2040
+131,Liverton Farm,Solar,7,1380,1,4.8,4800,2015,2040
+132,Home Farm (Knowlton - solar),Solar,7,1382,1,11.5,11500,2014,2039
+133,Lake Farm,Solar,7,1384,1,5.0,5000,2011,2036
+134,Parkhouse Corner (Orta Solar),Solar,7,1385,1,6.6,6600,2013,2038
+135,Sandhill Solar Park,Solar,7,1386,1,2.0,2000,2011,2036
+136,Mingay Farm,Solar,7,1387,1,5.0,5000,2011,2036
+137,Jordanston Solar Farm,Solar,7,1388,1,5.0,5000,2013,2038
+138,Aldi Distribution Centre - Neston,Solar,7,1390,1,1.2,1200,2014,2039
+139,Rodbourne Rail Farm - Solar Park,Solar,7,1394,1,7.6,7600,2013,2038
+140,Barnby Moor,Solar,7,1404,1,4.0,4000,2015,2040
+141,Knockworthy Farm,Solar,7,1416,1,3.5,3500,2013,2038
+142,"Raglington Farm, Botley Road, Shedfield, Southampton, Hampshire",Solar,7,1418,1,5.8,5800,2013,2038
+143,Stables Farm,Solar,7,1421,1,1.5,1500,2012,2037
+144,Luson Farm,Solar,7,1423,1,1.9,1900,2013,2038
+145,Kellygreen Farm,Solar,7,1428,1,4.0,4000,2016,2041
+146,Grove Farm (solar),Solar,7,1429,1,3.5,3500,2015,2040
+147,Marston Solar Farm,Solar,7,1433,1,4.9,4900,2011,2036
+148,Tredown Solar Farm,Solar,7,1435,1,1.2,1200,2013,2038
+149,Slaughtergate Farm,Solar,7,1439,1,1.8,1800,2013,2038
+150,Kia Ora Farm,Solar,7,1441,1,1.8,1800,2013,2038
+151,Ellicombe Farm,Solar,7,1442,1,1.4,1400,2013,2038
+152,Southcombe Farm,Solar,7,1443,1,1.2,1200,2013,2038
+153,West Bradley Farm,Solar,7,1445,1,1.5,1500,2012,2037
+154,Whiddon Farm,Solar,7,1446,1,1.0,1000,2013,2038
+155,Lovedean Farm,Solar,7,1449,1,4.5,4500,2013,2038
+156,Higher Knapp Farm,Solar,7,1450,1,1.5,1500,2013,2038
+157,Park Farm,Solar,7,1453,1,4.0,4000,2013,2038
+158,Dunkeswell Airfield,Solar,7,1454,1,2.0,2000,2015,2040
+159,Langenhoe Solar Farm,Solar,7,1463,1,21.3,21300,2015,2040
+160,Kentishes Solar Farm ,Solar,7,1464,1,5.0,5000,2016,2041
+161,Marley Thatch Solar Farm,Solar,7,1467,1,6.3,6300,2013,2038
+162,Newlands Farm (East Devon),Solar,7,1468,1,5.0,5000,2013,2038
+163,Goldthorpe,Solar,7,1473,1,1.5,1500,2014,2039
+164,Barley Wood Farm Lane (Gaston Lane - resubmission),Solar,7,1474,1,5.4,5400,2015,2040
+165,Battens Farm Solar Park,Solar,7,1476,1,11.0,11000,2014,2039
+166,Combermere Abbey,Solar,7,1478,1,14.0,14000,2015,2040
+167,Foxburrow Farm,Solar,7,1480,1,8.0,8000,2014,2039
+168,Great Houndbeare Farm,Solar,7,1484,1,10.0,10000,2017,2042
+169,Condover (Green Farm),Solar,7,1485,1,10.2,10200,2015,2040
+170,Hurst Farm,Solar,7,1489,1,5.0,5000,2014,2039
+171,Ikea Distribution Centre - resubmission,Solar,7,1490,1,1.7,1700,2015,2040
+172,Jaguar Land Rover ,Solar,7,1491,1,5.8,5800,2014,2039
+173,Leverton Ings,Solar,7,1494,1,12.0,12000,2014,2039
+174,Little Morton Solar Farm,Solar,7,1497,1,14.3,14300,2014,2039
+175,Lodge Farm - Orston,Solar,7,1498,1,12.4,12400,2014,2039
+176,Lowther Farms,Solar,7,1500,1,1.8,1800,2014,2039
+177,Mackies Dairy PV,Solar,7,1501,1,1.8,1800,2015,2040
+178,Mingay Farm - extension,Solar,7,1502,1,19.3,19300,2014,2039
+179,Redcourt Farm,Solar,7,1503,1,3.3,3300,2015,2040
+180,Sowerby Lodge Farm,Solar,7,1506,1,5.0,5000,2018,2043
+181,Stone Hill,Solar,7,1507,1,2.6,2600,2014,2039
+182,Taunton Racecourse,Solar,7,1509,1,1.5,1500,2015,2040
+183,The Stables,Solar,7,1510,1,1.8,1800,2014,2039
+184,Vantage Point,Solar,7,1513,1,1.4,1400,2011,2036
+185,Wilsom Farm,Solar,7,1515,1,11.0,11000,2016,2041
+186,Woodlands Farm Solar Park,Solar,7,1516,1,10.0,10000,2015,2040
+187,Bowerhouse Farm,Solar,7,1518,1,8.3,8300,2015,2040
+188,Brickyard Barn (resubmission),Solar,7,1519,1,4.1,4100,2014,2039
+189,Bronwylfa Reservoir,Solar,7,1520,1,3.0,3000,2015,2040
+190,Land At Court Farm,Solar,7,1521,1,2.2,2200,2016,2041
+191,Crapnell Farm Solar Farm,Solar,7,1522,1,5.4,5400,2014,2039
+192,Danes Farm - extension,Solar,7,1525,1,10.5,10500,2016,2041
+193,Ellough Airfield (Resubmission),Solar,7,1527,1,13.2,13200,2014,2039
+194,Ermine Street Farm solar park,Solar,7,1528,1,32.5,32500,2014,2039
+195,Eynsham Solar Farm,Solar,7,1529,1,13.2,13200,2014,2039
+196,Ford Farm (Ashurst),Solar,7,1531,1,10.0,10000,2016,2041
+197,Priors Byne Farm,Solar,7,1536,1,7.6,7600,2016,2041
+198,Scottow Moor - RAF Coltishall Solar Farm (Phase 1),Solar,7,1537,1,32.0,32000,2015,2040
+199,Owls Lodge Farm Extension,Solar,7,1538,1,5.0,5000,2013,2038
+200,Hawksland Solar,Solar,7,1540,1,3.1,3100,2013,2038
+201,Middle Treworder Farm,Solar,7,1541,1,5.0,5000,2013,2038
+202,Black Bush Farm,Solar,7,1542,1,2.7,2700,2014,2039
+203,Goonhilly Downs - PV,Solar,7,1543,1,4.5,4500,2014,2039
+204,Higher Tregarne Solar Farm,Solar,7,1544,1,5.0,5000,2013,2038
+205,Causilgey Solar Farm,Solar,7,1545,1,5.0,5000,2013,2038
+206,Ninnis Farm Solar,Solar,7,1546,1,5.0,5000,2013,2038
+207,Trelow Farm,Solar,7,1547,1,1.6,1600,2012,2037
+208,Hewas Solar Farm,Solar,7,1548,1,5.0,5000,2013,2038
+209,Great Knowle Farm Solar,Solar,7,1549,1,3.0,3000,2012,2037
+210,Airfield Farm PV,Solar,7,1550,1,5.0,5000,2012,2037
+211,Lower Bodiniel Farm,Solar,7,1551,1,5.0,5000,2012,2037
+212,Shelswell Park Solar Farm,Solar,7,1552,1,5.0,5000,2013,2038
+213,Chittering Solar Farm,Solar,7,1553,1,5.0,5000,2012,2037
+214,Kernow Solar Farm,Solar,7,1554,1,5.0,5000,2012,2037
+215,Limes Farm Solar Farm,Solar,7,1555,1,4.6,4600,2013,2038
+216,Bratton Fleming Solar Farm,Solar,7,1557,1,5.0,5000,2013,2038
+217,Lee Farm,Solar,7,1558,1,5.0,5000,2012,2037
+218,Woodlands Barton Solar Farm,Solar,7,1560,1,4.9,4900,2013,2038
+219,Winsdon Farm,Solar,7,1561,1,5.0,5000,2014,2039
+220,The Manor of Cadland Estate,Solar,7,1562,1,5.0,5000,2012,2037
+221,Trenouth Farm,Solar,7,1563,1,3.6,3600,2012,2037
+222,Callington Solar Farm,Solar,7,1564,1,6.4,6400,2014,2039
+223,St Columb Major Solar Farm,Solar,7,1566,1,7.0,7000,2014,2039
+224,Crossways Pit Solar Farm,Solar,7,1567,1,5.0,5000,2013,2038
+225,Ayshford Court Farm,Solar,7,1569,1,5.0,5000,2013,2038
+226,Andover Solar Farm,Solar,7,1570,1,5.0,5000,2013,2038
+227,Oving Solar Farm,Solar,7,1571,1,5.0,5000,2012,2037
+228,Grange Farm (Cornwall),Solar,7,1572,1,5.0,5000,2013,2038
+229,Shipton Bellinger - Park House Corner Solar Farm,Solar,7,1573,1,5.4,5400,2013,2038
+230,Wyld Meadow Solar Farm,Solar,7,1574,1,4.8,4800,2012,2037
+231,Shooters Bottom Solar Park,Solar,7,1575,1,7.0,7000,2014,2039
+232,Goldenhaye Field Solar Farm,Solar,7,1576,1,2.0,2000,2013,2038
+233,Clearwell Farm - solar,Solar,7,1577,1,2.0,2000,2015,2040
+234,Danes Farm,Solar,7,1578,1,3.3,3300,2011,2036
+235,Langstone Court Road Solar Farm,Solar,7,1580,1,2.5,2500,2013,2038
+236,Five Oaks Solar Farm,Solar,7,1581,1,5.0,5000,2011,2036
+237,Culworth House Solar Farm,Solar,7,1582,1,3.0,3000,2015,2040
+238,Warleigh Barton Solar Farm,Solar,7,1583,1,5.0,5000,2013,2038
+239,Trenoweth Solar Farm,Solar,7,1584,1,2.5,2500,2013,2038
+240,Wymeswold Airfield,Solar,7,1585,1,34.0,34000,2013,2038
+241,Higher Hatherleigh Solar Farm,Solar,7,1586,1,3.5,3500,2013,2038
+242,Barton Solar Farm,Solar,7,1587,1,1.2,1200,2012,2037
+243,Clann Solar Farm,Solar,7,1588,1,1.4,1400,2014,2039
+244,Dolmans Hill (Redbridge Farm) Solar Arrays,Solar,7,1589,1,5.0,5000,2014,2039
+245,North Norfolk Business Centre Solar Park,Solar,7,1590,1,11.0,11000,2014,2039
+246,Horsacott Farm Solar Park,Solar,7,1591,1,6.4,6400,2013,2038
+247,Broxted Solar Farm (Stradishall Airfield),Solar,7,1592,1,31.6,31600,2014,2039
+248,Pentylands Farm,Solar,7,1593,1,19.0,19000,2014,2039
+249,Trefinnick Farm,Solar,7,1594,1,5.0,5000,2013,2038
+250,Four Burrows Solar farm,Solar,7,1595,1,7.2,7200,2015,2040
+251,Rudbaxton Solar Park,Solar,7,1598,1,10.8,10800,2014,2039
+252,Hope Solar Farm,Solar,7,1601,1,7.3,7300,2014,2039
+253,Culmhead Solar Farm (Resubmission),Solar,7,1603,1,7.5,7500,2014,2039
+254,Wheal Alfred Road Solar Farm,Solar,7,1604,1,3.5,3500,2013,2038
+255,Blatchworthy Farm,Solar,7,1605,1,1.5,1500,2013,2038
+256,Parsonage Barn (extension),Solar,7,1606,1,7.6,7600,2013,2038
+257,BIOSSENCE SOLAR PARK,Solar,7,1607,1,4.5,4500,2011,2036
+258,HENDRA HOLIDAY PARK SOLAR FARM,Solar,7,1609,1,1.2,1200,2011,2036
+259,EASTACOMBE SOLAR FARM,Solar,7,1610,1,3.6,3600,2012,2037
+260,Wrexham Social Housing PV,Solar,7,1612,1,5.4,5400,2012,2037
+261,Sainsbury's Stores (169 individual Stores),Solar,7,1613,1,16.0,16000,2012,2037
+262,Creathorne Farm  - Solar Farm,Solar,7,1614,1,1.8,1800,2014,2039
+263,First Wessex Housing Properties (multiple),Solar,7,1616,1,1.0,1000,2015,2040
+264,Higher Pirzwell Solar Farm,Solar,7,1617,1,1.2,1200,2012,2037
+265,Broadgate Solar Farm,Solar,7,1618,1,1.1,1100,2012,2037
+266,CRAYSMARSH SOLAR FARM,Solar,7,1619,1,1.8,1800,2012,2037
+267,SOLAR PARK - WHITCHURCH FARM,Solar,7,1620,1,6.5,6500,2014,2039
+268,THE HOLLIES SOLAR PARK - SKEGNESS,Solar,7,1622,1,8.6,8600,2013,2038
+269,AMBLESTON SOLAR PANELS,Solar,7,1623,1,6.0,6000,2012,2037
+270,Ford Farm Solar Farm,Solar,7,1626,1,5.0,5000,2013,2038
+271,Canworthy Water,Solar,7,1630,1,41.0,41000,2014,2039
+272,Foxcombe Farm Solar Park,Solar,7,1631,1,5.0,5000,2013,2038
+273,Liddeston Ridge Solar Park (Milford Haven),Solar,7,1634,1,5.0,5000,2014,2039
+274,Bodwen Solar Park,Solar,7,1639,1,5.5,5500,2017,2042
+275,Treswarrow Solar Park,Solar,7,1641,1,6.5,6500,2015,2040
+276,Carnemough Farm Solar Park,Solar,7,1642,1,7.0,7000,2016,2041
+277,Aller Court Farm Solar Park,Solar,7,1646,1,5.0,5000,2017,2042
+278,Derriton Fields Solar Farm,Solar,7,1648,1,11.8,11800,2014,2039
+279,Cleave Farm Solar Park,Solar,7,1649,1,4.7,4700,2013,2038
+280,Four Burrows Farm  (Extension 2),Solar,7,1655,1,6.3,6300,2014,2039
+281,Chelworth Industrial Estate Solar Park,Solar,7,1656,1,1.0,1000,2014,2039
+282,Drapers Farm Solar Park,Solar,7,1658,1,6.0,6000,2014,2039
+283,Week Farm Solar Park,Solar,7,1659,1,3.3,3300,2014,2039
+284,Langton Farm Solar park,Solar,7,1661,1,4.4,4400,2015,2040
+285,Says Court Farm solar park,Solar,7,1663,1,19.8,19800,2014,2039
+286,Ketton solar farm,Solar,7,1667,1,9.0,9000,2014,2039
+287,The Manor of Cadland Estate - extension,Solar,7,1669,1,3.0,3000,2014,2039
+288,Rowles Farm solar park,Solar,7,1671,1,13.0,13000,2015,2040
+289,Ryston Estate Solar Park,Solar,7,1672,1,4.8,4800,2015,2040
+290,Reaches Farm Solar Park,Solar,7,1673,1,6.1,6100,2014,2039
+291,Watchfield Lawn,Solar,7,1681,1,10.2,10200,2014,2039
+292,Witches Solar Farm,Solar,7,1699,1,5.0,5000,2013,2038
+293,Burntstalk Solar Park,Solar,7,1713,1,11.5,11500,2013,2038
+294,Claypit Moor Solar Farm (Lexham),Solar,7,1714,1,7.9,7900,2013,2038
+295,Holton Airfield,Solar,7,1715,1,11.0,11000,2013,2038
+296,Goose Willow Farm,Solar,7,1716,1,11.5,11500,2013,2038
+297,Chediston Hall Solar Park,Solar,7,1717,1,12.3,12300,2013,2038
+298,Burthy Farm,Solar,7,1718,1,10.0,10000,2015,2040
+299,Caeremlyn Solar Farm,Solar,7,1719,1,18.0,18000,2014,2039
+300,Hazard Farm,Solar,7,1720,1,6.4,6400,2014,2039
+301,Home Farm (Merton - solar),Solar,7,1721,1,18.3,18300,2013,2038
+302,Rudge Hill Farm,Solar,7,1723,1,1.5,1500,2013,2038
+303,Sevor Farm,Solar,7,1724,1,9.3,9300,2013,2038
+304,Marsh Farm,Solar,7,1725,1,14.0,14000,2014,2039
+305,Four Burrows Solar farm (Extension 1),Solar,7,1726,1,1.5,1500,2014,2039
+306,Old Rides solar Farm,Solar,7,1727,1,8.0,8000,2014,2039
+307,Parabel North Beer Solar Farm,Solar,7,1728,1,6.8,6800,2013,2038
+308,Crockers Hele,Solar,7,1729,1,1.3,1300,2013,2038
+309,Bentley Motors Ltd 1,Solar,7,1730,1,5.1,5100,2013,2038
+310,Northwick Estate (Extension),Solar,7,1731,1,2.2,2200,2013,2038
+311,North Of Field Barn,Solar,7,1732,1,1.0,1000,2014,2039
+312,Wroughton Airfield Solar Park,Solar,7,1735,1,50.0,50000,2016,2041
+313,Forest Heath Solar Farm,Solar,7,1736,1,5.0,5000,2014,2039
+314,Abbey Farm,Solar,7,1737,1,9.0,9000,2014,2039
+315,Land at Soho Farm,Solar,7,1743,1,1.5,1500,2014,2039
+316,Land South West Of Apollo Business Park,Solar,7,1744,1,1.7,1700,2014,2039
+317,Manor Farm (Monmouthshire),Solar,7,1746,1,10.5,10500,2016,2041
+318,Land at Mill Farm,Solar,7,1747,1,1.0,1000,2013,2038
+319,Land at East Farm,Solar,7,1748,1,6.8,6800,2013,2038
+320,New Rendy Farm,Solar,7,1750,1,4.8,4800,2013,2038
+321,Reydon Farm (resubmission),Solar,7,1751,1,3.9,3900,2015,2040
+322,Copley Farm,Solar,7,1752,1,30.0,30000,2016,2041
+323,Ellough Airfield (Ellough 2 extension),Solar,7,1753,1,10.0,10000,2016,2041
+324,Nanteague Farm,Solar,7,1754,1,7.7,7700,2015,2040
+325,Grange Farm (Burton Pedwardine),Solar,7,1755,1,15.0,15000,2014,2039
+326,Wheat Leasows Solar Park,Solar,7,1756,1,4.0,4000,2014,2039
+327,Honington Solar Farm,Solar,7,1757,1,13.6,13600,2014,2039
+328,Hill Farm Solar Park,Solar,7,1758,1,10.2,10200,2014,2039
+329,Homeland Solar Farm,Solar,7,1761,1,13.2,13200,2014,2039
+330,East Fairlee,Solar,7,1762,1,7.3,7300,2015,2040
+331,Fairwind Farm,Solar,7,1763,1,10.0,10000,2014,2039
+332,Redlands Farm,Solar,7,1764,1,6.2,6200,2015,2040
+333,Fenton Home Farm,Solar,7,1765,1,31.3,31300,2014,2039
+334,Abbots Ripton Solar Farm,Solar,7,1766,1,24.7,24700,2014,2039
+335,South Lees Farm,Solar,7,1767,1,11.0,11000,2014,2039
+336,Southwick Estate,Solar,7,1768,1,48.0,48000,2015,2040
+337,Waterloo solar park,Solar,7,1769,1,14.6,14600,2015,2040
+338,Ketton solar farm - phase 2,Solar,7,1772,1,3.0,3000,2015,2040
+339,Oak Cottage,Solar,7,1774,1,4.9,4900,2015,2040
+340,Sycamore Farm,Solar,7,1775,1,20.0,20000,2014,2039
+341,North Wayton Farm,Solar,7,1776,1,5.0,5000,2014,2039
+342,South Creake Solar Farm,Solar,7,1777,1,26.0,26000,2016,2041
+343,Pen Y Cae solar farm,Solar,7,1781,1,6.9,6900,2015,2040
+344,Rose And Crown Farm,Solar,7,1783,1,30.0,30000,2016,2041
+345,Wickfield Farm,Solar,7,1784,1,5.0,5000,2017,2042
+346,Rookery Farm,Solar,7,1785,1,3.8,3800,2015,2040
+347,Seaview Farm,Solar,7,1787,1,1.7,1700,2016,2041
+348,Chelveston Airfield - extension,Solar,7,1788,1,3.5,3500,2014,2039
+349,Huddlesford Farm,Solar,7,1804,1,1.0,1000,2016,2041
+350,Park Lane,Solar,7,1806,1,1.0,1000,2016,2041
+351,Gypsom Solar Farm,Solar,7,1811,1,5.0,5000,2017,2042
+352,Polmaugan Farm,Solar,7,1813,1,5.0,5000,2014,2039
+353,Land at Gilley's Mill Dam,Solar,7,1815,1,5.0,5000,2016,2041
+354,East Lenham Solar Farm,Solar,7,1816,1,6.6,6600,2014,2039
+355,Steventon Solar Park,Solar,7,1817,1,10.0,10000,2014,2039
+356,Westwood Farm Solar Park,Solar,7,1818,1,5.1,5100,2015,2040
+357,Meadow Farm solar park,Solar,7,1820,1,6.0,6000,2014,2039
+358,Sutton Mawr Farm,Solar,7,1823,1,7.5,7500,2014,2039
+359,Carloggas Farm Solar Park,Solar,7,1824,1,8.3,8300,2015,2040
+360,Lincoln Farm,Solar,7,1826,1,11.4,11400,2016,2041
+361,Llwyn Du Solar Farm,Solar,7,1827,1,8.0,8000,2015,2040
+362,West Hill Farm (solar),Solar,7,1828,1,7.3,7300,2014,2039
+363,Elms Farm,Solar,7,1832,1,29.0,29000,2015,2040
+364,Rock Farm / Goldborough Farm (Rookwood),Solar,7,1834,1,5.0,5000,2015,2040
+365,Great Wilbraham Solar Farm,Solar,7,1835,1,38.1,38100,2015,2040
+366,Somerton Door Farm,Solar,7,1836,1,8.7,8700,2015,2040
+367,Barugh Farm,Solar,7,1838,1,5.0,5000,2016,2041
+368,Lains Farm,Solar,7,1840,1,5.0,5000,2016,2041
+369,Great Seabrook Farm,Solar,7,1842,1,5.0,5000,2015,2040
+370,Cotgrave solar farm,Solar,7,1843,1,4.9,4900,2015,2040
+371,Parkview solar park,Solar,7,1846,1,6.5,6500,2015,2040
+372,Overton,Solar,7,1848,1,4.0,4000,2015,2040
+373,Lower Basset Down Farm,Solar,7,1850,1,10.5,10500,2016,2041
+374,Morfa Farm,Solar,7,1862,1,2.0,2000,2016,2041
+375,Barton Close Farm,Solar,7,1864,1,5.5,5500,2016,2041
+376,Wiggin Hill Solar Farm - Phase 1,Solar,7,1865,1,6.8,6800,2015,2040
+377,Wilton Farm (pv),Solar,7,1872,1,9.5,9500,2015,2040
+378,Canada Farm,Solar,7,1874,1,8.3,8300,2014,2039
+379,Hoback Farm,Solar,7,1875,1,13.1,13100,2014,2039
+380,The Rainbows Solar Farm,Solar,7,1876,1,4.0,4000,2014,2039
+381,Salcey Solar Farm,Solar,7,1878,1,5.0,5000,2014,2039
+382,Hillsmoor Solar Farm,Solar,7,1884,1,1.2,1200,2017,2042
+383,Desford Solar Farm,Solar,7,1885,1,5.0,5000,2016,2041
+384,Iwood Lane Solar Farm,Solar,7,1886,1,8.0,8000,2014,2039
+385,Playters Solar Farm,Solar,7,1889,1,8.6,8600,2016,2041
+386,Bypass Nurseries Solar Farm,Solar,7,1890,1,3.3,3300,2014,2039
+387,Warrington Home Solar Scheme,Solar,7,1892,1,5.3,5300,2016,2041
+388,Babergh Home Solar Scheme,Solar,7,1893,1,2.8,2800,2016,2041
+389,Mid Suffolk Home Solar Scheme,Solar,7,1894,1,4.8,4800,2016,2041
+390,Garn Solar Farm,Solar,7,1895,1,7.4,7400,2014,2039
+391,Trethosa Farm Solar Park,Solar,7,1896,1,4.8,4800,2015,2040
+392,Garvinack Farm Solar Park,Solar,7,1897,1,7.0,7000,2015,2040
+393,Caswell Farm Solar Park,Solar,7,1898,1,6.7,6700,2016,2041
+394,Epwell Grounds Farm solar park,Solar,7,1899,1,7.0,7000,2014,2039
+395,Pant-Y-Moch Farm,Solar,7,1900,1,5.0,5000,2016,2041
+396,Woolbridge Solar Park,Solar,7,1902,1,5.0,5000,2014,2039
+397,Tengore Lane - resubmission,Solar,7,1903,1,3.6,3600,2015,2040
+398,Manor Farm (Dorset),Solar,7,1904,1,5.0,5000,2014,2039
+399,Hadlow Place solar farm,Solar,7,1905,1,14.3,14300,2015,2040
+400,Bassingbourn Solar Farm,Solar,7,1906,1,14.4,14400,2015,2040
+401,Lower Pennington Farm,Solar,7,1907,1,2.7,2700,2014,2039
+402,Goose Willow Farm - extension,Solar,7,1908,1,7.0,7000,2014,2039
+403,Avenue Farm,Solar,7,1909,1,7.3,7300,2015,2040
+404,Sywell Road,Solar,7,1910,1,5.0,5000,2017,2042
+405,Gosfield Airfield,Solar,7,1912,1,12.6,12600,2015,2040
+406,Exning,Solar,7,1913,1,29.9,29900,2015,2040
+407,Grange Farm (Avon),Solar,7,1914,1,21.0,21000,2014,2039
+408,Land at East Farm - extension,Solar,7,1915,1,6.0,6000,2016,2041
+409,Laughton Level,Solar,7,1918,1,7.0,7000,2015,2040
+410,Croydon / Church Farm (Royston),Solar,7,1919,1,16.5,16500,2015,2040
+411,Hadley Farm (Orta Membury Solar Farm),Solar,7,1920,1,17.0,17000,2015,2040
+412,Manor Farm (Wiltshire) - resubmission,Solar,7,1923,1,6.3,6300,2015,2040
+413,Tonge Corner Farm,Solar,7,1924,1,22.0,22000,2016,2041
+414,Oaklands Farm - resubmission,Solar,7,1925,1,6.9,6900,2015,2040
+415,North East of Ainderby Steeple,Solar,7,1927,1,5.9,5900,2017,2042
+416,Errol Estate,Solar,7,1930,1,13.0,13000,2016,2041
+417,Grange Farm,Solar,7,1931,1,6.0,6000,2015,2040
+418,Wraysbury Landfill,Solar,7,1938,1,4.8,4800,2017,2042
+419,Wisbridge Farm,Solar,7,1940,1,9.3,9300,2014,2039
+420,Caddington Solar Farm (Phase 1),Solar,7,1942,1,3.0,3000,2014,2039
+421,Capeland Farm,Solar,7,1943,1,8.3,8300,2015,2040
+422,Castle Combe Circuit,Solar,7,1944,1,12.0,12000,2015,2040
+423,Castle Eaton Farm,Solar,7,1945,1,17.8,17800,2014,2039
+424,Chancery Farm (Ardleigh),Solar,7,1946,1,11.9,11900,2016,2041
+425,Clapham solar farm,Solar,7,1947,1,7.5,7500,2016,2041
+426,Chelveston Airfield,Solar,7,1949,1,16.0,16000,2014,2039
+427,Chisbon Solar Farm (Frowick Lane),Solar,7,1950,1,13.0,13000,2015,2040
+428,Clawdd Ddu PV,Solar,7,1951,1,13.5,13500,2014,2039
+429,Congresbury Solar Farm,Solar,7,1952,1,7.1,7100,2015,2040
+430,Abergelli Glas Solar Farm,Solar,7,1953,1,7.7,7700,2015,2040
+431,Anthony Estate Solar Farm - resubmission,Solar,7,1954,1,4.7,4700,2015,2040
+432,Aston House Solar Farm,Solar,7,1955,1,20.0,20000,2015,2040
+433,Bakers Farm (solar),Solar,7,1957,1,12.0,12000,2015,2040
+434,Balls Wood Solar Farm,Solar,7,1958,1,8.7,8700,2015,2040
+435,Barn Farm - resubmission,Solar,7,1959,1,4.2,4200,2015,2040
+436,Bay Farm,Solar,7,1961,1,8.1,8100,2014,2039
+437,Berwick solar farm,Solar,7,1963,1,8.2,8200,2015,2040
+438,Bidwell Solar Farm - resubmission,Solar,7,1964,1,5.0,5000,2015,2040
+439,Bilsham Farm,Solar,7,1966,1,14.5,14500,2014,2039
+440,Blackwell Grange Solar Farm,Solar,7,1968,1,5.0,5000,2017,2042
+441,Blenches Mill,Solar,7,1969,1,6.1,6100,2014,2039
+442,Bobbing solar farm,Solar,7,1970,1,11.3,11300,2016,2041
+443,Bodmin 2 Solar Farm,Solar,7,1971,1,5.3,5300,2015,2040
+444,Bottom Plain,Solar,7,1973,1,10.0,10000,2014,2039
+445,Braydon Manor Farm,Solar,7,1974,1,8.7,8700,2016,2041
+446,Brynwhilach solar park,Solar,7,1975,1,5.0,5000,2017,2042
+447,Bulls Head Farm North,Solar,7,1976,1,4.7,4700,2014,2039
+448,Burrowton Farm,Solar,7,1978,1,5.0,5000,2016,2041
+449,Ebbsfleet Solar Farm,Solar,7,1981,1,5.0,5000,2014,2039
+450,Court Colman solar park,Solar,7,1982,1,15.0,15000,2015,2040
+451,Cowdown Lane,Solar,7,1983,1,40.0,40000,2016,2041
+452,Crannaford Solar Farm,Solar,7,1984,1,12.5,12500,2014,2039
+453,Cwmcaesingrug Farm,Solar,7,1985,1,10.0,10000,2015,2040
+454,Decoy Farm House Solar Modules,Solar,7,1987,1,6.0,6000,2014,2039
+455,Hadley Solar Farm,Solar,7,1990,1,6.6,6600,2015,2040
+456,Hall Farm Solar Farm (Newbold Verdon),Solar,7,1991,1,5.0,5000,2015,2040
+457,Hammond Court Farm,Solar,7,1992,1,15.0,15000,2015,2040
+458,Hatch Penn Farm PV,Solar,7,1994,1,1.0,1000,2014,2039
+459,Hayford Farm - extension,Solar,7,1995,1,8.2,8200,2015,2040
+460,High Penn Solar Park,Solar,7,1998,1,9.6,9600,2014,2039
+461,Highfields Farm (Braintree),Solar,7,1999,1,2.8,2800,2014,2039
+462,Highfields Farm (Colchester),Solar,7,2000,1,12.2,12200,2014,2039
+463,Hill End Farm,Solar,7,2001,1,2.8,2800,2014,2039
+464,Holwell Hill,Solar,7,2004,1,6.0,6000,2016,2041
+465,Hook Valley Solar Park,Solar,7,2005,1,17.0,17000,2014,2039
+466,Partridge Farm,Solar,7,2006,1,10.6,10600,2016,2041
+467,Aspatria,Solar,7,2007,1,19.0,19000,2015,2040
+468,Penare Farm Solar Farm,Solar,7,2008,1,11.0,11000,2014,2039
+469,Pencoose Farm,Solar,7,2009,1,8.5,8500,2015,2040
+470,Pensipple Farm,Solar,7,2010,1,5.0,5000,2014,2039
+471,Pingewood Road South,Solar,7,2011,1,15.8,15800,2015,2040
+472,Pingry Farm - Phase 1,Solar,7,2012,1,3.4,3400,2014,2039
+473,Pitworthy Farm Solar Park,Solar,7,2013,1,15.6,15600,2014,2039
+474,Primrose Hill Farm,Solar,7,2014,1,3.7,3700,2015,2040
+475,Pyde Drove,Solar,7,2015,1,7.0,7000,2014,2039
+476,Race farm,Solar,7,2016,1,6.1,6100,2014,2039
+477,Radcliffe Solar Farm,Solar,7,2017,1,4.2,4200,2015,2040
+478,Redhall Industrial Estate,Solar,7,2019,1,5.0,5000,2014,2039
+479,Ring O Bells Farm,Solar,7,2020,1,5.0,5000,2016,2041
+480,Roanhead Farm,Solar,7,2021,1,6.5,6500,2015,2040
+481,Rotherdale Farm - extension,Solar,7,2022,1,9.0,9000,2015,2040
+482,Roundponds Farm Solar Park,Solar,7,2023,1,13.5,13500,2015,2040
+483,Hopton Road Industrial Estate,Solar,7,2024,1,1.3,1300,2014,2039
+484,Field House Solar / Hursley Road,Solar,7,2026,1,6.4,6400,2015,2040
+485,Kencot Hill Solar Farm (revised application),Solar,7,2027,1,37.0,37000,2014,2039
+486,KERNICK MICA DAM - SOLAR FARM,Solar,7,2028,1,12.0,12000,2014,2039
+487,Landmead Farm (East Hanney),Solar,7,2030,1,46.0,46000,2014,2039
+488,Lower Newton Farm,Solar,7,2032,1,11.5,11500,2015,2040
+489,Lower Slade Farm,Solar,7,2033,1,4.1,4100,2015,2040
+490,Lower Ufford Lane,Solar,7,2034,1,1.1,1100,2015,2040
+491,Lynt Farm,Solar,7,2035,1,27.0,27000,2015,2040
+492,Marchington Solar Farm,Solar,7,2036,1,4.3,4300,2016,2041
+493,Monksham Solar Farm,Solar,7,2039,1,10.7,10700,2014,2039
+494,Moorhouse Lane - resubmission,Solar,7,2040,1,1.8,1800,2015,2040
+495,Morton Wood Farm,Solar,7,2041,1,4.8,4800,2016,2041
+496,Natewood Farm,Solar,7,2043,1,8.9,8900,2015,2040
+497,Netley Landfill Solar,Solar,7,2044,1,12.0,12000,2017,2042
+498,New Stone House,Solar,7,2045,1,12.5,12500,2015,2040
+499,North Creake Airfield (Resubmission),Solar,7,2046,1,20.0,20000,2014,2039
+500,North of Newton Farm,Solar,7,2047,1,3.0,3000,2014,2039
+501,Roves Farm (Solar) - resubmission,Solar,7,2049,1,12.7,12700,2015,2040
+502,Salhouse Solar Farm,Solar,7,2050,1,5.0,5000,2015,2040
+503,Norton Hall,Solar,7,2051,1,2.8,2800,2014,2039
+504,Oaklands Plantation,Solar,7,2052,1,5.0,5000,2016,2041
+505,Packington Solar Farm,Solar,7,2054,1,13.9,13900,2015,2040
+506,SAUNDERCROFT SOLAR FARM,Solar,7,2055,1,7.0,7000,2014,2039
+507,Sedbury Park,Solar,7,2056,1,5.0,5000,2015,2040
+508,Six Hills Solar Farm,Solar,7,2057,1,18.7,18700,2015,2040
+509,South Newton Farm,Solar,7,2058,1,11.3,11300,2014,2039
+510,Southdown Quarry,Solar,7,2059,1,1.5,1500,2015,2040
+511,Southfield Farm Solar Park (resubmission),Solar,7,2060,1,11.5,11500,2016,2041
+512,Spittleborough Farm,Solar,7,2061,1,12.0,12000,2014,2039
+513,Stanton solar park,Solar,7,2062,1,5.0,5000,2015,2040
+514,Stantway Solar Farm,Solar,7,2063,1,5.0,5000,2014,2039
+515,Stonebarrow Farm,Solar,7,2064,1,8.0,8000,2014,2039
+516,Stowbridge Farm,Solar,7,2065,1,24.0,24000,2014,2039
+517,Stratton Hall Solar Park,Solar,7,2066,1,11.6,11600,2014,2039
+518,Sutton Montis Road Solar Park / Sutton Bridge Solar Farm,Solar,7,2067,1,5.4,5400,2015,2040
+519,Thame solar farm,Solar,7,2068,1,4.3,4300,2016,2041
+520,The Flit,Solar,7,2071,1,10.5,10500,2015,2040
+521,The Old Airfield,Solar,7,2072,1,5.0,5000,2015,2040
+522,Thorne Farm,Solar,7,2073,1,6.2,6200,2014,2039
+523,Tiers Cross Solar Farm,Solar,7,2074,1,24.0,24000,2014,2039
+524,Tilmanstone Colliery,Solar,7,2075,1,10.0,10000,2016,2041
+525,Toggam Farm,Solar,7,2076,1,12.5,12500,2016,2041
+526,Tower Hill Farm,Solar,7,2077,1,8.1,8100,2015,2040
+527,Toyota Motor Manufacturing Uk - Deeside,Solar,7,2078,1,3.8,3800,2014,2039
+528,Trench Farm,Solar,7,2079,1,7.2,7200,2015,2040
+529,Troughton Farm,Solar,7,2080,1,30.0,30000,2016,2041
+530,Turweston Solar Farm,Solar,7,2081,1,16.7,16700,2014,2039
+531,Upper Farm solar park,Solar,7,2082,1,12.0,12000,2015,2040
+532,Upper Huntingford Farm,Solar,7,2083,1,7.7,7700,2016,2041
+533,Walnut Yard (Phase 1),Solar,7,2084,1,1.8,1800,2015,2040
+534,Water Eaton Farm / Port Farm,Solar,7,2085,1,34.8,34800,2015,2040
+535,Wedgehill Farm,Solar,7,2086,1,13.0,13000,2015,2040
+536,West Raynham,Solar,7,2088,1,49.9,49900,2015,2040
+537,Westerfield Farm - resubmission,Solar,7,2089,1,12.5,12500,2015,2040
+538,Westover Farm - resubmission,Solar,7,2090,1,7.0,7000,2014,2039
+539,Whitley Farm (1 of 2),Solar,7,2091,1,3.5,3500,2014,2039
+540,Whitley Farm (2 of 2),Solar,7,2092,1,3.5,3500,2014,2039
+541,Whitton Mawr,Solar,7,2093,1,6.0,6000,2017,2042
+542,Winham Farm - resubmission,Solar,7,2095,1,5.0,5000,2015,2040
+543,Woden Park,Solar,7,2096,1,5.0,5000,2014,2039
+544,West Kingsmill Farm Solar Park,Solar,7,2098,1,1.6,1600,2014,2039
+545,Bommertown Solar Farm,Solar,7,2101,1,5.0,5000,2015,2040
+546,West Ditchen Farm (resubmission),Solar,7,2102,1,5.0,5000,2016,2041
+547,Lower Marsh Farm,Solar,7,2103,1,5.0,5000,2014,2039
+548,Bodorgan Solar Farm,Solar,7,2104,1,12.6,12600,2014,2039
+549,Chapel Lane Parley Solar Farm Phase 2,Solar,7,2105,1,36.0,36000,2014,2039
+550,Arkwright Solar Farm,Solar,7,2107,1,8.0,8000,2015,2040
+551,Charity Farm (Burlton Solar Farm),Solar,7,2108,1,11.9,11900,2016,2041
+552,Verwood Solar Farm,Solar,7,2109,1,20.4,20400,2015,2040
+553,Parciau Farm Solar Park,Solar,7,2110,1,13.9,13900,2015,2040
+554,Smith Hall Farm Solar Park,Solar,7,2111,1,5.0,5000,2016,2041
+555,Bystock Solar Farm,Solar,7,2112,1,4.1,4100,2015,2040
+556,Bedborough Farm,Solar,7,2114,1,7.0,7000,2016,2041
+557,Cranham Golf Course Solar Park,Solar,7,2117,1,2.6,2600,2016,2041
+558,Hurcott Copse Solar Farm,Solar,7,2118,1,10.0,10000,2015,2040
+559,Grange Farm Solar Farm,Solar,7,2120,1,4.9,4900,2013,2038
+560,Trehawke Barton (Doddycross) Solar Farm,Solar,7,2121,1,10.6,10600,2014,2039
+561,Newton Ferrers solar park,Solar,7,2125,1,19.5,19500,2016,2041
+562,Nancrossa Farm solar park,Solar,7,2126,1,6.0,6000,2016,2041
+563,Pitts Farm (revised application),Solar,7,2127,1,2.6,2600,2014,2039
+564,Walmoor Farm solar park,Solar,7,2128,1,4.0,4000,2015,2040
+565,Trequite Farm solar park (resubmission),Solar,7,2129,1,9.9,9900,2014,2039
+566,Bentley Estate,Solar,7,2132,1,5.0,5000,2015,2040
+567,New Row Farm,Solar,7,2133,1,3.9,3900,2014,2039
+568,MALMAYNES HALL FARM,Solar,7,2135,1,12.0,12000,2015,2040
+569,Crucis Park,Solar,7,2136,1,12.5,12500,2014,2039
+570,Treguff Farm - resubmission,Solar,7,2137,1,4.4,4400,2015,2040
+571,Kenardington Place Farm,Solar,7,2138,1,7.0,7000,2015,2040
+572,Henbury Quarry,Solar,7,2139,1,3.9,3900,2015,2040
+573,Grange Farm (Kirkby on Bain),Solar,7,2140,1,9.0,9000,2015,2040
+574,Boxted Airfield,Solar,7,2143,1,18.8,18800,2015,2040
+575,Rectory Farm/Emberton,Solar,7,2144,1,9.0,9000,2015,2040
+576,St Francis Court Farm,Solar,7,2145,1,4.0,4000,2017,2042
+577,Berry Court Farm,Solar,7,2150,1,4.2,4200,2016,2041
+578,Walkers Wood Solar Park,Solar,7,2151,1,27.0,27000,2015,2040
+579,Odell Glebe Solar Farm,Solar,7,2152,1,16.8,16800,2015,2040
+580,Hunstrete (Wilmington Farm),Solar,7,2153,1,2.3,2300,2014,2039
+581,Lower Severalls Farm,Solar,7,2154,1,10.8,10800,2017,2042
+582,Burton Farm,Solar,7,2157,1,4.4,4400,2015,2040
+583,Sundorne Grove,Solar,7,2158,1,20.0,20000,2015,2040
+584,Lower End Farm,Solar,7,2159,1,4.9,4900,2015,2040
+585,Skegness Solar Park,Solar,7,2160,1,4.9,4900,2015,2040
+586,Land north of Temple Normanton,Solar,7,2162,1,4.9,4900,2016,2041
+587,Helland Meads - resubmission,Solar,7,2164,1,1.2,1200,2014,2039
+588,Crow Trees Farm,Solar,7,2165,1,4.7,4700,2016,2041
+589,Priest Weston,Solar,7,2166,1,1.0,1000,2015,2040
+590,Horam,Solar,7,2169,1,8.1,8100,2015,2040
+591,Turves/Burtnhouse Solar Farm extension,Solar,7,2171,1,4.7,4700,2015,2040
+592,Coombe Farm,Solar,7,2173,1,8.0,8000,2015,2040
+593,Higher Hill Farm (extension),Solar,7,2174,1,1.5,1500,2016,2041
+594,Mount Farm,Solar,7,2175,1,22.0,22000,2016,2041
+595,Hafod-Y-Dafal Farm,Solar,7,2176,1,14.0,14000,2015,2040
+596,Barr Farm,Solar,7,2178,1,1.8,1800,2015,2040
+597,BAE Samlesbury Aerodrome,Solar,7,2179,1,2.0,2000,2015,2040
+598,Shoals Hook Farm,Solar,7,2180,1,12.1,12100,2015,2040
+599,Manor Farm,Solar,7,2181,1,7.5,7500,2015,2040
+600,Littlewood Farm,Solar,7,2182,1,14.0,14000,2015,2040
+601,Cherry Tree Farm,Solar,7,2184,1,5.0,5000,2016,2041
+602,Lodge Farm,Solar,7,2185,1,2.4,2400,2015,2040
+603,Bumpers Farm Phase 1,Solar,7,2186,1,5.0,5000,2017,2042
+604,Birch Airfield,Solar,7,2187,1,5.6,5600,2015,2040
+605,Gaultney Solar Park,Solar,7,2188,1,20.5,20500,2015,2040
+606,Puriton Landfill Solar Farm,Solar,7,2190,1,11.4,11400,2015,2040
+607,Hunciecroft Farm,Solar,7,2192,1,8.0,8000,2015,2040
+608,Rolleston Park Farm,Solar,7,2196,1,18.7,18700,2015,2040
+609,Prestop Park Farm,Solar,7,2200,1,16.0,16000,2015,2040
+610,Yardwall Manor,Solar,7,2201,1,3.0,3000,2015,2040
+611,Royston Solar Farm (Phase 1) (a),Solar,7,2202,1,5.0,5000,2016,2041
+612,MOD Lyneham,Solar,7,2203,1,69.8,69800,2015,2040
+613,Deepdale Farm,Solar,7,2204,1,8.0,8000,2016,2041
+614,Manor Farm (Horton),Solar,7,2205,1,5.0,5000,2016,2041
+615,Penrhiwarwydd Farm,Solar,7,2206,1,8.5,8500,2015,2040
+616,Nowhere Farm,Solar,7,2208,1,8.1,8100,2015,2040
+617,Langar Lane,Solar,7,2210,1,10.0,10000,2016,2041
+618,Pitchford,Solar,7,2211,1,10.2,10200,2015,2040
+619,Condover Airfield,Solar,7,2212,1,12.3,12300,2015,2040
+620,Askern Colliery solar farm,Solar,7,2213,1,5.0,5000,2015,2040
+621,Maesgwyn solar farm,Solar,7,2215,1,7.5,7500,2017,2042
+622,Church Farm,Solar,7,2216,1,6.2,6200,2015,2040
+623,Folly Farm,Solar,7,2217,1,13.1,13100,2015,2040
+624,Stowbridge Farm - Extension (Phase 2),Solar,7,2218,1,10.0,10000,2015,2040
+625,Black Peak Farm,Solar,7,2219,1,31.8,31800,2015,2040
+626,"Jubilee Farm, Barnby Moor",Solar,7,2221,1,5.0,5000,2017,2042
+627,Newnham Estate,Solar,7,2225,1,14.0,14000,2015,2040
+628,Wambrook Farm,Solar,7,2226,1,4.1,4100,2015,2040
+629,Gawcott Fields Farm,Solar,7,2227,1,9.2,9200,2015,2040
+630,Mount Mill Farm - resubmission,Solar,7,2228,1,12.0,12000,2015,2040
+631,Handley Park - resubmission,Solar,7,2231,1,5.0,5000,2016,2041
+632,Tollgate Farm,Solar,7,2232,1,4.3,4300,2016,2041
+633,North Farm (Spetisbury),Solar,7,2233,1,11.6,11600,2015,2040
+634,Chapel Lane Parley Solar Farm Phase 3,Solar,7,2234,1,4.0,4000,2015,2040
+635,GDL Wymeswold Solar Farm/land off the A6006,Solar,7,2237,1,6.1,6100,2016,2041
+636,Hillhouse Farm,Solar,7,2238,1,28.5,28500,2015,2040
+637,Gib Lane (Aston Clinton solar park),Solar,7,2239,1,24.2,24200,2015,2040
+638,Outwood Farm (Phase 1),Solar,7,2240,1,5.0,5000,2016,2041
+639,Raventhorpe Farm,Solar,7,2241,1,38.0,38000,2015,2040
+640,Manor Farm (Castle Cary),Solar,7,2242,1,1.8,1800,2017,2042
+641,Maes Bach Farm,Solar,7,2243,1,4.9,4900,2015,2040
+642,Sheepbridge Court Farm,Solar,7,2244,1,5.0,5000,2015,2040
+643,Elton solar farm,Solar,7,2247,1,5.0,5000,2015,2040
+644,Cross Roads Plantation,Solar,7,2248,1,5.0,5000,2015,2040
+645,Munceys Farm,Solar,7,2249,1,31.6,31600,2015,2040
+646,Luscott Barton,Solar,7,2252,1,13.0,13000,2015,2040
+647,Kinmel 1 CIC,Solar,7,2253,1,5.0,5000,2016,2041
+648,Owls Hatch Road,Solar,7,2255,1,48.0,48000,2015,2040
+649,Wilbees Farm (resubmission),Solar,7,2258,1,5.0,5000,2016,2041
+650,Winterbrook,Solar,7,2259,1,1.2,1200,2015,2040
+651,Welbeck Solar / Hazel Gap,Solar,7,2260,1,16.0,16000,2015,2040
+652,Homestead Farm (Alderton),Solar,7,2261,1,17.6,17600,2015,2040
+653,Arna Wood Solar,Solar,7,2263,1,6.2,6200,2017,2042
+654,Knottingley A,Solar,7,2264,1,5.0,5000,2016,2041
+655,Clayhill Farm,Solar,7,2265,1,10.0,10000,2016,2041
+656,Paddock Wood,Solar,7,2266,1,9.2,9200,2015,2040
+657,Wick Farm (Burnham on Crouch),Solar,7,2268,1,5.0,5000,2015,2040
+658,Netherfield Lane,Solar,7,2271,1,19.7,19700,2015,2040
+659,Upper Meadowley Farm,Solar,7,2272,1,10.7,10700,2017,2042
+660,Wick Farm Solar Park,Solar,7,2274,1,14.6,14600,2016,2041
+661,High Leas,Solar,7,2277,1,6.5,6500,2015,2040
+662,Atherstone,Solar,7,2278,1,14.7,14700,2015,2040
+663,The Elms,Solar,7,2279,1,10.4,10400,2015,2040
+664,Hunters Race Solar Park,Solar,7,2280,1,9.3,9300,2014,2039
+665,Parham Airfield (Great Glenham),Solar,7,2281,1,17.5,17500,2013,2038
+666,Chapel Lane Parley Solar Farm Phase 1,Solar,7,2282,1,20.0,20000,2014,2039
+667,Welbeck Colliery,Solar,7,2283,1,11.3,11300,2014,2039
+668,Priory Farm,Solar,7,2284,1,3.1,3100,2014,2039
+669,Norrington Common Solar Farm,Solar,7,2285,1,10.0,10000,2014,2039
+670,Hendre Fawr Farm,Solar,7,2286,1,11.6,11600,2015,2040
+671,Northmoor,Solar,7,2288,1,5.0,5000,2015,2040
+672,Manor Farm - Shripney,Solar,7,2296,1,5.0,5000,2016,2041
+673,Chelwood Solar Farm,Solar,7,2298,1,5.0,5000,2015,2040
+674,Manor Farm - Pertenhall,Solar,7,2299,1,15.0,15000,2015,2040
+675,Hardingham Solar Farm - extension,Solar,7,2300,1,5.2,5200,2015,2040
+676,Brooks Farm Solar Park,Solar,7,2307,1,8.0,8000,2015,2040
+677,Christchurch Energy,Solar,7,2308,1,18.0,18000,2015,2040
+678,Yarburgh Grove Farm,Solar,7,2309,1,8.1,8100,2015,2040
+679,Taplins Farm solar park,Solar,7,2312,1,5.9,5900,2016,2041
+680,Homestead Farm,Solar,7,2314,1,10.7,10700,2015,2040
+681,The Kickles,Solar,7,2319,1,5.0,5000,2016,2041
+682,Eakring Solar Farm,Solar,7,2320,1,11.9,11900,2015,2040
+683,Egmanton Solar Farm - resubmission,Solar,7,2321,1,14.2,14200,2015,2040
+684,Branston solar park,Solar,7,2323,1,18.9,18900,2015,2040
+685,Golden Hill,Solar,7,2325,1,6.2,6200,2015,2040
+686,Chapel Hill,Solar,7,2326,1,8.0,8000,2015,2040
+687,Pen Rhiw Caradog,Solar,7,2327,1,4.7,4700,2017,2042
+688,Vine Farm Solar Park,Solar,7,2329,1,45.0,45000,2016,2041
+689,Coombeshead Solar Farm,Solar,7,2331,1,8.0,8000,2015,2040
+690,Decoy Farm,Solar,7,2332,1,5.0,5000,2015,2040
+691,Easington Farm (Chalgrove),Solar,7,2333,1,21.3,21300,2015,2040
+692,Gelliwern Isaf Farm,Solar,7,2334,1,6.0,6000,2015,2040
+693,Sawmills Solar Farm,Solar,7,2335,1,6.5,6500,2015,2040
+694,Walland Farm,Solar,7,2336,1,5.0,5000,2015,2040
+695,Weycock Road,Solar,7,2338,1,7.0,7000,2016,2041
+696,Higher Bye Farm,Solar,7,2342,1,6.8,6800,2015,2040
+697,Cockhill Solar Farm,Solar,7,2343,1,20.0,20000,2015,2040
+698,Bentham Farm,Solar,7,2344,1,8.0,8000,2015,2040
+699,Boscombe Airfield,Solar,7,2345,1,12.3,12300,2015,2040
+700,Shotwick Solar Farm,Solar,7,2347,1,45.7,45700,2016,2041
+701,Winnards Perch Solar Farm,Solar,7,2348,1,3.8,3800,2013,2038
+702,Lodge Farm (Poulshot),Solar,7,2351,1,14.5,14500,2015,2040
+703,Glebe Farm Solar Energy Park,Solar,7,2352,1,15.0,15000,2015,2040
+704,Bryn yr Odyn Solar Farm,Solar,7,2353,1,15.0,15000,2015,2040
+705,Rhyd-y-Pandy Solar Farm,Solar,7,2354,1,6.0,6000,2015,2040
+706,Saron Road solar park,Solar,7,2355,1,6.7,6700,2015,2040
+707,Tiln Farm solar park,Solar,7,2356,1,8.0,8000,2015,2040
+708,Langford Solar Farm,Solar,7,2357,1,13.0,13000,2015,2040
+709,Stokes Marsh Farm,Solar,7,2358,1,16.6,16600,2015,2040
+710,West Hall Solar Farm,Solar,7,2359,1,7.0,7000,2014,2039
+711,Stowbridge Farm - Extension (Phase 1),Solar,7,2360,1,10.0,10000,2015,2040
+712,Bourne Park (Solar),Solar,7,2361,1,5.0,5000,2015,2040
+713,Hall Farm,Solar,7,2362,1,5.1,5100,2015,2040
+714,Brynteg Farm,Solar,7,2363,1,16.2,16200,2014,2039
+715,Stonepit Farm,Solar,7,2364,1,5.0,5000,2014,2039
+716,Yerbeston Gate Farm,Solar,7,2365,1,6.1,6100,2015,2040
+717,Grange Farm (Lincolnshire),Solar,7,2366,1,12.7,12700,2015,2040
+718,Molehill Farm,Solar,7,2367,1,18.0,18000,2015,2040
+719,Pashley Farm,Solar,7,2368,1,11.5,11500,2015,2040
+720,Fiskerton Airfield (Phase 1),Solar,7,2369,1,12.0,12000,2015,2040
+721,Hendai Farm,Solar,7,2370,1,13.4,13400,2015,2040
+722,Bury Lane Fruit Farm,Solar,7,2372,1,24.0,24000,2014,2039
+723,Marsh Farm Hilperton,Solar,7,2373,1,9.1,9100,2015,2040
+724,Ashlawn Farm,Solar,7,2375,1,6.8,6800,2015,2040
+725,Cuckoo Grove Farm,Solar,7,2376,1,6.1,6100,2015,2040
+726,Gedling Solar Farm,Solar,7,2377,1,5.7,5700,2015,2040
+727,Bilsthorpe Quarry Solar Park,Solar,7,2378,1,4.8,4800,2014,2039
+728,Littlebourne,Solar,7,2379,1,17.0,17000,2014,2039
+729,Wellingborough Solar Farm,Solar,7,2380,1,8.5,8500,2014,2039
+730,Baglan Bay Solar Farm - Phase 1,Solar,7,2381,1,5.0,5000,2014,2039
+731,Gover Farm Solar Park,Solar,7,2382,1,8.0,8000,2014,2039
+732,Kerriers Solar Park,Solar,7,2383,1,9.6,9600,2014,2039
+733,Hullavington Solar Park,Solar,7,2384,1,7.0,7000,2015,2040
+734,Crossness Sewage Works PV,Solar,7,2385,1,1.5,1500,2011,2036
+735,Higher Hill Farm,Solar,7,2386,1,5.0,5000,2011,2036
+736,Manor Farm (Keinton Mandeville),Solar,7,2387,1,1.0,1000,2011,2036
+737,Walton WTW PV,Solar,7,2388,1,1.8,1800,2011,2036
+738,Wolseley National Distribution Centre,Solar,7,2389,1,2.0,2000,2014,2039
+739,East Midlands Distribution Centre,Solar,7,4694,1,6.1,6100,2015,2040
+740,Land at High Point Farm,Solar,7,4701,1,4.5,4500,2017,2042
+741,Land at Newlands Farm,Solar,7,4703,1,5.0,5000,2016,2041
+742,Eckland Lodge Farm,Solar,7,4705,1,2.9,2900,2016,2041
+743,Caddington Solar Farm (Phase 2),Solar,7,4706,1,5.0,5000,2016,2041
+744,Montys Farm,Solar,7,4712,1,5.0,5000,2016,2041
+745,Merston Solar Park,Solar,7,4713,1,10.0,10000,2016,2041
+746,Fambridge Road/Canewdon Road,Solar,7,4718,1,5.0,5000,2015,2040
+747,Roskrow Farm,Solar,7,4721,1,8.9,8900,2015,2040
+748,Hale Farm,Solar,7,4727,1,8.0,8000,2016,2041
+749,Pylle Southern solar park (Lower Easton Farm),Solar,7,4729,1,5.0,5000,2015,2040
+750,Land at Darran Farm,Solar,7,4734,1,2.6,2600,2017,2042
+751,Wisbech Solar Farm,Solar,7,4736,1,3.5,3500,2015,2040
+752,Stow Solar Farm,Solar,7,4737,1,10.2,10200,2016,2041
+753,Rhug Estate,Solar,7,4738,1,1.2,1200,2016,2041
+754,Snettisham Solar Farm,Solar,7,4739,1,2.7,2700,2017,2042
+755,West Hill Farm,Solar,7,4740,1,2.4,2400,2015,2040
+756,Cold Harbour Farm,Solar,7,4745,1,5.0,5000,2015,2040
+757,Land at Whatton Road,Solar,7,4748,1,1.5,1500,2015,2040
+758,Marshwood Farm,Solar,7,4752,1,1.8,1800,2015,2040
+759,House O?Hill Solar Farm,Solar,7,4753,1,1.6,1600,2015,2040
+760,Hawkers Farm (resubmission),Solar,7,4757,1,9.5,9500,2015,2040
+761,Woodtown Farm,Solar,7,4761,1,3.8,3800,2015,2040
+762,Land at Tangmere Airfield,Solar,7,4766,1,5.0,5000,2015,2040
+763,Land at Coton Park Colliery,Solar,7,4767,1,2.5,2500,2015,2040
+764,Chapel Farm,Solar,7,4769,1,5.0,5000,2017,2042
+765,Cairnmore Solar Park,Solar,7,4780,1,3.8,3800,2016,2041
+766,Bake Farm Solar Farm,Solar,7,4783,1,5.0,5000,2016,2041
+767,Thompson House Equestrian farm,Solar,7,4785,1,5.0,5000,2016,2041
+768,Red Hill Farm,Solar,7,4792,1,4.8,4800,2015,2040
+769,Stoneshill Farm (resubmission),Solar,7,4794,1,5.0,5000,2017,2042
+770,Carlam Hill Education CIC,Solar,7,4804,1,5.0,5000,2016,2041
+771,Caldecote Manor Farm,Solar,7,4825,1,5.0,5000,2016,2041
+772,Crundale / Fenton Home Farm (extension),Solar,7,4830,1,5.9,5900,2015,2040
+773,Fieldscale,Solar,7,4833,1,10.6,10600,2016,2041
+774,Iwade Solar Farm,Solar,7,4836,1,1.7,1700,2015,2040
+775,Kingsland Barton Solar Farm (resubmission),Solar,7,4838,1,5.0,5000,2014,2039
+776,Lee Moor China Clay Works,Solar,7,4839,1,9.5,9500,2015,2040
+777,Littleton,Solar,7,4840,1,12.1,12100,2015,2040
+778,Lount solar farm,Solar,7,4841,1,2.8,2800,2015,2040
+779,New Mains Of Guynd Farm,Solar,7,4844,1,10.0,10000,2016,2041
+780,Orchard Farm,Solar,7,4846,1,10.0,10000,2016,2041
+781,Salford Lodge,Solar,7,4850,1,5.0,5000,2015,2040
+782,The Grange,Solar,7,4856,1,8.0,8000,2016,2041
+783,Thorne Farm,Solar,7,4857,1,5.0,5000,2015,2040
+784,Tiddiecross Solar Farm,Solar,7,4858,1,10.5,10500,2015,2040
+785,Tooleys Farm,Solar,7,4859,1,5.3,5300,2015,2040
+786,Trickey Warren,Solar,7,4860,1,4.8,4800,2015,2040
+787,Twemlows,Solar,7,4861,1,10.0,10000,2015,2040
+788,Tyddyn Cae (Nefyn),Solar,7,4862,1,4.9,4900,2015,2040
+789,Abbots Ann,Solar,7,4874,1,7.0,7000,2015,2040
+790,Margate Solar Farm,Solar,7,4878,1,3.0,3000,2015,2040
+791,Laceby Solar Farm,Solar,7,4880,1,27.1,27100,2016,2041
+792,Land East of White Horse Lane,Solar,7,4885,1,5.0,5000,2016,2041
+793,Westfield Farm,Solar,7,4887,1,5.0,5000,2016,2041
+794,West Woodlands ,Solar,7,4889,1,5.0,5000,2016,2041
+795,Mendennick Farm (resubmission),Solar,7,4891,1,2.8,2800,2015,2040
+796,Cockett Valley,Solar,7,4896,1,4.0,4000,2017,2042
+797,Rampisham North,Solar,7,4897,1,5.0,5000,2017,2042
+798,Severn Road Solar Park,Solar,7,4899,1,1.8,1800,2016,2041
+799,Moorhouse Farm,Solar,7,4903,1,5.0,5000,2016,2041
+800,Land at Sutor Farm,Solar,7,4916,1,5.0,5000,2016,2041
+801,Land North East Of Penrose Far,Solar,7,4929,1,1.5,1500,2015,2040
+802,Land At Ferry Farm,Solar,7,4931,1,10.0,10000,2015,2040
+803,Land at Brookbarn Farm,Solar,7,4933,1,3.0,3000,2015,2040
+804,Field at School Aycliffe Lane,Solar,7,4935,1,5.0,5000,2015,2040
+805,Capel Grange Solar Park,Solar,7,4936,1,6.6,6600,2016,2041
+806,Pentre farm,Solar,7,4938,1,5.5,5500,2014,2039
+807,Land At Rymes Farm (Phase 1),Solar,7,4939,1,6.9,6900,2016,2041
+808,Land At Rymes Farm (Phase 2)/Grange Solar Farm,Solar,7,4943,1,6.8,6800,2015,2040
+809,Trowle Common,Solar,7,4948,1,5.0,5000,2016,2041
+810,Canopus Farm,Solar,7,4951,1,5.0,5000,2015,2040
+811,Land At Guston Court Farm,Solar,7,4952,1,5.0,5000,2015,2040
+812,Pressock Farm,Solar,7,4969,1,5.0,5000,2017,2042
+813,Rufford Lane,Solar,7,4983,1,2.6,2600,2016,2041
+814,Land to the north and south of Cakers Lane (Wilsom),Solar,7,4986,1,11.0,11000,2017,2042
+815,Collacott Farm,Solar,7,4990,1,4.5,4500,2016,2041
+816,Tonedale Farm,Solar,7,4994,1,5.0,5000,2015,2040
+817,Lindridge Farm,Solar,7,4996,1,5.0,5000,2015,2040
+818,Abbots Ripton Solar Farm (ext.),Solar,7,4997,1,3.9,3900,2015,2040
+819,Fleetwood Water Treatment Works,Solar,7,5001,1,1.3,1300,2015,2040
+820,Triangle Solar Farm Park,Solar,7,5002,1,10.0,10000,2017,2042
+821,Land at Lower House Farm,Solar,7,5006,1,8.1,8100,2016,2041
+822,Aldi Distribution Centre,Solar,7,5012,1,1.3,1300,2015,2040
+823,Bromfield Sand and Gravel,Solar,7,5014,1,0.5,500,2017,2042
+824,Land at Heywood Grange,Solar,7,5015,1,8.4,8400,2016,2041
+825,Ravens Close,Solar,7,5017,1,5.0,5000,2017,2042
+826,Forest Farm,Solar,7,5018,1,3.0,3000,2017,2042
+827,Land West of Roberts Wall Far,Solar,7,5019,1,2.5,2500,2016,2041
+828,Drayton Manor Farm,Solar,7,5020,1,25.0,25000,2016,2041
+829,Somersal Mill Farm,Solar,7,5022,1,2.6,2600,2016,2041
+830,Land Opposite Tyn Y Pistyll,Solar,7,5026,1,5.0,5000,2015,2040
+831,Land South of Highfield House,Solar,7,5033,1,5.0,5000,2016,2041
+832,Rhewl Farm,Solar,7,5053,1,6.0,6000,2016,2041
+833,Land at Dayfields Farm,Solar,7,5063,1,4.7,4700,2016,2041
+834,MMD Shipping Services,Solar,7,5071,1,1.2,1200,2015,2040
+835,Newton Margate,Solar,7,5079,1,1.5,1500,2015,2040
+836,Eveley Farm (resubmission),Solar,7,5080,1,49.0,49000,2016,2041
+837,Court Farm (Resubmission),Solar,7,5084,1,8.5,8500,2017,2042
+838,Green Farm (resubmission),Solar,7,5089,1,5.0,5000,2015,2040
+839,Home Farm,Solar,7,5090,1,6.7,6700,2017,2042
+840,Land at Thornborough Grounds,Solar,7,5092,1,5.0,5000,2016,2041
+841,Port of Barry (Resubmission) - Site 1,Solar,7,5093,1,4.5,4500,2015,2040
+842,Southern Counties Shooting Ground Phase 1 (resubmission),Solar,7,5096,1,9.0,9000,2017,2042
+843,Fanny House Farm,Solar,7,5099,1,5.0,5000,2015,2040
+844,Chard Solar Park,Solar,7,5102,1,3.0,3000,2016,2041
+845,Home Farm,Solar,7,5104,1,3.0,3000,2017,2042
+846,Marshborough Farm solar park (resubmission),Solar,7,5117,1,5.0,5000,2015,2040
+847,Fiskerton Airfield (Phase 2),Solar,7,5118,1,22.0,22000,2015,2040
+848,"Langley Priory, Walnut Yard (Phase 2)",Solar,7,5119,1,6.2,6200,2016,2041
+849,Bluegates Solar Park,Solar,7,5125,1,10.5,10500,2015,2040
+850,Land To The East Of Back Lane,Solar,7,5128,1,5.0,5000,2015,2040
+851,Land East Of Wadbrook Farm,Solar,7,5131,1,5.0,5000,2017,2042
+852,Land at Fell View Farm (Phase 1),Solar,7,5132,1,4.2,4200,2016,2041
+853,South of Henley Hall,Solar,7,5136,1,5.0,5000,2017,2042
+854,Place Barton Farm,Solar,7,5137,1,4.9,4900,2017,2042
+855,Lower Stanley Farm,Solar,7,5139,1,4.0,4000,2016,2041
+856,Land Parcel North of Goddards,Solar,7,5140,1,5.0,5000,2016,2041
+857,"Ld At Lawrence End Park &, Dane Street",Solar,7,5142,1,5.0,5000,2015,2040
+858,"Gravel Works, Wasing Estate",Solar,7,5143,1,5.0,5000,2017,2042
+859,Drakelow Solar Farm,Solar,7,5145,1,5.0,5000,2016,2041
+860,Land at Five Oaks Farm,Solar,7,5146,1,5.0,5000,2016,2041
+861,Knolton Farmhouse Cheese Solar Farm,Solar,7,5147,1,1.0,1000,2016,2041
+862,Blakenhall Park Solar Farm,Solar,7,5148,1,1.8,1800,2015,2040
+863,Grantham Solar Farm,Solar,7,5149,1,5.0,5000,2015,2040
+864,Agricultural Land at Trecastle,Solar,7,5150,1,4.0,4000,2015,2040
+865,Sharland Solar Farm,Solar,7,5152,1,2.8,2800,2017,2042
+866,Short Hazel Solar Farm,Solar,7,5156,1,5.0,5000,2016,2041
+867,Mill Hill Farm,Solar,7,5157,1,5.0,5000,2015,2040
+868,"Little Irchester, Higham Road Solar Farm",Solar,7,5158,1,4.6,4600,2016,2041
+869,Land North of Chiltern Greeen,Solar,7,5162,1,5.0,5000,2016,2041
+870,Land off Moss Land (resubmission),Solar,7,5163,1,5.0,5000,2017,2042
+871,Hill Farm,Solar,7,5164,1,5.0,5000,2017,2042
+872,Padleywood Farm,Solar,7,5165,1,5.0,5000,2016,2041
+873,Tiln Farm Retford (extension),Solar,7,5167,1,1.7,1700,2015,2040
+874,Tower Hayes Farm,Solar,7,5168,1,5.0,5000,2016,2041
+875,Land West of Sheriffhales (resubmission),Solar,7,5169,1,8.2,8200,2015,2040
+876,Land Adjacent Claypits Farm (a),Solar,7,5182,1,5.0,5000,2015,2040
+877,Land Adjacent Claypits Farm (b) (Birch Estate),Solar,7,5183,1,2.3,2300,2016,2041
+878,Fferm Bryn Bachau,Solar,7,5190,1,4.4,4400,2016,2041
+879,Scottow Moor - RAF Coltishall Solar Farm (Phase 2),Solar,7,5199,1,17.9,17900,2016,2041
+880,West Carclaze Solar Farm,Solar,7,5202,1,6.5,6500,2017,2042
+881,Flixborough Industrial Estate,Solar,7,5204,1,5.0,5000,2017,2042
+882,Land adjacent to Church Road,Solar,7,5207,1,3.5,3500,2016,2041
+883,Lady Hole Farm,Solar,7,5212,1,3.0,3000,2016,2041
+884,Bransholme Solar CIC,Solar,7,5214,1,5.0,5000,2016,2041
+885,Land at Christ?s Hospital School,Solar,7,5218,1,1.1,1100,2015,2040
+886,Creswell Solar Park (resubmission),Solar,7,5224,1,5.0,5000,2016,2041
+887,Pollington Solar Farm,Solar,7,5225,1,5.0,5000,2017,2042
+888,Land NW Of Pickhill Bridge Farm,Solar,7,5226,1,3.6,3600,2017,2042
+889,Moneystone Quarry Solar Farm (resubmission),Solar,7,5229,1,5.0,5000,2016,2041
+890,Pingry Farm - Phase 2,Solar,7,5230,1,3.4,3400,2015,2040
+891,Kenninghall Solar / Hazeldick Solar,Solar,7,5231,1,8.0,8000,2015,2040
+892,Wogaston Solar Farm,Solar,7,5232,1,5.3,5300,2015,2040
+893,Crugmore Farm,Solar,7,5233,1,6.4,6400,2015,2040
+894,Rydon Farm,Solar,7,5234,1,12.0,12000,2015,2040
+895,"Solar farm at land at The Willows, Uttoxeter",Solar,7,5241,1,6.4,6400,2017,2042
+896,Highwood Lane,Solar,7,5242,1,5.0,5000,2016,2041
+897,Yorkley Solar Park,Solar,7,5243,1,5.0,5000,2015,2040
+898,Solar Farm at Fields Farm (Phase 1),Solar,7,5244,1,5.0,5000,2016,2041
+899,Land at Beech Farm,Solar,7,5253,1,4.6,4600,2016,2041
+900,Aberporth Solar Farm,Solar,7,5256,1,1.5,1500,2015,2040
+901,Hoplass Farm,Solar,7,5257,1,10.0,10000,2015,2040
+902,Chelveston Renewable Energy Park - Solar Extension,Solar,7,5258,1,19.5,19500,2015,2040
+903,Grove Solar Park (Phase 1),Solar,7,5259,1,5.0,5000,2016,2041
+904,Fell View Farm (Phase 2),Solar,7,5261,1,2.9,2900,2016,2041
+905,Land At Chiddinglye Farm,Solar,7,5263,1,5.0,5000,2016,2041
+906,Land of coal pit lane,Solar,7,5264,1,5.0,5000,2016,2041
+907,Huntingfield Solar Farm,Solar,7,5265,1,4.4,4400,2018,2043
+908,Astley Solar Farm,Solar,7,5266,1,5.0,5000,2016,2041
+909,Majors Hill/Turners Hill Solar Farm,Solar,7,5267,1,1.1,1100,2016,2041
+910,Land South Of Bryn Cyrnau Isaf (resubmission),Solar,7,5271,1,5.9,5900,2017,2042
+911,Ashby Solar Farm (a),Solar,7,5273,1,5.0,5000,2016,2041
+912,Land South of Knock Lane,Solar,7,5282,1,4.0,4000,2016,2041
+913,Land south of Brick Kiln Road,Solar,7,5285,1,5.0,5000,2016,2041
+914,Averhill Farm,Solar,7,5287,1,5.0,5000,2015,2040
+915,Morton House (Marchington),Solar,7,5288,1,6.2,6200,2016,2041
+916,Biglis Farm,Solar,7,5289,1,5.0,5000,2016,2041
+917,Milborne Port Solar Farm,Solar,7,5290,1,4.2,4200,2018,2043
+918,Land At Cwm Bargoed,Solar,7,5292,1,5.0,5000,2016,2041
+919,Land South Off Ollerton Road,Solar,7,5293,1,4.2,4200,2017,2042
+920,Land At Swanland Road,Solar,7,5295,1,5.0,5000,2017,2042
+921,Rookery Business Park,Solar,7,5296,1,5.0,5000,2016,2041
+922,Land North of Sandhutton Lane,Solar,7,5297,1,5.0,5000,2017,2042
+923,"Land West Of Hunger Hill Farm
+",Solar,7,5301,1,5.0,5000,2017,2042
+924,Land East Of Honeysome Road,Solar,7,5302,1,4.6,4600,2016,2041
+925,Salford Road Solar Farm (resubmission),Solar,7,5303,1,2.2,2200,2015,2040
+926,Ld NW Of Ratcliffe House Farm,Solar,7,5305,1,3.5,3500,2015,2040
+927,"Land at Woodhouse Farm           
+",Solar,7,5309,1,5.0,5000,2016,2041
+928,"Parklands         
+",Solar,7,5310,1,4.6,4600,2016,2041
+929,Amcor Flexibles,Solar,7,5312,1,1.7,1700,2015,2040
+930,Waterditch Solar Farm,Solar,7,5315,1,18.0,18000,2016,2041
+931,Land Off Ingarsby Lane,Solar,7,5316,1,2.1,2100,2016,2041
+932,Nissan Test Track,Solar,7,5320,1,4.8,4800,2016,2041
+933,Cooper House Farm,Solar,7,5321,1,5.0,5000,2016,2041
+934,Land at Pollington Airfield,Solar,7,5322,1,5.0,5000,2015,2040
+935,"Land at Poles Hole Farm     
+",Solar,7,5324,1,6.8,6800,2017,2042
+936,"Staining Wood Farm
+",Solar,7,5328,1,4.9,4900,2016,2041
+937,"Land between Orton Park Farm    
+",Solar,7,5330,1,6.4,6400,2016,2041
+938,"Site To North East Of, Lochcraigs Farm
+",Solar,7,5332,1,5.0,5000,2017,2042
+939,"West Mains of Kinblethmont 
+",Solar,7,5333,1,5.0,5000,2016,2041
+940,"Land West Side of Axe and Cleaver Lane 
+",Solar,7,5336,1,5.0,5000,2016,2041
+941,"Land To The North Of Moor Farm       
+",Solar,7,5340,1,3.8,3800,2017,2042
+942,Henley Solar Farm,Solar,7,5342,1,6.5,6500,2017,2042
+943,Hawkers Farm,Solar,7,5343,1,2.5,2500,2016,2041
+944,Crown Farm,Solar,7,5357,1,6.0,6000,2017,2042
+945,Eaglescliffe Solar Farm,Solar,7,5359,1,5.0,5000,2017,2042
+946,Tyddyn Gwyn (Gelli Gron Farm),Solar,7,5360,1,3.8,3800,2016,2041
+947,Thornton Lane,Solar,7,5368,1,2.7,2700,2016,2041
+948,Penycae Solar Farm,Solar,7,5376,1,5.0,5000,2016,2041
+949,Land at Ingles Hill Farm,Solar,7,5377,1,3.0,3000,2016,2041
+950,"Southbrook Solar Farm                
+",Solar,7,5379,1,5.0,5000,2016,2041
+951,Green Croft Solar Farm,Solar,7,5380,1,5.0,5000,2016,2041
+952,Upper Pant-Ysgawen Farm/Crumlin,Solar,7,5381,1,4.9,4900,2016,2041
+953,Land at Oxcroft Stocking Ground,Solar,7,5383,1,1.2,1200,2016,2041
+954,West Strathore Solar Limited,Solar,7,5384,1,5.0,5000,2017,2042
+955,Land at Meadow Farm,Solar,7,5385,1,5.0,5000,2017,2042
+956,Hungerford Farm,Solar,7,5387,1,5.0,5000,2016,2041
+957,Land at Morfa Camp,Solar,7,5389,1,2.8,2800,2016,2041
+958,Land South of Pogmore Spinney,Solar,7,5391,1,5.0,5000,2017,2042
+959,Abbey Fields Farm,Solar,7,5394,1,5.3,5300,2016,2041
+960,Ernesettle Solar Farm,Solar,7,5395,1,4.1,4100,2016,2041
+961,SPF Thirty Acres Farm,Solar,7,5396,1,3.8,3800,2016,2041
+962,Killan Farm Solar Array Extens,Solar,7,5398,1,1.0,1000,2017,2042
+963,Land East of Appleton Farm,Solar,7,5400,1,5.0,5000,2016,2041
+964,Land At Debdale Lane,Solar,7,5401,1,5.0,5000,2016,2041
+965,Land at Ash Row Farm,Solar,7,5402,1,5.0,5000,2015,2040
+966,Land at Stripe Farm,Solar,7,5403,1,5.0,5000,2016,2041
+967,Land at Bolsover Moor Quarry,Solar,7,5404,1,5.0,5000,2017,2042
+968,Land To The North Of Dairy House Farm,Solar,7,5406,1,3.4,3400,2016,2041
+969,Pennington Recycling Centre,Solar,7,5407,1,1.2,1200,2016,2041
+970,Land west of Welton Road,Solar,7,5412,1,4.4,4400,2016,2041
+971,Twin Yards Solar Farm,Solar,7,5415,1,5.0,5000,2017,2042
+972,Land of Green Lane,Solar,7,5424,1,5.8,5800,2017,2042
+973,Land At  Actrees Farm,Solar,7,5425,1,5.0,5000,2016,2041
+974,Land at Bowden Lane,Solar,7,5428,1,5.0,5000,2017,2042
+975,Land at Stalbridge Park,Solar,7,5429,1,5.0,5000,2017,2042
+976,Frog's Loke Solar Farm,Solar,7,5430,1,5.0,5000,2016,2041
+977,Manmoel Road Solar Park,Solar,7,5437,1,4.1,4100,2017,2042
+978,Huntspill Level Solar Park,Solar,7,5440,1,5.5,5500,2016,2041
+979,Land at Box Road,Solar,7,5442,1,2.2,2200,2016,2041
+980,Land south of Wood Lane (Safeguard Bradwell),Solar,7,5447,1,5.0,5000,2017,2042
+981,Newton Downs Farm,Solar,7,5451,1,5.0,5000,2017,2042
+982,Bunn's Hill Solar Park,Solar,7,5453,1,5.0,5000,2016,2041
+983,Rushmoor Lane Farm (Cheshire Coppice),Solar,7,5465,1,5.0,5000,2016,2041
+984,Fullenton Solar Farm,Solar,7,5472,1,4.2,4200,2016,2041
+985,Cwm Derwyn Farm,Solar,7,5477,1,5.0,5000,2017,2042
+986,Land to the west of Ashfordby Business Park,Solar,7,5478,1,3.5,3500,2016,2041
+987,York Solar Farm,Solar,7,5482,1,34.7,34700,2019,2044
+988,Land Off Folly Lane,Solar,7,5483,1,5.0,5000,2016,2041
+989,Land At Bake Farm,Solar,7,5485,1,5.0,5000,2016,2041
+990,Land To The South Of Todderstaffe,Solar,7,5486,1,4.5,4500,2017,2042
+991,Strettington Solar Farm,Solar,7,5487,1,5.0,5000,2016,2041
+992,Cressing Solar Farm (Phase 1),Solar,7,5497,1,5.0,5000,2016,2041
+993,Land north of Ashton Road,Solar,7,5498,1,4.0,4000,2017,2042
+994,Parc Cynog,Solar,7,5499,1,5.0,5000,2016,2041
+995,Albrighton Solar farm,Solar,7,5506,1,15.8,15800,2017,2042
+996,Clapton Farm Solar Park,Solar,7,5508,1,5.0,5000,2017,2042
+997,Galton Manor Solar Park,Solar,7,5512,1,5.0,5000,2017,2042
+998,Wormit Solar Farm,Solar,7,5513,1,4.0,4000,2017,2042
+999,The Breck,Solar,7,5520,1,5.0,5000,2016,2041
+1000,North Tenement,Solar,7,5523,1,5.0,5000,2017,2042
+1001,Cwrt Henllys Farm,Solar,7,5524,1,5.0,5000,2016,2041
+1002,Land at Wreay,Solar,7,5525,1,5.0,5000,2017,2042
+1003,Common Farm,Solar,7,5527,1,4.8,4800,2016,2041
+1004,Fields Farm (Agden),Solar,7,5529,1,5.0,5000,2017,2042
+1005,Land at Hill Farm,Solar,7,5530,1,1.2,1200,2016,2041
+1006,Land to North West of Lodge Farm (Park Farm),Solar,7,5531,1,4.0,4000,2017,2042
+1007,Seaton Road Solar Farm,Solar,7,5532,1,4.0,4000,2017,2042
+1008,Wick Lane Solar Ltd,Solar,7,5536,1,2.8,2800,2017,2042
+1009,Otherton Farm,Solar,7,5538,1,4.0,4000,2017,2042
+1010,Nanthenfoel Farms,Solar,7,5540,1,5.0,5000,2017,2042
+1011,Land at Green Farm,Solar,7,5545,1,1.0,1000,2016,2041
+1012,West Venn Solar Farm (resubmission),Solar,7,5547,1,5.0,5000,2017,2042
+1013,Corntown Farm,Solar,7,5548,1,3.4,3400,2017,2042
+1014,Wally Corner Landfill Site,Solar,7,5551,1,7.0,7000,2017,2042
+1015,Land North of the Wood at Averill Farm,Solar,7,5554,1,5.0,5000,2016,2041
+1016,Sudforth Lane (Kellingley Solar Farm),Solar,7,5559,1,5.0,5000,2017,2042
+1017,Berthlwyd Farm,Solar,7,5560,1,5.0,5000,2017,2042
+1018,Pinguin Foods,Solar,7,5562,1,1.5,1500,2016,2041
+1019,Land East of Lawn Lane,Solar,7,5568,1,5.0,5000,2016,2041
+1020,Land off Ford Lane,Solar,7,5572,1,4.7,4700,2016,2041
+1021,Woodhouse Fields Farm,Solar,7,5577,1,5.0,5000,2017,2042
+1022,Land off Hooklands Lane,Solar,7,5578,1,5.0,5000,2016,2041
+1023,High Dyke (Mill Farm),Solar,7,5581,1,5.0,5000,2016,2041
+1024,Land West of Parsonage Wood,Solar,7,5582,1,4.2,4200,2016,2041
+1025,Land at Oldstone Farm,Solar,7,5588,1,5.0,5000,2017,2042
+1026,Shortheath Solar Park,Solar,7,5590,1,5.0,5000,2017,2042
+1027,Land at Oxcroft Stocking Ground,Solar,7,5591,1,3.0,3000,2016,2041
+1028,Holtwood Farm,Solar,7,5592,1,5.0,5000,2016,2041
+1029,Nectar Way Regional Distribution Centre,Solar,7,5596,1,1.0,1000,2015,2040
+1030,Gib Lane Solar farm (Extension),Solar,7,5599,1,5.0,5000,2016,2041
+1031,Land east of Littledown Business Park,Solar,7,5600,1,6.2,6200,2016,2041
+1032,Lyreco - Telford Distribution Centre,Solar,7,5602,1,3.8,3800,2016,2041
+1033,Port of Barry (Resubmission) - Site 2,Solar,7,5605,1,5.0,5000,2015,2040
+1034,Holly Farm Solar Park,Solar,7,5632,1,5.0,5000,2017,2042
+1035,Worsted Farm,Solar,7,5633,1,5.0,5000,2019,2044
+1036,Basin Bridge Farm,Solar,7,5643,1,5.0,5000,2016,2041
+1037,Land at East Farm,Solar,7,5650,1,5.0,5000,2017,2042
+1038,B&Q Swindon DC,Solar,7,5653,1,2.5,2500,2016,2041
+1039,Stragglethorpe Road farm,Solar,7,5654,1,5.0,5000,2016,2041
+1040,Land at Bluehouse Farm,Solar,7,5656,1,5.0,5000,2016,2041
+1041,Potters Bar Solar Farm,Solar,7,5660,1,5.0,5000,2017,2042
+1042,Stob House Farm,Solar,7,5664,1,4.9,4900,2016,2041
+1043,Granville Road Solar Farm,Solar,7,5670,1,5.0,5000,2016,2041
+1044,Hyde Farm,Solar,7,5685,1,5.0,5000,2017,2042
+1045,Lower Venn Farm,Solar,7,5686,1,5.0,5000,2016,2041
+1046,Littlewood Lane Solar,Solar,7,5687,1,5.0,5000,2017,2042
+1047,Peterlee Solar Farm,Solar,7,5694,1,5.0,5000,2016,2041
+1048,Land On The East Side Of Fosse Way,Solar,7,5712,1,10.0,10000,2017,2042
+1049,Briar Solar Farm,Solar,7,5720,1,1.9,1900,2017,2042
+1050,Bent Spur Solar Farm,Solar,7,5723,1,5.0,5000,2016,2041
+1051,Blaby Solar Farm,Solar,7,5735,1,3.5,3500,2016,2041
+1052,Bilsthorpe (Land off Forest Lane),Solar,7,5742,1,5.0,5000,2017,2042
+1053,Godley Water Treatment Works,Solar,7,5756,1,3.0,3000,2016,2041
+1054,Park Farm,Solar,7,5786,1,5.0,5000,2016,2041
+1055,Greaves Solar Farm,Solar,7,5793,1,5.0,5000,2016,2041
+1056,Balhearty Solar,Solar,7,5795,1,5.0,5000,2016,2041
+1057,Weddington Farm,Solar,7,5796,1,2.1,2100,2016,2041
+1058,Middle Balbeggie,Solar,7,5797,1,5.0,5000,2017,2042
+1059,Widehurst Farm,Solar,7,5824,1,5.0,5000,2017,2042
+1060,Screwfix Direct,Solar,7,5828,1,2.5,2500,2016,2041
+1061,Land at Biggin Lane,Solar,7,5829,1,5.0,5000,2016,2041
+1062,Land at Barnham,Solar,7,5832,1,1.0,1000,2017,2042
+1063,Ebnal Lodge (resubmission),Solar,7,5834,1,5.0,5000,2017,2042
+1064,Southill Solar (resubmission),Solar,7,5835,1,4.5,4500,2016,2041
+1065,"Carver Hay, moss lane",Solar,7,5838,1,2.5,2500,2017,2042
+1066,St Helen's Lane,Solar,7,5848,1,5.0,5000,2017,2042
+1067,Avonmouth,Solar,7,5864,1,4.2,4200,2016,2041
+1068,Newport (Began Road),Solar,7,5866,1,4.9,4900,2016,2041
+1069,Land to the south of Hill Farm (resubmission),Solar,7,5880,1,6.8,6800,2017,2042
+1070,Mill Farm (resubmission),Solar,7,5887,1,5.0,5000,2016,2041
+1071,Southern Counties Shooting Ground Phase 2 (resubmission),Solar,7,5891,1,5.0,5000,2017,2042
+1072,Dura Park Bynea Industrial Site,Solar,7,5917,1,1.4,1400,2015,2040
+1073,Brook Hall Farm (resubmission),Solar,7,5926,1,4.7,4700,2016,2041
+1074,Land off Moss Side Lane (resubmission),Solar,7,5928,1,5.0,5000,2017,2042
+1075,Barvills Solar Farm (resubmission),Solar,7,5942,1,5.0,5000,2017,2042
+1076,Cairnmore Solar Park (extension),Solar,7,5945,1,1.2,1200,2015,2040
+1077,London Southend Airport (resubmission),Solar,7,5946,1,2.5,2500,2016,2041
+1078,Thameside DC,Solar,7,5985,1,1.0,1000,2016,2041
+1079,Kinmel 2 CIC,Solar,7,6015,1,5.0,5000,2016,2041
+1080,Moss Thorn Farm,Solar,7,6019,1,5.8,5800,2017,2042
+1081,Caergarw Farm,Solar,7,6035,1,3.8,3800,2017,2042
+1082,Rolls Royce Filton Campus Building 184,Solar,7,6042,1,1.4,1400,2016,2041
+1083,Rolls Royce Filton Campus Building 185,Solar,7,6043,1,1.8,1800,2016,2041
+1084,ParkerSteel Shoreham Plant,Solar,7,6055,1,1.8,1800,2015,2040
+1085,Bourne Farm,Solar,7,6062,1,2.4,2400,2015,2040
+1086,London?s Queen Elizabeth II reservoir,Solar,7,6063,1,6.3,6300,2016,2041
+1087,Barnfield Solar Park,Solar,7,6069,1,2.5,2500,2018,2043
+1088,Popehill Farm,Solar,7,6108,1,5.0,5000,2017,2042
+1089,Waltham Point Distribution Centre,Solar,7,6114,1,1.8,1800,2016,2041
+1090,Knottingley B,Solar,7,6129,1,2.4,2400,2016,2041
+1091,Western International Market,Solar,7,6132,1,1.7,1700,2016,2041
+1092,Land East of Horton Road ,Solar,7,6133,1,4.9,4900,2017,2042
+1093,Salford Road,Solar,7,6162,1,1.6,1600,2016,2041
+1094,Grove Solar Park (Phase 2),Solar,7,6163,1,11.0,11000,2016,2041
+1095,Williams Farm,Solar,7,6172,1,5.0,5000,2016,2041
+1096,Kirton Solar PV Farm,Solar,7,6174,1,3.2,3200,2016,2041
+1097,Bury Green Farm Solar,Solar,7,6180,1,5.0,5000,2016,2041
+1098,Misson Solar Farm,Solar,7,6181,1,5.0,5000,2016,2041
+1099,Lancaster Wastewater Treatment Works,Solar,7,6189,1,1.2,1200,2016,2041
+1100,Whitman Laboratories,Solar,7,6198,1,1.0,1000,2017,2042
+1101,Binsted Farm,Solar,7,6205,1,5.0,5000,2016,2041
+1102,Oakfield Farm,Solar,7,6230,1,5.0,5000,2016,2041
+1103,Oakfield Farm - extension,Solar,7,6231,1,1.7,1700,2016,2041
+1104,Former Westhampnett Landfill,Solar,7,6244,1,7.5,7500,2018,2043
+1105,Bentley Motors,Solar,7,6246,1,2.9,2900,2018,2043
+1106,DPD Distribution Centre,Solar,7,6314,1,1.0,1000,2017,2042
+1107,Bywaters? Materials Recovery Facility Solar Array,Solar,7,6320,1,1.0,1000,2017,2042
+1108,High Meadow Farm,Solar,7,6321,1,4.0,4000,2016,2041
+1109,Deep Moor Landfill Site (Resubmission),Solar,7,6328,1,2.0,2000,2018,2043
+1110,Testwood Water Supply Works,Solar,7,6329,1,1.9,1900,2017,2042
+1111,Rosedew Farm,Solar,7,6369,1,5.0,5000,2016,2041
+1112,Dengemarsh Road,Solar,7,6376,1,1.0,1000,2016,2041
+1113,Haigh Hall Solar Farm (Resubmission),Solar,7,6402,1,5.0,5000,2017,2042
+1114,Next Distribution Centre Doncaster,Solar,7,6403,1,2.5,2500,2016,2041
+1115,Sytchwythy Fields,Solar,7,6458,1,1.4,1400,2017,2042
+1116,Clifton Marsh Wastewater Treatment Works,Solar,7,6466,1,1.3,1300,2019,2044
+1117,Sherburn,Solar,7,6485,1,5.0,5000,2016,2041
+1118,Aldi - Cardiff,Solar,7,6486,1,1.5,1500,2016,2041
+1119,Oak Grove Farm,Solar,7,6493,1,5.7,5700,2017,2042
+1120,Lathom (Pilkington Technical Centre),Solar,7,6513,1,2.5,2500,2019,2044
+1121,Stormy Down Solar Farm,Solar,7,6520,1,3.8,3800,2017,2042
+1122,Clifton Marsh Wastewater Treatment Works,Solar,7,6523,1,3.2,3200,2019,2044
+1123,Huntington Water Treatment Works,Solar,7,6532,1,7.2,7200,2019,2044
+1124,Cranfield Airfield,Solar,7,6603,1,1.0,1000,2018,2043
+1125,Chamber 16 (Cold Store),Solar,7,6683,1,1.2,1200,2016,2041
+1126,Burneside Mill,Solar,7,6759,1,0.5,500,2019,2044
+1127,Leeways,Solar,7,6761,1,0.5,500,2019,2044
+1128,Ainsdale Wastewater Treatment Works,Solar,7,7279,1,0.3,300,2019,2044
+1129,Volmary Site,Solar,7,7298,1,0.2,200,2019,2044
+1130,National Space Centre,Solar,7,7320,1,0.2,200,2019,2044
+1131,Henry Colbeck Office,Solar,7,7391,1,0.2,200,2019,2044
+1132,Jaywick Water Recycling Centre,Solar,7,7689,1,0.9,900,2019,2044

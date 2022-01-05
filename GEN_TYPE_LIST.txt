@@ -1,0 +1,11 @@
+CCGT
+OCGT
+Coal
+Nuclear
+Wind Offshore
+Wind Onshore
+Solar
+Hydro
+Biomass
+BECCS
+Hydrogen

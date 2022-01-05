@@ -1,0 +1,77 @@
+,Company Name,Name,Type,TypeID,SiteID,Renewable,Capacity(MW),Capacity(kW),StartYear,EndYear,Bus
+0,ABP Ellesmere,ABP Ellesmere Abbatoir,Biomass,9,6488,1,1.1,1100,2015,2040,0
+1,Ancillary Components,Goosey Lodge Industrial Estate,Biomass,9,49,1,16,16000,2000,2025,0
+2,Balcas,Invergordon Pellet Mill,Biomass,9,28,1,5,5000,2009,2034,0
+3,Balfor Beaty,Beckton STW Biodiesel Power Plant,Biomass,9,24,1,8,8000,2010,2035,0
+4,Bioflame,South View Farm,Biomass,9,37,1,2,2000,2007,2032,0
+5,Burmeister & Wain Scandinavian,Widnes 3MG Biomass/Mersey Bioenergy (CHP) Plant,Biomass,9,190,1,20,20000,2017,2042,0
+6,Burmeister & Wain Scandinavian,Discovery Park,Biomass,9,173,1,16,16000,2018,2043,0
+7,Burmeister & Wain Scandinavian,Snetterton Biomass Plant,Biomass,9,185,1,44.2,44200,2016,2041,0
+8,Caledonian Paper,Caledonian Papermill,Biomass,9,34,1,26,26000,2009,2034,0
+9,Cofely,Rampton Hospital Energy Centre,Biomass,9,66,1,1.2,1200,2015,2040,0
+10,Dalkia,Chilton Energy Plant,Biomass,9,14,1,18,18000,2012,2037,10
+11,Diageo,Diageo Biomass Energy Project,Biomass,9,172,1,5.5,5500,2013,2038,0
+12,Double H Nurseries,Double H Nurseries Biomass Plant,Biomass,9,22,1,1.5,1500,2012,2037,28
+13,Drax Power Ltd,Drax Biomass Power Station - Unit 3,Biomass,9,175,1,645,645000,2017,2042,0
+14,Drax Power Ltd,Drax Biomass Power Station - Unit 2,Biomass,9,192,1,645,645000,2014,2039,0
+15,Drax Power Ltd,Drax Biomass Power Station - Unit 4,Biomass,9,6659,1,645,645000,2018,2043,0
+16,Drax Power Ltd,Drax Biomass Power Station - Unit 1,Biomass,9,174,1,645,645000,2013,2038,0
+17,E.On UK,Ironbridge Power Station,Biomass,9,125,1,740,740000,2013,2038,0
+18,E.On UK,Blackburn Meadows Biomass Plant,Biomass,9,166,1,30,30000,2014,2039,0
+19,E.On UK,Stevens Croft,Biomass,9,196,1,50.4,50400,2007,2032,0
+20,Earthworm,Daventry,Biomass,9,5639,1,1,1000,2018,2043,0
+21,Eccleshal Biomass,Eccleshall Biomass,Biomass,9,58,1,2.6,2600,2007,2032,0
+22,Eco Sustainable Solutions,Eco Composting,Biomass,9,139,1,3.2,3200,2017,2042,0
+23,Eco2,Brigg Renewable Energy Plant (Re-submission),Biomass,9,150,1,40,40000,2016,2041,0
+24,Energy Power Resources,Thetford Biomass Power Station,Biomass,9,4,1,38.5,38500,1998,2023,0
+25,EPR Scotland,Westfield Biomass Power Station,Biomass,9,62,1,12.5,12500,2000,2025,0
+26,Estover Energy,Cramlington CHP,Biomass,9,121,1,27.7,27700,2018,2043,0
+27,European Development Corporation,Elean Business Park Biomass Plant,Biomass,9,78,1,40,40000,2000,2025,0
+28,GDF SUEZ ENERGY UK,SAICA Paper Mill,Biomass,9,132,1,41.6,41600,2012,2037,13
+29,GIB and Equitix ,Pulteney Distillery ,Biomass,9,6091,1,3.5,3500,2012,2037,1
+30,Glenmont,Sleaford Renewable Energy Plant,Biomass,9,206,1,40,40000,2014,2039,0
+31,Glenmont,Margam Green Energy Plant,Biomass,9,113,1,40,40000,2017,2042,0
+32,Glennon Brothers Troon,Harbour Road,Biomass,9,6138,1,2.6,2600,2017,2042,0
+33,Greencoat Capital,Templeborough Biomass Power Plant- Rotherham,Biomass,9,161,1,42,42000,2019,2044,0
+34,Heathrow Airport,Heathrow Airport Biomass CHP,Biomass,9,129,1,1.8,1800,2013,2038,0
+35,"Icon, EEA Holdings & 2OC consortium",Beckton Gas Pressure Reduction Station,Biomass,9,143,1,19,19000,2015,2040,0
+36,Iggesund Paperboard (Workington),Iggesund Paperboard CHP Plant,Biomass,9,47,1,49,49000,2013,2038,0
+37,JG Pears Power,JG Pears' animal rendering facility,Biomass,9,6227,1,12,12000,2018,2043,0
+38,Living Power (REG Bio-Power),Buslingthorpe Power Station (Leeds North),Biomass,9,26,1,2,2000,2011,2036,14
+39,Lynemouth Power,Lynemouth Power Station,Biomass,9,115,1,420,420000,2018,2043,0
+40,Markley Group,Markley Group (Premiere Kitckens) Biomass,Biomass,9,127,1,2.1,2100,2012,2037,23
+41,"MVV Energie, Ridham Dock",Ridham CHP Plant,Biomass,9,106,1,25,25000,2016,2041,0
+42,Naturegen Energy Centre,Ipswich Hospital Energy Centre,Biomass,9,6507,1,2.6,2600,2017,2042,0
+43,Newbridge Energy ,Blazer Fuels ,Biomass,9,6228,1,3,3000,2017,2042,0
+44,Norbord,Cowie Biomass Facility,Biomass,9,41,1,15,15000,2008,2033,0
+45,Northampton General Hospital,Northampton General Hospital,Biomass,9,182,1,1.9,1900,2016,2041,0
+46,Northern Energy Developments ,Acharn Forest Killin Biomass Plant,Biomass,9,6061,1,5.6,5600,2017,2042,0
+47,Plymouth Hospital NHS Trust,Derriford Hospital,Biomass,9,64,1,1.5,1500,2014,2039,0
+48,RCMA Stratford,Alscot,Biomass,9,6492,1,1.6,1600,2017,2042,0
+49,REG Bio-Power,Bentwaters CHP,Biomass,9,130,1,4.6,4600,2010,2035,0
+50,REG Bio-Power,Whitemoor,Biomass,9,5003,1,18,18000,2014,2039,0
+51,Rocpower,Loicher Lane,Biomass,9,6274,1,8,8000,2016,2041,0
+52,RWE,Markinch Biomass CHP Plant,Biomass,9,155,1,65,65000,2014,2039,0
+53,RWE,Aberthaw Power Station Biomass,Biomass,9,1,1,35,35000,2007,2032,0
+54,Safran Landing Systems UK/Technical Plant Services,Safran Landing Systems Service,Biomass,9,6367,1,3.6,3600,2017,2042,0
+55,Scottish Bio-Power,Rothes Bio-Plant,Biomass,9,140,1,8.3,8300,2013,2038,0
+56,SIMEC Group,Uskmouth Power Station ,Biomass,9,6089,1,18,18000,2015,2040,0
+57,SIMEC Group,Liberty Steel Power Station,Biomass,9,6184,1,9,9000,2017,2042,0
+58,SIMEC Group,Liberty Steel Dalzell,Biomass,9,6731,1,17,17000,2017,2042,0
+59,Solar 21,Hull Biomass Plant (Tansterne power station),Biomass,9,6087,1,22,22000,2018,2043,0
+60,South Western Power (NOVERA),Eye Biomass Plant,Biomass,9,82,1,14.3,14300,1992,2017,0
+61,SPEP,Barnsley 1.5 ,Biomass,9,6164,1,9,9000,2015,2040,0
+62,SPEP,Spalding,Biomass,9,6165,1,14.5,14500,2015,2040,0
+63,SPEP,Balderton,Biomass,9,6166,1,20.3,20300,2015,2040,0
+64,Speyside Renewable Energy Partnership,Speyside Biomass CHP Plant,Biomass,9,186,1,12.5,12500,2016,2041,0
+65,Suez Energy Services,King's Yard,Biomass,9,87,1,3,3000,2012,2037,25
+66,Sunrise Renewables,King George Dock,Biomass,9,179,1,9,9000,2018,2043,0
+67,Tilbury Green Power,Tilbury Green Power,Biomass,9,152,1,43,43000,2017,2042,0
+68,TPS (UK),Thornton Power Station,Biomass,9,44,1,9,9000,2002,2027,0
+69,UK Wood Recycling,Wilton International,Biomass,9,35,1,35.2,35200,2007,2032,0
+70,University of St Andrews,Sustainable Power and Research Campus,Biomass,9,4730,1,6.5,6500,2016,2041,0
+71,UYE (UK) / Veolia,Holbrook Community Renewable Energy Centre,Biomass,9,117,1,6.5,6500,2017,2042,0
+72,Veolia Energy Services,The Sawmill,Biomass,9,5752,1,6.8,6800,2017,2042,0
+73,Volac,Felinfach,Biomass,9,6016,1,3.2,3200,2016,2041,0
+74,"Western Bioenergy, affiliate of Western Log",Western Wood Energy Plant,Biomass,9,57,1,14,14000,2009,2034,0
+75,,Macphie of Glenbervie,Biomass,9,205,1,1.2,1200,2008,2033,0

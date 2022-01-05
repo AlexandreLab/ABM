@@ -1,0 +1,324 @@
+Company Name,Station Name,Fuel,Installed Capacity(MW),StartYear,Location
+AES,Ballylumford B,CCGT,540,1968,Northern Ireland
+AES,Ballylumford B OCGT,OCGT,116,1968,Northern Ireland
+AES,Ballylumford C,CCGT,616,2003,Northern Ireland
+AES,Kilroot OCGT,OCGT,142,1981,Northern Ireland
+AES,Kilroot,Coal,560,1981,Northern Ireland
+Blue energy,Beinneun Wind Farm,Wind Onshore,109,2017,Scotland
+Blue energy,Cour Wind Farm,Wind Onshore,21,2016,Scotland
+British Solar Renewables,Bradenstoke Solar Park,Solar,70,2015,South West
+Calon energy (formerly MPF operations),Sutton Bridge,CCGT,819,1999,East Midlands
+Calon energy (formerly MPF operations),Baglan Bay CCGT,CCGT,520,2002,Wales
+Calon energy (formerly MPF operations),Severn Power,CCGT,850,2010,Wales
+Calon energy (formerly MPF operations),Baglan Bay OCGT,OCGT,32.3,2002,Wales
+Centrica,Peterborough,CCGT,360,1993,East England
+Centrica,Glanford Brigg,CCGT,150,1993,Yorkshire & Humber
+Centrica,Barry,CCGT,235,1998,Wales
+Corby Power Ltd,Corby,CCGT,401,1993,East Midlands
+Cubico Sustainable Investments Limited,Broxted Solar Park,Solar,32,2014,Eastern
+Cubico Sustainable Investments Limited,Owl's Hatch Solar Park,Solar,51.9,2015,South East
+Drax Power Ltd,Drax - coal units,Coal,1980,1974,Yorkshire and the Humber
+Drax Power Ltd,Drax - biomass units,Biomass,1980,1974,Yorkshire and the Humber
+Drax Power Ltd,Drax GT,OCGT,75,1971,Yorkshire and the Humber
+E.On UK,Blackburn meadows *,Biomass,33,2015,Yorkshire & Humber
+E.On UK,Castleford,CCGT,56,2002,Yorkshire & Humber
+E.On UK,Sandbach,CCGT,56,1999,North West
+E.On UK,Steven's Croft *,Biomass,50,2007,Scotland
+E.On UK,Thornhill,CCGT,50,1998,Yorkshire & Humber
+E.On UK,Camster,Wind Onshore,50,2013,Scotland
+E.On UK,Humber Gateway,Wind Offshore,219,2015,Yorkshire and Humber
+E.On UK,London Array,Wind Offshore,630,2013,South East
+E.On UK,Robin Rigg East,Wind Offshore,90,2010,Scotland
+E.On UK,Robin Rigg West,Wind Offshore,90,2010,Scotland
+E.On UK,Rosehall,Wind Onshore,25,2013,Scotland
+E.On UK,Scroby Sands,Wind Offshore,60,2004,Eastern
+E.On UK,Tween Bridge,Wind Onshore,44,2012,Yorkshire and Humber
+E.On UK,Rampion,Wind Offshore,182.9,2018,South East
+EDF Energy,Dungeness B,Nuclear,1120,1983,South East
+EDF Energy,Hartlepool,Nuclear,1207,1984,North East
+EDF Energy,Heysham 1,Nuclear,1179,1984,North West
+EDF Energy,Heysham 2,Nuclear,1254,1988,North West
+EDF Energy,Hinkley Point B,Nuclear,1061,1976,South West
+EDF Energy,Sizewell B,Nuclear,1216,1995,East England
+EDF Energy,Hunterston B,Nuclear,1074,1976,Scotland
+EDF Energy,Torness,Nuclear,1250,1988,Scotland
+EDF Energy,Cottam,Coal,2008,1969,West Midlands
+EDF Energy,West Burton,Coal,2012,1967,West Midlands
+EDF Energy,West Burton CCGT,CCGT,1332,2012,West Midlands
+EDF Energy,Barkantine Heat & Power Company *,Gas,1,2000,London
+EDF Energy,London Heat & Power Company *,Gas,9,2000,London
+EDF Energy,West Burton GT,OCGT,40,1967,East Midlands
+EDF renewables,Beckburn,Wind Onshore,31.1,2017,North West
+EDF renewables,Bicker Fen,Wind Onshore,26,2008,East Midlands
+EDF renewables,Blyth,Wind Offshore,40,2017,North East
+EDF renewables,Burnfoot,Wind Onshore,30.1,2010,Scotland
+EDF renewables,Burnhead Moss,Wind Onshore,26,2015,Scotland
+EDF renewables,Corriemoillie,Wind Onshore,47.5,2017,Scotland
+EDF renewables,Fallago Rig,Wind Onshore,144,2013,Scotland
+EDF renewables,Green Rigg,Wind Onshore,36,2012,North East
+EDF renewables,Longpark,Wind Onshore,38,2009,Scotland
+EDF renewables,Red Tile,Wind Onshore,24,2006,Eastern
+EDF renewables,Rusholme,Wind Onshore,24,2010,Yorkshire and Humber
+EDF renewables,Teesside (offshore),Wind Offshore,62,2013,North East
+Eggborough Power Ltd,Eggborough,Coal,1960,1967,Yorkshire & Humber
+Eneco,Burn of Whilk,Wind Onshore,22.5,2015,Scotland
+Eneco,Lochluichart,Wind Onshore,69,2014,Scotland
+Eneco,Moy,Wind Onshore,60,2016,Scotland
+Eneco,Twinshiels,Wind Onshore,25,2015,Scotland
+ENGIE,Dinorwig,Pumped storage,1800,1983,Wales
+ENGIE,Ffestiniog,Pumped storage,360,1961,Wales
+EPR,Eye Suffolk,Biomass,14.3,1992,East England
+EPR,Glanford,Meat & bone meal,14,1993,Yorkshire & Humber
+EPR,Thetford,Biomass,41.5,1998,East England
+EPR,Westfield,Biomass,12.5,2000,Scotland
+EPR,EPR Ely Ltd,Straw,38,2001,East England
+EPUKi,South Humber Bank,CCGT,1365,1996,Yorkshire & Humber
+EPUKi,Langage,CCGT,905,2010,South West
+ESB,Coolkeeragh,CCGT,408,2005,Northern Ireland
+ESB,Coolkeeragh OCGT,OCGT,53,2005,Northern Ireland
+ESB,Carrington,CCGT,910,2016,North West
+Falck renewables LTD,Assel Valley,Wind Onshore,25,2016,Scotland
+Falck renewables LTD,Auchrobert,Wind Onshore,38.8,2017,Scotland
+Falck renewables LTD,Ben Aketil,Wind Onshore,27.6,2007,Scotland
+Falck renewables LTD,Cambrian,Wind Onshore,58.5,2016,Wales
+Falck renewables LTD,Earlsburn,Wind Onshore,37.5,2006,Scotland
+Falck renewables LTD,Kilbraur,Wind Onshore,67.5,2008,Scotland
+Falck renewables LTD,Kingsburn,Wind Onshore,22.5,2016,Scotland
+Falck renewables LTD,Millennium,Wind Onshore,65,2007,Scotland
+Falck renewables LTD,West Browncastle,Wind Onshore,30,2014,Scotland
+Foresight Group,Shotwick,Solar,72,2017,Wales
+Fred Olsen,Brockloch Rig,Wind Onshore,61.5,2017,Scotland
+Fred Olsen,Crystal Rig,Wind Onshore,62.5,2003,Scotland
+Fred Olsen,Crystal Rig II,Wind Onshore,138,2003,Scotland
+Fred Olsen,Mid Hill,Wind Onshore,75.9,2013,Scotland
+Fred Olsen,Pauls Hill,Wind Onshore,64.4,2005,Scotland
+Fred Olsen,Rothes,Wind Onshore,50.6,2004,Scotland
+Fred Olsen,Rothes II,Wind Onshore,41.4,2013,Scotland
+Greencoat,Braes of Doune Wind Farm,Wind Onshore,72,2006,Scotland
+Greencoat,Drone Hill,Wind Onshore,28.6,2012,Scotland
+Greencoat,Maerdy,Wind Onshore,24,2012,Wales
+Greencoat,North Rhins,Wind Onshore,22,2010,Scotland
+Greencoat,Sixpenny Wood,Wind Onshore,20.5,2013,Yorkshire and Humber
+Greencoat,Stroupster,Wind Onshore,29.9,2015,Scotland
+Greencoat,Tappaghan Wind Farm,Wind Onshore,28.5,2004,Northern Ireland
+Greencoat,Slieve Divena,Wind Onshore,30,2009,Northern Ireland
+Greencoat,Bann Road,Solar,45.8,2017,Northern Ireland
+Greencoat,Coltishall 1,Solar,33.7,2015,Eastern
+Greencoat,Eveley,Solar,49.3,2016,South East
+Indian Queens Power Ltd,Indian Queens,OCGT,140,1996,South West
+Infinis,Ardrossan,Wind Onshore,30,2004,Scotland
+Infinis,A'Chruach,Wind Onshore,42.6,2016,Scotland
+Infinis,Dalswinton,Wind Onshore,30,2007,Scotland
+Infinis,Galawhistle,Wind Onshore,55.2,2016,Scotland
+Infinis,Lissett,Wind Onshore,30,2007,Yorkshire and Humber
+Infinis,Minsca,Wind Onshore,36.8,2007,Scotland
+Infinis,Carno,Wind Onshore,33.6,1997,Wales
+Infinis,Causeymire wind farm,Wind Onshore,48.3,2004,Scotland
+Infinis,Farr wind farm ltd,Wind Onshore,92,2005,Scotland
+Infinis,Fynnon Oer,Wind Onshore,32,2006,Wales
+Infinis,Llyn Alaw,Wind Onshore,20.4,1997,Wales
+Infinis,Windy Standard,Wind Onshore,21.6,1996,Scotland
+Innogy renewables,Bradwell,Wind Onshore,20.5,2013,Eastern
+Innogy renewables,Galloper,Wind Offshore,33,2013,Yorkshire and Humber
+Innogy renewables,Goole Fields 2,Wind Onshore,34.9,2016,Yorkshire and Humber
+Innogy renewables,Gwynt-y-Mor,Wind Offshore,576,2013,Wales
+Innogy renewables,Little Cheyne Court,Wind Onshore,59.8,2008,South East
+Innogy renewables,Middlemoor,Wind Onshore,54,2013,North East
+Innogy renewables,North Hoyle,Wind Offshore,60,2003,Wales
+Innogy renewables,Novar2,Wind Onshore,36.8,2012,Scotland
+Innogy renewables,Rhyl Flats,Wind Offshore,90,2009,Wales
+Innogy renewables,Galloper Wind Farm,Wind Offshore,72,2017,Eastern
+Intergen,Rocksavage,CCGT,810,1998,North West
+Intergen,Coryton,CCGT,800,2001,East England
+Intergen,Spalding,CCGT,880,2004,East Midlands
+Lark,Nixey Farm - Chalgrove - Solar Farm,Solar,21.3,2015,South East
+LightsourceBP,Bury Lane,Solar,22.2,2014,Eastern
+LightsourceBP,Crundale,Solar,43.7,2014,Wales
+LightsourceBP,Exning,Solar,30.3,2015,Eastern
+LightsourceBP,Fareham,Solar,20.5,2014,South East
+LightsourceBP,Hill House Farm,Solar,28.3,2015,South West
+LightsourceBP,South Creake,Solar,26,2016,Eastern
+LightsourceBP,Lough Road PV,Solar,32.1,2017,Northern Ireland
+Londonwaste Limited,Edmonton,Waste,60,1970,London
+Magnox Ltd,Maentwrog,Hydro,35.3,1928,Wales
+Marchwood Power Limited,Marchwood,CCGT,920,2009,South East
+Multifuel energy ltd,Ferrybridge Multi-fuel,Waste,79,2015,Yorkshire & Humber
+Octopus energy,Abbots Ripton,Solar,24.7,2014,Eastern
+Octopus energy,Ermine,Solar,32.4,2014,East Midlands
+Octopus energy,Melborn Muncey,Solar,30.9,2015,Eastern
+Octopus energy,Pitchford,Solar,21,2015,West Midlands
+Octopus energy,Waterloo,Solar,28.7,2015,Eastern
+Orsted,Barrow,Wind Offshore,90,2006,North West
+Orsted,Burbo Extension Offshore Windfarm,Wind Offshore,259,2017,North West
+Orsted,Burbo Offshore Windfarm,Wind Offshore,90,2007,North West
+Orsted,Gunfleet Sands 1 & 2 Ltd.,Wind Offshore,172.8,2010,Eastern
+Orsted,Lincs,Wind Offshore,270,2013,East Midlands
+Orsted,Race Bank,Wind Offshore,548.1,2018,Eastern
+Orsted,Walney 1 & 2,Wind Offshore,368,2012,North West
+Orsted,Walney 3,Wind Offshore,330,2017,North West
+Orsted,West of Duddon Sands,Wind Offshore,388.8,2014,North West
+Orsted,Westermost Rough,Wind Offshore,210,2014,Yorkshire and Humber
+Peel Energy Ltd,Frodsham Wind Farm Ltd,Wind Onshore,50.4,2016,North West
+REG power,Glens of Foudland,Wind Onshore,26,2005,Scotland
+Renewable energy systems,Gruig Wind Farm Limited,Wind Onshore,25,2009,Northern Ireland
+Renewable energy systems,Altahullion Wind Farm (NI),Wind Onshore,26,2003,Northern Ireland
+Renewable energy systems,Black Hill Wind Farm (GB),Wind Onshore,28.6,2006,Scotland
+Renewable energy systems,Freasdail (GB),Wind Onshore,22.5,2017,Scotland
+Renewable energy systems,Garreg Llwyd (GB),Wind Onshore,30.4,2017,Wales
+Renewable energy systems,Glenchamber Wind Farm (GB),Wind Onshore,27.5,2016,Scotland
+Renewable energy systems,Hill of Towie Wind Farm (GB),Wind Onshore,48.3,2012,Scotland
+Renewable energy systems,Kelburn Wind Farm (GB),Wind Onshore,28,2012,Scotland
+Renewable energy systems,Minnygap (GB),Wind Onshore,25,2017,Scotland
+Renewable energy systems,Penmanshiel (GB),Wind Onshore,28.7,2016,Scotland
+Renewable energy systems,Wadlow Farm (GB),Wind Onshore,26,2012,Eastern
+Renewable energy systems,Wryde Croft Wind Farm (GB),Wind Onshore,26,2016,Eastern
+Renewable energy systems,Parley,Solar,24.2,2014,South West
+Riverside Resource Recovery Limited,Riverside - Energy from Waste,Waste,80,2011,London
+Rockfire capital,Swindon Solar Farm,Solar,60.9,2016,South West
+RWE Generation SE,Aberthaw B,Coal,1610,1971,Wales
+RWE Generation SE,Aberthaw GT,OCGT,51,1971,Wales
+RWE Generation SE,Cowes,OCGT,140,1982,South East
+RWE Generation SE,Didcot B,CCGT,1550,1998,South East
+RWE Generation SE,Didcot GT,OCGT,100,1972,South East
+RWE Generation SE,Great Yarmouth,CCGT,420,2001,East England
+RWE Generation SE,Little Barford,CCGT,740,1995,East England
+RWE Generation SE,Little Barford GT,Gas oil,17,2006,East England
+RWE Generation SE,Markinch CHP *,Biomass,65,2014,Scotland
+RWE Generation SE,Pembroke,CCGT,2199,2012,Wales
+RWE Generation SE,Staythorpe C,CCGT,1772,2010,East Midlands
+Saltend Cogeneration Company Ltd,Saltend *,CCGT,1200,2000,Yorkshire & Humber
+Scira Offshore Energy Ltd,Dudgeon BMU 1,Wind Offshore,108,2017,Eastern
+Scira Offshore Energy Ltd,Dudgeon BMU 2,Wind Offshore,90,2017,Eastern
+Scira Offshore Energy Ltd,Dudgeon BMU 3,Wind Offshore,102,2017,Eastern
+Scira Offshore Energy Ltd,Dudgeon BMU 4,Wind Offshore,102,2017,Eastern
+Scira Offshore Energy Ltd,Hywind BMU 1,Wind Offshore,30,2017,Scotland
+Scira Offshore Energy Ltd,Sheringham Shoal BMU 1,Wind Offshore,158,2012,Eastern
+Scira Offshore Energy Ltd,Sheringham Shoal BMU 2,Wind Offshore,158,2017,Eastern
+Scottish power,Blackburn,CCGT,59,2011,North West
+Scottish power,Damhead Creek,CCGT,805,2000,South East
+Scottish power,Shoreham,CCGT,420,2000,South East
+Scottish power,Rye House,CCGT,715,1993,East England
+Scottish power,Arecleoch,Wind Onshore,120,2010,Scotland
+Scottish power,Beinn an Tuirc I,Wind Onshore,29.7,2001,Scotland
+Scottish power,Beinn an Tuirc II,Wind Onshore,43.7,2002,Scotland
+Scottish power,Beinn Tharsuinn,Wind Onshore,29.8,2006,Scotland
+Scottish power,Black Law,Wind Onshore,124.2,2005,Scotland
+Scottish power,Black Law II,Wind Onshore,63.4,2017,Scotland
+Scottish power,Cruach Mhor,Wind Onshore,29.8,2004,Scotland
+Scottish power,Dersalloch,Wind Onshore,69,2016,Scotland
+Scottish power,Dun Law II,Wind Onshore,29.8,2009,Scotland
+Scottish power,Ewe Hill II,Wind Onshore,36.8,2017,Scotland
+Scottish power,Glenapp,Wind Onshore,22,2016,Scotland
+Scottish power,Green Knowes,Wind Onshore,27,2008,Scotland
+Scottish power,Hagshaw Hill II,Wind Onshore,26,1995,Scotland
+Scottish power,Hare Hill II,Wind Onshore,29.8,2016,Scotland
+Scottish power,Harestanes,Wind Onshore,136,2013,Scotland
+Scottish power,Kilgallioch,Wind Onshore,239,2017,Scotland
+Scottish power,Lynemouth,Wind Onshore,26,2012,North East
+Scottish power,Mark Hill,Wind Onshore,56,2011,Scotland
+Scottish power,P&L,Wind Onshore,30.6,1993,Wales
+Scottish power,Whitelee,Wind Onshore,322,2007,Scotland
+Scottish power,Whitelee II,Wind Onshore,217,2013,Scotland
+Scottish power,Glenlee,Hydro,24,1935,Scotland
+Scottish power,Kendoon,Hydro,24,1936,Scotland
+Scottish power,Tongland,Hydro,33,1935,Scotland
+Scottish power,Cruachan,Pumped storage,440,1966,Scotland
+Seabank Power Limited,Seabank,CCGT,1234,1998,South West
+Sellafield Ltd,Fellside CHP *,CCGT,180,1995,North West
+Sembcorp Utilities (UK) Ltd,Wilton GT *,Coal,120,1952,North East
+Sembcorp Utilities (UK) Ltd,Wilton 10 *,Biomass,38,2007,North East
+SIMEC,Uskmouth power,Coal,363,1966,Wales
+South East London Combined Heat & Power Ltd,SELCHP ERF *,Waste,35,1994,London
+SSE,Deanie,Hydro,38,1963,Scotland
+SSE,Fasnakyle,Hydro,69,1951,Scotland
+SSE,Lochay,Hydro,46,1958,Scotland
+SSE,Luichart,Hydro,34,1954,Scotland
+SSE,Foyers,Hydro / pumped storage,300,1974,Scotland
+SSE,Glendoe,Hydro,100,2008,Scotland
+SSE,Glenmoriston,Hydro,37,1957,Scotland
+SSE,Clachan,Hydro,40,1955,Scotland
+SSE,Inverawe,Hydro,25,1963,Scotland
+SSE,Sloy,Hydro,152.5,1950,Scotland
+SSE,Clunie,Hydro,61.2,1950,Scotland
+SSE,Errochty,Hydro,75,1955,Scotland
+SSE,Rannoch,Hydro,45,1930,Scotland
+SSE,Tummel,Hydro,34,1933,Scotland
+SSE,Burghfield,Gas,50,1998,South East
+SSE,Chickerell,Gas,50,1998,South West
+SSE,Chippenham,Gas,10,2002,South West
+SSE,Pilkington - Greengate *,Gas,10,1998,North West
+SSE,Arnish,Diesel,10.2,2001,Scotland
+SSE,Barra,Diesel,3,1990,Scotland
+SSE,Bowmore,Diesel,6.2,1946,Scotland
+SSE,Kirkwall,Diesel,16,1953,Scotland
+SSE,Lerwick,Diesel,67,1953,Scotland
+SSE,"Loch Carnan, South Uist",Diesel,11.5,1971,Scotland
+SSE,Tiree,Diesel,3,1945,Scotland
+SSE,Peterhead,CCGT,1180,1980,Scotland
+SSE,Stornoway,Diesel,24,1950,Scotland
+SSE,Keadby,CCGT,735,1994,Yorkshire & Humber
+SSE,Medway,CCGT,755,1995,South East
+SSE,Fiddler’s Ferry GT,OCGT,35,1969,North West
+SSE,Fiddler’s Ferry,Coal,1961,1971,North West
+SSE,Slough *,Biomass,35,1918,South East
+SSE,Keadby GT,OCGT,25,1994,Yorkshire and the Humber
+SSE,Achany Windfarm,Wind Onshore,38,2010,Scotland
+SSE,"Artfield Fell Windfarm - A,C",Wind Onshore,28.6,2005,Scotland
+SSE,Bhlaraidh Wind Farm,Wind Onshore,110.4,2017,Scotland
+SSE,Clyde Windfarm (Central),Wind Onshore,112.7,2011,Scotland
+SSE,Clyde Windfarm (North),Wind Onshore,108.1,2012,Scotland
+SSE,Clyde Windfarm (South),Wind Onshore,128.8,2011,Scotland
+SSE,Drumderg Windfarm,Wind Onshore,36.8,2008,Scotland
+SSE,Dunmaglass Wind Farm,Wind Onshore,94.1,2016,Scotland
+SSE,Fairburn Windfarm,Wind Onshore,40,2010,Scotland
+SSE,Gordonbush Wind Farm,Wind Onshore,70,2012,Scotland
+SSE,Greater Gabbard,Wind Offshore,504,2012,Eastern
+SSE,Griffin Wind Farm,Wind Onshore,188.6,2012,Scotland
+SSE,"Hadyard Hill Windfarm - A,C",Wind Onshore,119.8,2006,Scotland
+SSE,Keadby Wind Farm,Wind Onshore,68,2013,Yorkshire and Humber
+SSE,Slieve Kirk Windfarm,Wind Onshore,73.6,2012,Northern Ireland
+SSE,Strathy North,Wind Onshore,66,2015,Scotland
+SSE,Toddleburn Windfarm,Wind Onshore,27.6,2010,Scotland
+SSE,Tievenameenta Wind Farm,Wind Onshore,34.5,2017,Northern Ireland
+SSE,Barkip AD,Waste,2.7,2012,Scotland
+Statkraft Energy Ltd,Alltwalis Wind Farm,Wind Onshore,23,2009,Wales
+Statkraft Energy Ltd,Andershaw Wind Farm,Wind Onshore,35,2016,Scotland
+Statkraft Energy Ltd,Baillie Wind Farm,Wind Onshore,52.5,2013,Scotland
+Statkraft Energy Ltd,Berry Burn Wind farm,Wind Onshore,66.7,2014,Scotland
+Statkraft Energy Ltd,Rheidol,Hydro,56,1961,Wales
+Suez recycling and recovery,Wilton 11 EfW,Waste,49,2016,North East
+Third Energy Trading Ltd,Knapton,OCGT,41.5,1994,Yorkshire & Humber
+Uniper UK Limited,Cottam Development Centre,CCGT,445,1999,East Midlands
+Uniper UK Limited,Connahs Quay,CCGT,1380,1996,Wales
+Uniper UK Limited,Enfield,CCGT,408,1999,London
+Uniper UK Limited,Grain CHP *,CCGT,1517,2010,South East
+Uniper UK Limited,Killingholme,OCGT,600,1994,East Midlands
+Uniper UK Limited,Ratcliffe,Coal,2021,1968,East Midlands
+Uniper UK Limited,Taylor's Lane GT,OCGT,144,1979,London
+Uniper UK Limited,Grain GT,OCGT,56,1978,South East
+Uniper UK Limited,Ratcliffe GT,OCGT,34,1966,East Midlands
+Vattenfall,Clashindarroch,Wind Onshore,36.9,2015,Scotland
+Vattenfall,Edinbane,Wind Onshore,41.4,2010,Scotland
+Vattenfall,Kentish,Wind Offshore,90,2005,South East
+Vattenfall,Kentish Flats Extension,Wind Offshore,49.5,2015,South East
+Vattenfall,Ormonde,Wind Offshore,150,2012,North West
+Vattenfall,Pen y Cymoedd,Wind Onshore,228,2016,Wales
+Vattenfall,Ray,Wind Onshore,54.4,2017,North East
+Vattenfall,Swinford,Wind Onshore,22,2012,East Midlands
+Vattenfall,Thanet,Wind Offshore,300,2010,South East
+Viridor Waste Management,Runcorn EfW,Waste,86,2014,North West
+Viridor Waste Management,Bolton EfW,Waste,8,1971,North West
+Viridor Waste Management,Exeter EfW,Waste,3.5,2014,South West
+Viridor Waste Management,Peterborough EfW,Waste,7.3,2016,East Midlands
+Viridor Waste Management,Ardley EfW,Waste,26,2014,South East
+Viridor Waste Management,Cardiff EfW,Waste,30,2014,South Wales
+Viridor Waste Management,Lakeside EfW,Waste,37,2010,South West
+VPI Immingham LLP,VPI Immingham *,CCGT,1240,2004,Yorkshire & Humber
+WPO,Airies,Wind Onshore,39.9,2017,Scotland
+WPO,Corriegarth,Wind Onshore,69,2016,Scotland
+WPO,Dungavel,Wind Onshore,26,2015,Scotland
+WPO,Middlewick,Wind Onshore,20.7,2014,Eastern
+WPO,Scout Moor,Wind Onshore,65,2008,North West
+WPO,Tir Mostyn & Foel Goch,Wind Onshore,21.3,2005,Wales
+Xceco,Inner Dowsing,Wind Offshore,97.2,2009,East Midlands
+Xceco,Lynn,Wind Offshore,97.2,2009,East Midlands
