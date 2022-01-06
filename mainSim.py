@@ -30,6 +30,7 @@ import TransmissionNetworkOwner as TNO
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import os
 
 
 # method to count number of companies with plants of each technology, e.g. hydro, CCGT, etc.
@@ -85,13 +86,6 @@ def getCapacityPerTech(genCompanies):
 
 
 
-
-
-
-
-   
-
-
 ######### main method, code starts executing from here ##################
 if __name__ == '__main__':
     import time
@@ -111,6 +105,7 @@ if __name__ == '__main__':
 
     maxYears = 41 #16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
     timeSteps=8760
+    boolDraw = True
     boolDrawMap = False
     boolDrawYearlyCompanies = True
     boolDrawYearlyCap = True
@@ -1547,15 +1542,10 @@ if __name__ == '__main__':
                 techCapYear[i].append(techCap[i])
                 techDeRCapYear[i].append(techDRCap[i])
 
-       
-
-
         for gc in range(len(elecGenCompanies)): # reset values
             elecGenCompanies[gc].resetYearlyValues()
 
         Utils.resetCurYearCapInvest()
-
-
 
         #Calculate net demand
         demand = np.zeros(8760)
@@ -1603,14 +1593,12 @@ if __name__ == '__main__':
                     print('cant convert to numpy and write output v2')
                 
 
-      #      input('wait')
 
-            
+            #export results to csv
+
             for j in range(len(techCapYear)):
                 techCapYear[j] = [i/100 for i in techCapYear[j]]
-            Utils.graphMultSeriesOnePlotV2(techCapYear, 'Year', 'Capacity (MW)', 'Yearly Capacity',techNamesGraph,years, RESULTS_FILE_PATH)                
-
-
+            
             capNamesOut = techNamesGraph.copy()
             capNamesOut.insert(0,'Year')
             capDataOut = techCapYear.copy()
@@ -1634,53 +1622,70 @@ if __name__ == '__main__':
                 
             Utils.writeListsToCSV(capFacData,capFacNames,fileOut)
 
-
             fileOut = RESULTS_FILE_PATH + 'HourlyCurtailment.csv'
             Utils.writeListsToCSV(hourlyCurtailPerYear,years,fileOut)
             
             fileOut = RESULTS_FILE_PATH + 'HourlyLossOfLoad.csv'
             Utils.writeListsToCSV(hourlyLossOfLoadPerYear,years,fileOut)
             
+            tempData = [years,yearlyTotCap,yearlyDeRCap ,yearlyPeakD, yearlyCapM, yearlyDeRCapM, yearlyCurtailedInstances, yearlyLossOfLoadInstances]
+            tempNames = ['Year', 'Capacity', 'Derated Capacity', 'Peak Demand', 'Capacity Margin', 'Derated Capacity Margin','Curtailed Hours', 'LossOfLoad Hours']
 
-
-            tempData = list()
-            tempNames = list()
-            tempData.append(years)
-            tempData.append(yearlyTotCap)
-            tempData.append(yearlyDeRCap)
-            tempData.append(yearlyPeakD)
-            tempData.append(yearlyCapM)
-            tempData.append(yearlyDeRCapM)
-            tempData.append(yearlyCurtailedInstances)
-            tempData.append(yearlyLossOfLoadInstances)
             if(boolEnergyStorage):
                 tempData.append(annualStorageCap)
-            
-            tempNames.append('Year')
-            tempNames.append('Capacity')
-            tempNames.append('Derated Capacity')
-            tempNames.append('Peak Demand')
-            tempNames.append('Capacity Margin')
-            tempNames.append('Derated Capacity Margin')
-            tempNames.append('Curtailed Hours')
-            tempNames.append('LossOfLoad Hours')
-            if(boolEnergyStorage):
                 tempNames.append('Annual Storage Capacity')
+
             fileOut = RESULTS_FILE_PATH + 'YearlySystemEvolution.csv'
             Utils.writeListsToCSV(tempData,tempNames,fileOut)
 
             policy.writeResultsToFile(RESULTS_FILE_PATH)
-
             
             for k in range(len(elecGenCompanies)):    
                 elecGenCompanies[k].writeToFileAllYears(RESULTS_FILE_PATH,k)
             
+            fileOut = RESULTS_FILE_PATH + os.path.sep + 'Nuclear' + '.csv'
+            Utils.writeListsToCSV(yearlynuclearcaplist,nuclearbuslist,fileOut)
 
-            Utils.systemevaluationGraph(years,yearlyLossOfLoadInstances,yearlyCurtailedInstances, RESULTS_FILE_PATH)
+            fileOut = RESULTS_FILE_PATH + os.path.sep + 'Storage' + '.csv'
+            Utils.writeListsToCSV(yearlybatterycaplist,batterybuslist,fileOut)
+
+            fileOut = RESULTS_FILE_PATH + os.path.sep + 'Coal' + '.csv'
+            Utils.writeListsToCSV(yearlycoalcaplist,coalbuslist,fileOut)
             
+            fileOut = RESULTS_FILE_PATH + os.path.sep + 'Wind Offshore' + '.csv'
+            Utils.writeListsToCSV(yearlywindoffcaplist,windoffbuslist,fileOut)
 
-            # if we want to look at individual companies 
-            if(boolDrawYearlyCompanies):
+            fileOut = RESULTS_FILE_PATH + os.path.sep + 'BECCS' + '.csv'
+            Utils.writeListsToCSV(yearlybeccscaplist,beccsbuslist,fileOut)
+
+            fileOut = RESULTS_FILE_PATH + os.path.sep + 'BusDemand' + '.csv'
+            Utils.writeListsToCSV(yearlybusdemand,years, fileOut)
+
+            fileOut = RESULTS_FILE_PATH + os.path.sep + 'Headroom' + '.csv'
+            Utils.writeListsToCSV(yearlyheadroom,years,fileOut)
+
+            tempData = [years,yearlymaxwholesale,yearlyminwholesale ,yearlyavgwholesale]
+            tempNames = ['Year', 'Max Wholesale Price', 'Min Wholesale Price', 'Avg Wholesale Price'] 
+
+            fileOut = RESULTS_FILE_PATH + 'WholesalePriceSummary.csv'
+            Utils.writeListsToCSV(tempData,tempNames,fileOut)
+
+            if (boolDraw):
+
+                Utils.graphMultSeriesOnePlotV2(techCapYear, 'Year', 'Capacity (MW)', 'Yearly Capacity',techNamesGraph,years, RESULTS_FILE_PATH)   
+                Utils.graphYearlyBus(years, yearlynuclearcaplist, nuclearbuslist, 'Nuclear', RESULTS_FILE_PATH)
+                Utils.graphYearlyBus(years, yearlybatterycaplist, batterybuslist, 'Storage', RESULTS_FILE_PATH)
+                Utils.graphYearlyBus(years, yearlycoalcaplist, coalbuslist, 'Coal', RESULTS_FILE_PATH) 
+                Utils.graphYearlyBus(years, yearlywindoffcaplist, windoffbuslist, 'Wind Offshore', RESULTS_FILE_PATH) 
+                Utils.graphYearlyBus(years, yearlybeccscaplist, beccsbuslist, 'BECCS', RESULTS_FILE_PATH)   
+                Utils.graphheadroom(years, yearlyheadroom, RESULTS_FILE_PATH)
+                Utils.drawdemand(years, yearlybusdemand, RESULTS_FILE_PATH)
+                Utils.graphYearlyCapacity(years, yearlyTotCap, yearlyDeRCap, yearlyPeakD, yearlyCapM, yearlyDeRCapM, RESULTS_FILE_PATH)
+                Utils.drawwholesale(years,yearlymaxwholesale,yearlyminwholesale,yearlyavgwholesale, RESULTS_FILE_PATH)
+                Utils.systemevaluationGraph(years,yearlyLossOfLoadInstances,yearlyCurtailedInstances, RESULTS_FILE_PATH)
+                policy.yearGraph()
+
+                # if we want to look at individual companies 
                 displayCompanies = list()
                 displayCompanies.append('E.On UK')
                 displayCompanies.append('EDF Energy')
@@ -1692,23 +1697,7 @@ if __name__ == '__main__':
                     if(elecGenCompanies[i].name in displayCompanies):
                         elecGenCompanies[i].graphAllGensAllYears()
 
-            Utils.drawwholesale(years,yearlymaxwholesale,yearlyminwholesale,yearlyavgwholesale, RESULTS_FILE_PATH)
-            # Utils.drawbatteryinvestment(years,yearlytotalbatterycap)
-            if(boolDrawYearlyCap):
-                Utils.graphYearlyCapacity(years, yearlyTotCap, yearlyDeRCap, yearlyPeakD, yearlyCapM, yearlyDeRCapM, RESULTS_FILE_PATH)
-
-            Utils.graphYearlyBus(years, yearlynuclearcaplist, nuclearbuslist, 'Nuclear', RESULTS_FILE_PATH)
-            Utils.graphYearlyBus(years, yearlybatterycaplist, batterybuslist, 'Storage', RESULTS_FILE_PATH)
-            Utils.graphYearlyBus(years, yearlycoalcaplist, coalbuslist, 'Coal', RESULTS_FILE_PATH) 
-            Utils.graphYearlyBus(years, yearlywindoffcaplist, windoffbuslist, 'Wind Offshore', RESULTS_FILE_PATH) 
-            Utils.graphYearlyBus(years, yearlybeccscaplist, beccsbuslist, 'BECCS', RESULTS_FILE_PATH)   
-            Utils.graphheadroom(years, yearlyheadroom, RESULTS_FILE_PATH)
-            Utils.drawdemand(years, yearlybusdemand, RESULTS_FILE_PATH)
-            if(boolDrawPolicyGraph):
-                policy.yearGraph()
-        ##########################################################################
-        ##########################################################################
-        ##########################################################################
+            
             
 
 

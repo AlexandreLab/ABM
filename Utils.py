@@ -269,17 +269,21 @@ def pieChart(pieData, pieLabels, title):
 
 def writeListsToCSV(profiles,profNames,FILEPATH):
 
+    # print(profiles)
+    # print(profNames)
 #    print('profNames[0] ',profNames[0])
  #   print('profiles[0] ',profiles[0])
 
-    df = pd.DataFrame({profNames[0]: profiles[0]})
-    for i in range(1,len(profiles)):
-  #      print('profNames[i] ',profNames[i])
-  #      print('profiles[i] ',profiles[i])
-        dat2 = pd.DataFrame({profNames[i]: profiles[i]})
-        df = pd.concat([df, dat2], axis=1)
+    if len(profNames)>0:
 
-    df.to_csv(FILEPATH)
+        df = pd.DataFrame({profNames[0]: profiles[0]})
+        for i in range(1,len(profiles)):
+    #      print('profNames[i] ',profNames[i])
+    #      print('profiles[i] ',profiles[i])
+            dat2 = pd.DataFrame({profNames[i]: profiles[i]})
+            df = pd.concat([df, dat2], axis=1)
+
+        df.to_csv(FILEPATH)
 
 
 
@@ -583,7 +587,6 @@ def graphYearlyBus(years, yearlycaplist, buslist, techtype, path_save):
     fig.savefig(path_save+os.path.sep+"AnnualCapacityYearlyBus"+techtype+"."+GLOBAL_FIG_FORMAT, bbox_inches='tight', format= GLOBAL_FIG_FORMAT, dpi=GLOBAL_DPI)
 
     fileOut = path_save + os.path.sep + techtype + '.csv'
-    writeListsToCSV(yearlycaplist,buslist,fileOut)
     plt.close()
 
 def drawdemand(years, yearlybusdemand, path_save):
@@ -609,8 +612,7 @@ def drawdemand(years, yearlybusdemand, path_save):
     # fig.show()
     fig.savefig(path_save+os.path.sep+"Demand."+GLOBAL_FIG_FORMAT, bbox_inches='tight', format= GLOBAL_FIG_FORMAT, dpi=GLOBAL_DPI)
     plt.close()   
-    fileOut = path_save + os.path.sep + 'BusDemand.csv'
-    writeListsToCSV(years,yearlybusdemand,fileOut)
+    
 
 
 def graphheadroom(years, yearlyheadroom, path_save):
