@@ -1,0 +1,15 @@
+
+
+What does the section below the following line in mainSim.py? :
+# ---------------- get renewable generation --------------------
+
+
+
+Each renewableGenerator should not store the emtire profile for the 8760 hours as they are all the same. 
+This can be done at the generationCompany level to save memory and the code faster.
+
+
+
+Function in traditionalGenerator.py def "getGeneration(self, demand)" could be done at the generaiton company level to save memory.
+
+Each generationCompany can have a dataframe with the hourly generation by technology type.

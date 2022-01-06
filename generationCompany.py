@@ -1523,7 +1523,7 @@ class generationCompany():
 
         return genID, renewableBool
         
-    # method to Generation new generation plants
+    # method to add new generation plants to the generation company
     def addGeneration(self, genName, genTypeID, renewableID, capacityKW, startYear, endYear, age, subsidy, cfdBool, capMarketBool, BusNum, Headroom):
         addGen = False
         if(cfdBool and capMarketBool):

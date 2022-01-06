@@ -269,8 +269,8 @@ def pieChart(pieData, pieLabels, title):
 
 def writeListsToCSV(profiles,profNames,FILEPATH):
 
-    # print(profiles)
-    # print(profNames)
+    print(profiles)
+    print(profNames)
 #    print('profNames[0] ',profNames[0])
  #   print('profiles[0] ',profiles[0])
 
@@ -287,7 +287,6 @@ def writeListsToCSV(profiles,profNames,FILEPATH):
 
 
 
-    
 
 def writeToCSV(profiles,profNames,FILEPATH):
     df = pd.DataFrame({profNames[0]:profiles[0]})

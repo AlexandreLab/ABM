@@ -35,7 +35,7 @@ class renewableGenerator(electricityGenerator):
         self.availabilityFactor = 0.1
         self.numbus = NumBus
         self.Headroom = Headroom
-        
+        self.genType = renGenType
         self.FuelCost = 0.0
         self.CarbonCost = 0.0
         self.fixedOandMCost = 0.0

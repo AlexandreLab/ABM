@@ -225,7 +225,7 @@ class traditionalGenerator(electricityGenerator):
                 self.yearlyFuelCost.append(newVal) # gbp per kWh
         self.FuelCost = self.yearlyFuelCost[0]
 
-    # get generation for demand profile
+    # get generation for demand profile, this function could be done at the generation company level to save memory
     def getGeneration(self, demand):
         self.marginalCost = list()
         self.energyGenerated = list()
