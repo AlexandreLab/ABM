@@ -13,3 +13,7 @@ This can be done at the generationCompany level to save memory and the code fast
 Function in traditionalGenerator.py def "getGeneration(self, demand)" could be done at the generaiton company level to save memory.
 
 Each generationCompany can have a dataframe with the hourly generation by technology type.
+
+
+
+why is the bus 0 associated to northem ireland and sometimes to Scotland? This lead to creating 31 energy customers not 30? 

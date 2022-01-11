@@ -10,6 +10,7 @@ from traditionalGenerator import traditionalGenerator
 from energyStorage import energyStorage
 from random import choice
 from scipy import (dot, eye, randn, asarray, array, trace, log, exp, sqrt, mean, sum, argsort, square, arange)
+import pandas as pd
 
 class generationCompany():
     
@@ -30,7 +31,7 @@ class generationCompany():
         file2.close()
         
         self.timeSteps = timeSteps
-        self.companyID = companyID
+        self.companyID = companyID #useless, to be removed
         self.companyType = companyType
         self.opCostPkW = 0.14 # ignore***
         self.opEmissionsPkW = 1.0 # ignore***
@@ -47,7 +48,7 @@ class generationCompany():
         self.CFDPriceChange = 0.0
 
         self.traditionalGen = list()
-        self.renewableGen = list()
+        self.renewableGen = list() # list of renewableGenerator objects
         self.curYearBatteryBuild = 0.0
 
         self.batteryDuration = 3 #7 #3 # hours
@@ -97,6 +98,7 @@ class generationCompany():
         self.yearlyCapacityMargin = list()
         self.yearlyDeRatedCapacityMargin = list()
 
+
         self.year = self.BASEYEAR
         self.years = list()
 
@@ -121,27 +123,6 @@ class generationCompany():
             
 
 
-    def getRenewableGen(self): # Get renewable gen for current year
-        self.renewGens = list()#hourly profile for each type
-        yearGenPerTechData = list()
-        yearGenPerTechLabels = list()
-        
-        for rg in range(len(self.renewableGen)): #by type
-            curRenewGen = self.renewableGen[rg].getGeneration() # return to the generation profile for each technology
-          #  renewableGen[rg].graph() # graph hourly generation for each technology, hydro, solar, etc
-            self.renewGens.append(curRenewGen)
-            yearGenPerTechData.append(self.renewableGen[rg].yearlyEnergyGen) #each rg call the class once
-            yearGenPerTechLabels.append(self.renewableGen[rg].name)
-
-        self.totalRenewGen = list() # all electricity from renewables - losses
-        for g in range (len(self.renewGens[0])): # loop through hours
-            sumGen= 0.0
-            for i in range (len(self.renewGens)): # loop through renewable gen sources
-                sumGen = sumGen + self.renewGens[i][g]
-            sumGen = sumGen * (1-self.elecLoss)
-            self.totalRenewGen.append(sumGen)
-                
-        return self.renewGens, yearGenPerTechData, yearGenPerTechLabels, self.totalRenewGen
 
 
 
@@ -336,36 +317,48 @@ class generationCompany():
         for i in range(len(self.renewableGen)):
             self.renewableGen[i].recalcEconomics()
 
+
+    def getRenewableGen(self): # Get renewable gen for current year for each plant and by type of technology (onshore, offshore, etc.)
+        df_renewGenPlant = pd.DataFrame() #hourly profile for each plant
+        df_renewGenType = pd.DataFrame() #hourly profile for each type
+
+        for rgIndex, rg in enumerate(self.renewableGen): #by plant
+            tempGeneration = rg.getGeneration() # return to the generation profile for each technology
+            df_renewGenPlant[rgIndex] = tempGeneration
+            if rg.name in df_renewGenType.columns:
+                df_renewGenType[rg.name] = df_renewGenType[rg.name] + tempGeneration
+            else:
+                df_renewGenType[rg.name] = tempGeneration
+        # df of the hourly generation profile of all the plants, annual generation by plant, 
+        return df_renewGenPlant, df_renewGenType
+
+
+
     # get generation from a particular plant, e.g. CCGT plant 2
     def getTraditionalGeneration(self, genIndx, curNetD):
         curGen,newNetD, excessGen = self.traditionalGen[genIndx].getGeneration(curNetD)
         return curGen, newNetD, excessGen
 
-    # get generation from specific technology type ,e.g. CCGT
-    def getTraditionalGenerationByType(self, genType, curNetD):
-        tempNetD = curNetD.copy()
-        sumGen = 0.0
-        totExcessGen = list()
-        hourGenProf = list()
-        for i in range(len(self.traditionalGen)):
-            if(self.traditionalGen[i].genType==genType):
-                curGen,newNetD, curExcessGen = self.getTraditionalGeneration(i, tempNetD)
-                sumGen = sumGen + sum(curGen)
-                tempNetD = list()
-                tempNetD = newNetD
-                if(len(hourGenProf)==0):
-                    hourGenProf = curGen.copy()
-                else:
-                    for k in range(len(hourGenProf)):
-                        val = hourGenProf[k]
-                        hourGenProf[k] = val + curGen[k] #accumulate by each type
 
-                if(len(totExcessGen)==0):
-                    totExcessGen = curExcessGen.copy()
-                else:
-                    for j in range(len(totExcessGen)):
-                        totExcessGen[j] = totExcessGen[j] + curExcessGen[j]
-        return sumGen, newNetD, totExcessGen, hourGenProf
+
+
+    # get generation from specific technology type ,e.g. CCGT
+    def getTraditionalGenerationByType(self, genTypeID, curNetD):
+        tempNetD = curNetD.copy()
+        df_tradGenType = pd.DataFrame(columns=["Hourly_Generation", "Excess_Generation", "NewNetDemand"], index=[x for x in range(len(curNetD))]) #hourly profile for each type
+        df_tradGenType.fillna(0, inplace=True)
+        
+        for tgen in self.traditionalGen:
+            # print(genTypeID, tgen.genTypeID)
+            if(tgen.genTypeID==genTypeID):
+                curGen,newNetD, curExcessGen = tgen.getGeneration(tempNetD)
+                # print(np.sum(curGen))
+                tempNetD = newNetD
+                df_tradGenType["Hourly_Generation"] = df_tradGenType["Hourly_Generation"] + curGen
+                df_tradGenType["Excess_Generation"] = df_tradGenType["Excess_Generation"] + curExcessGen
+                df_tradGenType["NewNetDemand"] = newNetD
+
+        return df_tradGenType
 
     # calculate yearly profit
     def calculateYearlyProfit(self):
@@ -717,31 +710,31 @@ class generationCompany():
 
         for i in range(len(profitableTradGenROI)):
             curTGen = self.traditionalGen[profitableTradGen[i]]
-            if(curTGen.genType==0): # coal
+            if(curTGen.genTypeID==0): # coal
                 if(profitableTradGenROI[i]>coalHighROI):
                     coalHighROI = profitableTradGenROI[i]
                     coalHighIndx = profitableTradGen[i]
-            elif(curTGen.genType==1): # CCGT
+            elif(curTGen.genTypeID==1): # CCGT
                 if(profitableTradGenROI[i]>CCGTHighROI):
                     CCGTHighROI = profitableTradGenROI[i]
                     CCGTHighIndx = profitableTradGen[i]
-            elif(curTGen.genType==2): # nuclear
+            elif(curTGen.genTypeID==2): # nuclear
                 if(profitableTradGenROI[i]>nuclearHighROI):
                     nuclearHighROI = profitableTradGenROI[i]
                     nuclearHighIndx = profitableTradGen[i]
-            elif(curTGen.genType==3): # OCGT
+            elif(curTGen.genTypeID==3): # OCGT
                 if(profitableTradGenROI[i]>OCGTHighROI):
                     OCGTHighROI = profitableTradGenROI[i]
                     OCGTHighIndx = profitableTradGen[i]
-            elif(curTGen.genType==4): # BECCS
+            elif(curTGen.genTypeID==4): # BECCS
                 if(profitableTradGenROI[i]>BECCSHighROI):
                     BECCSHighROI = profitableTradGenROI[i]
                     BECCSHighIndx = profitableTradGen[i]
-            elif(curTGen.genType==5): # biomass
+            elif(curTGen.genTypeID==5): # biomass
                 if(profitableTradGenROI[i]>biomassHighROI):
                     biomassHighROI = profitableTradGenROI[i]
                     biomassHighIndx = profitableTradGen[i]
-            elif(curTGen.genType==6): # hydrogen
+            elif(curTGen.genTypeID==6): # hydrogen
                 if(profitableTradGenROI[i]>hydrogenHighROI):
                     hydrogenHighROI = profitableTradGenROI[i]
                     hydrogenHighIndx = profitableTradGen[i]
@@ -1342,13 +1335,13 @@ class generationCompany():
         sumCap = 0.0
         if(boolRenewable):
             for i in range(len(self.renewableGen)):
-                if(self.renewableGen[i].genType == genTypeID):
+                if(self.renewableGen[i].genTypeID == genTypeID):
                     sumCap = sumCap + self.renewableGen[i].genCapacity
                     deR = self.renewableGen[i].availabilityFactor
 
         else:
             for i in range(len(self.traditionalGen)):
-                if(self.traditionalGen[i].genType == genTypeID):
+                if(self.traditionalGen[i].genTypeID == genTypeID):
                     sumCap = sumCap + self.traditionalGen[i].genCapacity
                     deR = self.traditionalGen[i].availabilityFactor
                     
@@ -1772,11 +1765,11 @@ class generationCompany():
                         Bus4Cap[indx] = Bus4Cap[indx] + self.renewableGen[j].genCapacity
             for k in range (len(self.traditionalGen)):
                 if(self.traditionalGen[k].Bus == Bus4Tech[i]):
-                    if(not (self.traditionalGen[k].genType+6) in Bus4Tech[i]):
-                        Bus4Tech[i].append((self.traditionalGen[k].genType+6))
+                    if(not (self.traditionalGen[k].genTypeID+6) in Bus4Tech[i]):
+                        Bus4Tech[i].append((self.traditionalGen[k].genTypeID+6))
                         Bus4Cap[i].append(self.traditionalGen[k].genCapacity)
                     else:
-                        indx = Bus4Tech[i].index((self.traditionalGen[k].genType+6))
+                        indx = Bus4Tech[i].index((self.traditionalGen[k].genTypeID+6))
                         Bus4Cap[i][indx] = Bus4Cap[i][indx] + self.traditionalGen[k].genCapacity
         return Bus4Tech, Bus4Cap
 
@@ -1799,14 +1792,14 @@ class generationCompany():
         tradTypes = list()
         tradIndx = list()
         for i in range (len(self.traditionalGen)):
-            if(not (self.traditionalGen[i].genType in tradTypes)):
-                tradTypes.append(self.traditionalGen[i].genType)
+            if(not (self.traditionalGen[i].genTypeID in tradTypes)):
+                tradTypes.append(self.traditionalGen[i].genTypeID)
                 tempL = list()
                 tempL.append(i)
                 tradIndx.append(tempL)
             else:
                 for j in range(len(tradTypes)):
-                    if(tradTypes[j]==self.traditionalGen[i].genType):
+                    if(tradTypes[j]==self.traditionalGen[i].genTypeID):
                         tradIndx[j].append(i)
         return renIndx,tradIndx # each type has a number of company number
 

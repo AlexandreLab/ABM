@@ -7,6 +7,7 @@ import os.path
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import matplotlib.ticker as tkr
+from random import randint
 
 GLOBAL_FIG_FORMAT = "png"
 GLOBAL_DPI = 1000
@@ -269,8 +270,8 @@ def pieChart(pieData, pieLabels, title):
 
 def writeListsToCSV(profiles,profNames,FILEPATH):
 
-    print(profiles)
-    print(profNames)
+    # print(profiles)
+    # print(profNames)
 #    print('profNames[0] ',profNames[0])
  #   print('profiles[0] ',profiles[0])
 
@@ -308,7 +309,7 @@ def sumVals(listOfVals):
 
 
 def randomOrderListIndx(myList):
-    from random import randint
+
     randomIndx = list()
     while(len(randomIndx)<len(myList)):
         rI = randint(0,len(myList)-1)
@@ -446,41 +447,40 @@ def getCurYearCapInvest():
 
 def getWholesaleEPrice(elecGenCompanies):
 
-    tech = list()
-    margeC = list()
+    # tech = list()
+    # margeC = list()
     wholesaleEPrice = list()
     nuclearMarginalCost = list()
-    for i in range(len(elecGenCompanies)):
-        genCo = elecGenCompanies[i]
-        for j in range(len(genCo.renewableGen)):
-            if(len(genCo.renewableGen[j].marginalCost)>0):
-                mCost = genCo.renewableGen[j].marginalCost
+    for eGC in elecGenCompanies:
+        for renGen in eGC.renewableGen:
+            if len(renGen.marginalCost)>0:
+                mCost = renGen.marginalCost
                 if(len(wholesaleEPrice)==0):
                     wholesaleEPrice = mCost.copy()
                 else:
                     for p in range(len(wholesaleEPrice)):
                         if(mCost[p]>wholesaleEPrice[p]):
                             wholesaleEPrice[p] = mCost[p]
-            if(not (genCo.renewableGen[j].name in tech) and (genCo.renewableGen[j].genCapacity>10)):
-                tech.append(genCo.renewableGen[j].name)
-                margeC.append(genCo.renewableGen[j].marginalCost)
-                            
-        for j in range(len(genCo.traditionalGen)):
-            if(genCo.traditionalGen[j].name=='Nuclear' and len(nuclearMarginalCost)==0 and (genCo.traditionalGen[j].genCapacity>10)):
-                nuclearMarginalCost = genCo.traditionalGen[j].marginalCost.copy()
-            if(len(genCo.traditionalGen[j].marginalCost)>0):
-                mCost = genCo.traditionalGen[j].marginalCost
-                if(len(wholesaleEPrice)==0):
-                    wholesaleEPrice = mCost.copy()
-                else:
-                    for p in range(len(wholesaleEPrice)):
-                        if(mCost[p]>wholesaleEPrice[p]):
-                            wholesaleEPrice[p] = mCost[p]
-            if(not (genCo.traditionalGen[j].name in tech) and (genCo.traditionalGen[j].genCapacity>10)):
-                tech.append(genCo.traditionalGen[j].name)
-                margeC.append(genCo.traditionalGen[j].marginalCost)
-                
 
+            # if not (renGen.name in tech) and (renGen.genCapacity>10):
+            #     tech.append(renGen.name)
+            #     margeC.append(renGen.marginalCost)
+                            
+        for tradGen in eGC.traditionalGen:
+            if tradGen.name =='Nuclear' and len(nuclearMarginalCost)==0 and tradGen.genCapacity>10:
+                nuclearMarginalCost = tradGen.marginalCost.copy()
+            if len(tradGen.marginalCost)>0:
+                mCost = tradGen.marginalCost
+                if(len(wholesaleEPrice)==0):
+                    wholesaleEPrice = mCost.copy()
+                else:
+                    for p in range(len(wholesaleEPrice)):
+                        if(mCost[p]>wholesaleEPrice[p]):
+                            wholesaleEPrice[p] = mCost[p]
+            # if not (tradGen.name in tech) and (tradGen.genCapacity>10):
+            #     tech.append(tradGen.name)
+            #     margeC.append(tradGen.marginalCost)
+                
     
     return wholesaleEPrice, nuclearMarginalCost
 

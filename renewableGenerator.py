@@ -9,12 +9,12 @@ import Utils
 class renewableGenerator(electricityGenerator):
     
     
-    def __init__(self,renGenType,timeSteps, capacity, CFDPrice, NumBus, Headroom): # kW
+    def __init__(self,renGenTypeID,timeSteps, capacity, CFDPrice, NumBus, Headroom): # kW
 
-        self.initialise(renGenType,timeSteps, capacity,CFDPrice, NumBus, Headroom)
+        self.initialise(renGenTypeID,timeSteps, capacity,CFDPrice, NumBus, Headroom)
 
 
-    def initialise(self,renGenType,timeSteps, capacity, CFDPrice, NumBus, Headroom):
+    def initialise(self,renGenTypeID,timeSteps, capacity, CFDPrice, NumBus, Headroom):
         self.generalInfo()
         self.genCapacity = capacity
         self.age = 0
@@ -35,7 +35,7 @@ class renewableGenerator(electricityGenerator):
         self.availabilityFactor = 0.1
         self.numbus = NumBus
         self.Headroom = Headroom
-        self.genType = renGenType
+        self.genTypeID = renGenTypeID
         self.FuelCost = 0.0
         self.CarbonCost = 0.0
         self.fixedOandMCost = 0.0
@@ -54,7 +54,7 @@ class renewableGenerator(electricityGenerator):
         CapexWindOnshore = list([1004.358739, 1004.358739, 1004.358739, 1004.358739, 1004.358739, 1004.358739, 1004.358739, 1004.358739, 1004.358739, 1004.358739, 1004.358739, 967.5764526, 917.6546487, 898.6907628, 879.5392132, 861.9, 850.85, 839.8, 829.6, 819.4, 809.2, 804.95, 799.85, 795.6, 791.35, 787.1, 782.85, 778.6, 774.35, 770.1, 765.85, 765.85, 765.85, 765.85, 765.85, 765.85, 765.85, 765.85, 765.85, 765.85, 765.85])
         CapexWindOffshore = list([1794.745399, 1794.745399, 1794.745399, 1794.745399, 1794.745399, 1794.745399, 1794.745399, 1794.745399, 1794.745399, 1794.745399, 1794.745399, 1707.284766, 1597.709786, 1544.466677, 1494.962705, 1447.55, 1395.7, 1344.7, 1296.25, 1266.5, 1236.75, 1207.85, 1180.65, 1153.45, 1135.6, 1118.6, 1102.45, 1085.45, 1069.3, 1053.15, 1037, 1027.65, 1018.3, 1008.95, 1000.45, 991.1, 982.6, 973.25, 964.75, 956.25, 946.9])
 
-        if(renGenType==0): # 9 gen companies with solar (10 if including 1 for distribution)
+        if(renGenTypeID==0): # 9 gen companies with solar (10 if including 1 for distribution)
             self.renewableType = 0
             self.name = 'Solar' # PV>5MW
     #        fileLoc = 'PV/1Year.txt'
@@ -71,7 +71,7 @@ class renewableGenerator(electricityGenerator):
      #       self.GBmaxBuildRate = 1000000  # 1GW
             self.GBmaxBuildRate = 1500000  # 1.5 GW
             self.maxBuildRate = 100000 # 1GW in total. 0.1 per company
-        elif(renGenType==1): # ********* ignore this one *************
+        elif(renGenTypeID==1): # ********* ignore this one *************
             self.renewableType = 1
             self.name = 'Wind'
      #       fileLoc = 'Wind/Ireland8760WindMW.txt'
@@ -85,7 +85,7 @@ class renewableGenerator(electricityGenerator):
             self.GBmaxBuildRate = 1000000  # 1GW
             input('wrong renewable type')
  #           self.loadGenProfile(fileLoc)
-        elif(renGenType==2): 
+        elif(renGenTypeID==2): 
         	#if(self.numbus in [1,12]):
 
             self.renewableType = 2
@@ -105,7 +105,7 @@ class renewableGenerator(electricityGenerator):
             #else:
             #	input('Error. This bus is not suitable for Hydro')
                         # 0.1GW
-        elif(renGenType==4): # 17 gen companies with onshore wind (18 if including 1 for distribution)
+        elif(renGenTypeID==4): # 17 gen companies with onshore wind (18 if including 1 for distribution)
             self.renewableType = 4 
             self.name = 'Wind Onshore' # Onshore UK>5MW
             fileLoc = 'Wind/2018_GB_WindOnshore_MW.txt'
@@ -121,7 +121,7 @@ class renewableGenerator(electricityGenerator):
             self.availabilityFactor = 0.17
             self.GBmaxBuildRate = 550000  # 0.55GW
             self.maxBuildRate = 30600 # 0.55 GW in total. /18 to get 0.0306 GW          #500000 # 0.5GW 
-        elif(renGenType==5): # 8 gen companies with offshore wind (9 if including 1 for distribution)
+        elif(renGenTypeID==5): # 8 gen companies with offshore wind (9 if including 1 for distribution)
             #if(self.numbus in [1,2,7,8,9,10,11,12,13,15,16,19,20,26,27,28,29]):            	
             self.renewableType = 5
             self.name = 'Wind Offshore' # Offshore R3

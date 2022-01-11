@@ -9,12 +9,12 @@ from electricityGenerator import electricityGenerator
 class traditionalGenerator(electricityGenerator):
     
     
-    def __init__(self,genType,capacity, NumBus, Headroom):
+    def __init__(self,genTypeID,capacity, NumBus, Headroom):
 
-        self.initialise(genType,capacity, NumBus, Headroom)
+        self.initialise(genTypeID,capacity, NumBus, Headroom)
         
 
-    def initialise(self,genType,capacity, NumBus, Headroom):
+    def initialise(self,genTypeID,capacity, NumBus, Headroom):
         self.generalInfo()
         self.age = 0
         self.startYear = 0
@@ -27,7 +27,7 @@ class traditionalGenerator(electricityGenerator):
         self.hourlyCost = list()
         self.hourlyEmissions = list()
         self.hourlyProfit = list()
-        self.genType = genType
+        self.genTypeID = genTypeID
         self.yearlyEnergyGen=0.0
         self.yearlyProfit=0.0
         self.yearlyIncome = 0.0
@@ -55,7 +55,7 @@ class traditionalGenerator(electricityGenerator):
         CapexBiomass = list([1624.441091, 1624.441091, 1624.441091, 1624.441091, 1624.441091, 1624.441091, 1624.441091, 1624.441091, 1624.441091, 1624.441091, 1624.441091, 1605.434614, 1561.608094, 1568.072063, 1574.536031, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581, 1581]) 
 
         
-        if(genType==0):
+        if(genTypeID==0):
             #if(self.numbus in [4,11,15,16,18]):                
             self.name = 'Coal' # Coal - CCS ASC Oxy FOAK
             self.opEmissionsPkW = 0.907 # kg CO2/kWh # no CCS
@@ -78,7 +78,7 @@ class traditionalGenerator(electricityGenerator):
             fuelFilePath = 'WholesaleEnergyPrices/Coal'+str(self.BASEYEAR)+'_2050_dollarPerTonne.txt'
             #else:
                # input('Error. This bus is not suitable for Coal') 
-        elif(genType==1): # 17 CCGT gen companies
+        elif(genTypeID==1): # 17 CCGT gen companies
             self.name = 'CCGT' # CCGT H Class
             self.opEmissionsPkW = 0.365 # kg CO2/kWh 
             self.fixedOandMCost = 12.2 # gbp per kW capacity per year
@@ -95,7 +95,7 @@ class traditionalGenerator(electricityGenerator):
             self.GBmaxBuildRate = 2000000  # 6GW
             self.maxBuildRate = 350000 # 6GW total max. 6/17 GW per company max build rate
             fuelFilePath = 'WholesaleEnergyPrices/NaturalGas'+str(self.BASEYEAR)+'_2050_pencePerTherm.txt'
-        elif(genType==2):
+        elif(genTypeID==2):
             #if(self.numbus in [5,7,10,11,20,27]):
             self.name = 'Nuclear' # Nuclear PWR FOAK
             self.opEmissionsPkW = 0.0 # kg CO2/kWh
@@ -115,7 +115,7 @@ class traditionalGenerator(electricityGenerator):
             fuelFilePath = 'WholesaleEnergyPrices/NuclearFuel'+str(self.BASEYEAR)+'_2050_pencePerkWh.txt'
             #else:
                 #input('Error. This bus is not suitable for Nuclear') 
-        elif(genType==3):# 8 OCGT companies
+        elif(genTypeID==3):# 8 OCGT companies
             self.name = 'OCGT' # OCGT 600MW 500 hr
             self.opEmissionsPkW = 0.46 # kg CO2/kWh 
             self.fixedOandMCost = 4.6 # gbp per kW capacity per year
@@ -131,7 +131,7 @@ class traditionalGenerator(electricityGenerator):
             self.GBmaxBuildRate = 1000000  # 4GW
             self.maxBuildRate = 500000 # 4GW total max. 0.5 GW max build rate per company
             fuelFilePath = 'WholesaleEnergyPrices/NaturalGas'+str(self.BASEYEAR)+'_2050_pencePerTherm.txt'
-        elif(genType==4):# BECCS
+        elif(genTypeID==4):# BECCS
             self.name = 'BECCS' # BECCS
             # https://reader.elsevier.com/reader/sd/pii/S1876610217319380?token=F7B61950FD8DC18C0829C7057AFF7E8BDA8BE245B5790AE2C490581EE4110BE970170DB19AF359BE5610D05B60CF806E
             self.opEmissionsPkW = -0.295 # kg CO2/kWh 
@@ -152,7 +152,7 @@ class traditionalGenerator(electricityGenerator):
 
 
 
-        elif(genType==5):# Biomass
+        elif(genTypeID==5):# Biomass
             self.name = 'Biomass' # Biomass
             # https://reader.elsevier.com/reader/sd/pii/S1876610217319380?token=F7B61950FD8DC18C0829C7057AFF7E8BDA8BE245B5790AE2C490581EE4110BE970170DB19AF359BE5610D05B60CF806E
             self.opEmissionsPkW = 0 # kg CO2/kWh 
@@ -170,7 +170,7 @@ class traditionalGenerator(electricityGenerator):
             self.maxBuildRate = 14000
           #  fuelFilePath = 'WholesaleEnergyPrices/BiomassMiscanthusPellet'+str(self.BASEYEAR)+'_2050_GBPPerkWh.txt'
             fuelFilePath = 'WholesaleEnergyPrices/WasteWood'+str(self.BASEYEAR)+'_2050_GBPPerkWh.txt'
-        elif(genType==6):# Hydrogen
+        elif(genTypeID==6):# Hydrogen
             self.name = 'Hydrogen' # Hydrogen
             self.opEmissionsPkW = 0 # kg CO2/kWh line 263 , 319 change as well
             self.fixedOandMCost = 12.2 # same as regular biomass # gbp per kW capacity per year
@@ -200,26 +200,26 @@ class traditionalGenerator(electricityGenerator):
     def loadFuelCost(self,FILEPATH): 
         fileIN = Utils.loadTextFile(FILEPATH)
         self.yearlyFuelCost = list()
-        if(self.genType==0): # coal
+        if(self.genTypeID==0): # coal
             for i in range(len(fileIN)):
                 val = fileIN[i]
                 newVal = val/1000.0 # tonnes to kg
                 newVal = newVal/2.46 # 1 kg of coal produces 2.46 kWh
                 newVal = newVal*0.77 # USD to GBP
                 self.yearlyFuelCost.append(newVal) # gbp per kWh
-        elif(self.genType==1 or self.genType==3): # CCGT and OCGT
+        elif(self.genTypeID==1 or self.genTypeID==3): # CCGT and OCGT
             for i in range(len(fileIN)):
                 val = fileIN[i]
                 newVal = val/100.0 # p/ therm to gbp/therm
                 newVal = newVal/29.31 # therms to kWh, 1 therm = 29.31 kWh
            #     print('Fuel cost CCGT GBP/kWh ',)
                 self.yearlyFuelCost.append(newVal) # gbp per kWh
-        elif(self.genType==2): # Nuclear
+        elif(self.genTypeID==2): # Nuclear
             for i in range(len(fileIN)):
                 val = fileIN[i]
                 newVal = val/100.0 # p/ kWh to gbp/kWh
                 self.yearlyFuelCost.append(newVal) # gbp per kWh
-        elif(self.genType==4 or self.genType==5 or self.genType==6): # BECCS
+        elif(self.genTypeID==4 or self.genTypeID==5 or self.genTypeID==6): # BECCS
             for i in range(len(fileIN)):
                 newVal = fileIN[i]
                 self.yearlyFuelCost.append(newVal) # gbp per kWh
@@ -275,7 +275,7 @@ class traditionalGenerator(electricityGenerator):
                 marginC = (fuel + variableOM + carbon)/curGen
             self.marginalCost.append(marginC)
 
-            if((self.genType==2 or self.genType==4) and self.CFDPrice>0.0001): # nuclear and BECCS
+            if((self.genTypeID==2 or self.genTypeID==4) and self.CFDPrice>0.0001): # nuclear and BECCS
                 curIncome = (self.CFDPrice*curGen) + ((self.capitalSub*self.genCapacity)/(365*24))
             else:
                 curIncome = (self.wholesaleEPriceProf[i]*curGen) + ((self.capitalSub*self.genCapacity)/(365*24))
@@ -331,7 +331,7 @@ class traditionalGenerator(electricityGenerator):
                 marginC = (fuel + variableOM + carbon)/curGen
             self.marginalCost.append(marginC)
 
-            if((self.genType==2 or self.genType==4) and self.CFDPrice>0.0001): # nuclear and BECCS
+            if((self.genTypeID==2 or self.genTypeID==4) and self.CFDPrice>0.0001): # nuclear and BECCS
                 curIncome = (self.CFDPrice*curGen) + ((self.capitalSub*self.genCapacity)/(365*24))
             else:
                 curIncome = (self.wholesaleEPriceProf[i]*curGen) + ((self.capitalSub*self.genCapacity)/(365*24))

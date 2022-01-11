@@ -32,6 +32,7 @@ class customerGroup(customer):
         scaledlist = Utils.multiplyList(tempList,scale)   
         consumerPerc = consumerPercList[(busbar-1)]
         self.LoadProfile = Utils.timeList(scaledlist,consumerPerc)
+        self.busbar = busbar
 
         PVFilePath = 'PV/1Year.txt'
              

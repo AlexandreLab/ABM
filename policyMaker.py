@@ -16,12 +16,13 @@ class policyMaker():
         self.initialise()
         
 
-    def initialise(self):
+    def initialise(self, path_save):
         file2 = open("BASEYEAR.txt", "r") 
         temp = file2.read()
         self.BASEYEAR = int(temp)
         file2.close()
         self.year=self.BASEYEAR
+        self.path_save = path_save
 
         carbonFilePath = 'CarbonPrice/carbonPrice'+str(self.BASEYEAR)+'_2050.txt'
         self.yearlyCarbonCost = Utils.loadTextFile(carbonFilePath)
@@ -260,7 +261,7 @@ class policyMaker():
                             genCompanies[int(round(bids[i,2]))].addBatterySizeCapacitySub(bidCap, bidSub)
                             genCompanies[int(round(bids[i,2]))].curYearBatteryBuild += bidCap
                             
-                outFileName = 'Results/test/CapacityMarketSuccessfulBidsYear'+str(self.year)+'.csv'
+                outFileName = self.path_save+'CapacityMarketSuccessfulBidsYear'+str(self.year)+'.csv'
                 outBidDF = pd.DataFrame(outputBids)
                 outBidDF.columns = ['bidPrice', 'Capacity', 'indx', 'Type', 'ConstructionTime', 'DeRateCap', 'Battery', 'bidBus' ,'STRIKEPriceGBP']
                 outBidDF.to_csv(outFileName, index = False)
@@ -421,7 +422,7 @@ class policyMaker():
                             tempCapList = Utils.addToCapGenList(rGenName, rCapacityKW,newCapList,technologyList)
                             newCapList = tempCapList
                         
-            outFileName = 'Results/test/CfDMarketSuccessfulBidsYear'+str(self.year)+'.csv'
+            outFileName = self.path_save+'CfDMarketSuccessfulBidsYear'+str(self.year)+'.csv'
             outBidDF = pd.DataFrame(outputBids)
             outBidDF.columns = ['bidPrice', 'Capacity', 'indx', 'Type', 'ConstructionTime', 'bidBus','STRIKEPriceGBP/kWh']
             outBidDF.to_csv(outFileName, index = False)
@@ -429,9 +430,6 @@ class policyMaker():
             Utils.updateCurYearCapInvest(technologyList, newCapList)
         else:
             print('++++++++++++++++++ No CfD auction +++++++++++++++++++++++')
-
-
-            
 
     # old function, not used anywhere
     def increaseCO2Price(self, pcIncrease): # fraction between 0 and 1
@@ -506,25 +504,7 @@ class policyMaker():
         fig1.show()
         fig2.show()
         fig3.show()
-    # output results to csv
-    def writeResultsToFile(self, RESULTS_FILE_PATH):
-        fileOut = RESULTS_FILE_PATH + 'YearlyPolicy.csv'
 
-        outNames = list()
-        outNames.append('Year')
-        outNames.append('Act_CO2Price')
-        outNames.append('BEIS_CO2Price')
-        outNames.append('CO2Emissions(gCO2/kWh)')
-        outNames.append('CO2EmissionsTarget(gCO2/kWh)')
-
-        outData = list()
-        outData.append(self.years)
-        outData.append(self.yearlyCO2Price)
-        outData.append(self.yearlyCarbonCost)
-        outData.append(self.yearlyEmissionsIntensity)
-        outData.append(self.yearlyEmissTarget)
-
-        Utils.writeListsToCSV(outData,outNames,fileOut)
         
 
 
