@@ -100,7 +100,7 @@ class electricityGenerator():
         self.yearlyProfitList.append(self.yearlyProfit)
         self.yearlyIncomeList.append(self.yearlyIncome)
         self.yearlyCostList.append(self.yearlyCost)
-        self.yearlyEmissionsList.append(self.runingEmissions)
+        self.yearlyEmissionsList.append(self.runningEmissions)
         self.years.append(self.year)
         if(self.age>=15):
             self.CFDPrice = 0.0
@@ -155,7 +155,7 @@ class electricityGenerator():
             if(self.name=='BECCS'or self.name =='Biomass'or self.name =='Hydrogen'):
                 newCarbonCost = 0.0
             else:
-                newCarbonCost = ((self.runingEmissions/1000.0)*newCO2Price)
+                newCarbonCost = ((self.runningEmissions/1000.0)*newCO2Price)
             estCost = self.yearlyCost - oldCarbonCost + newCarbonCost
             estYearProfit = estIncome - estCost
 
@@ -177,8 +177,8 @@ class electricityGenerator():
         self.yearlyProfit=0.0
         self.yearlyIncome = 0.0
         self.yearlyCost = 0.0
-        self.runingCost=0.0
-        self.runingEmissions=0.0
+        self.runningCost=0.0
+        self.runningEmissions=0.0
         self.hourlyCost = list()
         self.hourlyEmissions = list()
         self.marginalCost = list()

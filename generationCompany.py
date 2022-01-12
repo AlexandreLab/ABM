@@ -39,8 +39,8 @@ class generationCompany():
         self.genCapacity = 1E11
         self.hourlyCost = list()
         self.hourlyEmissions = list()
-        self.runingCost=0.0
-        self.runingEmissions=0.0
+        self.runningCost=0.0
+        self.runningEmissions=0.0
         self.totalEmissionsYear = 0.0 # total emissions of all technologies for cur year
         self.name = 'Generation Company '+ str(self.companyID)+': '
         self.elecLoss = 0.0 #0.1
@@ -365,10 +365,10 @@ class generationCompany():
         self.totalEmissionsYear = 0.0
         for i in range(len(self.traditionalGen)):
             self.traditionalGen[i].calcProfitPerKWh()
-            self.totalEmissionsYear = self.totalEmissionsYear + self.traditionalGen[i].runingEmissions #running emissions is yearly value
+            self.totalEmissionsYear = self.totalEmissionsYear + self.traditionalGen[i].runningEmissions #running emissions is yearly value
         for i in range(len(self.renewableGen)):
             self.renewableGen[i].calcProfitPerKWh()
-            self.totalEmissionsYear = self.totalEmissionsYear + self.renewableGen[i].runingEmissions
+            self.totalEmissionsYear = self.totalEmissionsYear + self.renewableGen[i].runningEmissions
 
     # get capacity of all battery storage in kW. In here, capacity id discharge
     def getBatteryCapKW(self):
@@ -887,7 +887,7 @@ class generationCompany():
                 sumProfit = sumProfit + self.traditionalGen[tradIndx[i][j]].yearlyProfit
                 sumRevenue = sumRevenue + self.traditionalGen[tradIndx[i][j]].yearlyIncome
                 sumCost = sumCost + self.traditionalGen[tradIndx[i][j]].yearlyCost
-                sumEmissions = sumEmissions + self.traditionalGen[tradIndx[i][j]].runingEmissions
+                sumEmissions = sumEmissions + self.traditionalGen[tradIndx[i][j]].runningEmissions
                 sumGeneration = sumGeneration + self.traditionalGen[tradIndx[i][j]].yearlyEnergyGen
 
             if(self.year == self.BASEYEAR):

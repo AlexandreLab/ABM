@@ -22,8 +22,8 @@ class traditionalGenerator(electricityGenerator):
         self.opEmissionsPkW = 0.0 # kg of CO2 emitted per kW generated
         self.genCapacity = capacity
         self.energyGenerated = list()
-        self.runingCost=0.0
-        self.runingEmissions=0.0
+        self.runningCost=0.0
+        self.runningEmissions=0.0
         self.hourlyCost = list()
         self.hourlyEmissions = list()
         self.hourlyProfit = list()
@@ -286,11 +286,11 @@ class traditionalGenerator(electricityGenerator):
             self.hourlyCost.append(curCost)
             self.hourlyEmissions.append(curEmiss)
             self.hourlyProfit.append(curProfit)
-            self.runingCost = self.runingCost + (curCost)
-            self.runingEmissions = self.runingEmissions + (curEmiss)
+            self.runningCost = self.runningCost + (curCost)
+            self.runningEmissions = self.runningEmissions + (curEmiss)
             self.yearlyEnergyGen = self.yearlyEnergyGen + self.energyGenerated[i]
             self.yearlyProfit = self.yearlyProfit + curProfit
-            self.yearlyCost = self.runingCost
+            self.yearlyCost = self.runningCost
             self.yearlyIncome = self.yearlyIncome + curIncome
             if(self.genCapacity>0.00001):
                 self.estimatedROI = (self.yearlyProfit * self.lifetime)/(self.capitalCost * self.genCapacity)

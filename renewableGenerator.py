@@ -28,8 +28,8 @@ class renewableGenerator(electricityGenerator):
         self.yearlyProfit=0.0
         self.yearlyIncome = 0.0
         self.yearlyCost = 0.0
-        self.runingCost=0.0
-        self.runingEmissions = 0.0
+        self.runningCost=0.0
+        self.runningEmissions = 0.0
         self.hourlyCost = list()
         self.renewableBool = True
         self.availabilityFactor = 0.1
@@ -213,9 +213,9 @@ class renewableGenerator(electricityGenerator):
             self.yearlyCarbonCostSum = 0.0
             self.hourlyCost.append(curCost)
             self.hourlyProfit.append(curProfit)
-            self.runingCost = self.runingCost + (curCost)
+            self.runningCost = self.runningCost + (curCost)
             self.yearlyProfit = self.yearlyProfit + curProfit
-            self.yearlyCost = self.runingCost
+            self.yearlyCost = self.runningCost
             self.yearlyIncome = self.yearlyIncome + curIncome
             if(self.genCapacity>0.00001):
                 self.estimatedROI = (self.yearlyProfit * self.lifetime)/(self.capitalCost * self.genCapacity)
@@ -313,9 +313,9 @@ class renewableGenerator(electricityGenerator):
             
             self.hourlyCost.append(curCost)
             self.hourlyProfit.append(curProfit)
-            self.runingCost = self.runingCost + (curCost)
+            self.runningCost = self.runningCost + (curCost)
             self.yearlyProfit = self.yearlyProfit + curProfit
-            self.yearlyCost = self.runingCost
+            self.yearlyCost = self.runningCost
             self.yearlyIncome = self.yearlyIncome + curIncome
             if(self.genCapacity>0.00001):
                 self.estimatedROI = (self.yearlyProfit * self.lifetime)/(self.capitalCost * self.genCapacity)
@@ -379,9 +379,9 @@ class renewableGenerator(electricityGenerator):
             self.yearlyCarbonCostSum = 0.0
             self.hourlyCost.append(curCost)
             self.hourlyProfit.append(curProfit)
-            self.runingCost = self.runingCost + (curCost)
+            self.runningCost = self.runningCost + (curCost)
             self.yearlyProfit = self.yearlyProfit + curProfit
-            self.yearlyCost = self.runingCost
+            self.yearlyCost = self.runningCost
             self.yearlyIncome = self.yearlyIncome + curIncome
             if(self.genCapacity>0.00001):
                 self.estimatedROI = (self.yearlyProfit * self.lifetime)/(self.capitalCost * self.genCapacity)
@@ -433,9 +433,9 @@ class renewableGenerator(electricityGenerator):
             
             self.hourlyCost.append(curCost)
             self.hourlyProfit.append(curProfit)
-            self.runingCost = self.runingCost + (curCost)
+            self.runningCost = self.runningCost + (curCost)
             self.yearlyProfit = self.yearlyProfit + curProfit
-            self.yearlyCost = self.runingCost
+            self.yearlyCost = self.runningCost
             self.yearlyIncome = self.yearlyIncome + curIncome
             if(self.genCapacity>0.00001):
                 self.estimatedROI = (self.yearlyProfit * self.lifetime)/(self.capitalCost * self.genCapacity)
@@ -487,9 +487,9 @@ class renewableGenerator(electricityGenerator):
             
             self.hourlyCost.append(curCost)
             self.hourlyProfit.append(curProfit)
-            self.runingCost = self.runingCost + (curCost)
+            self.runningCost = self.runningCost + (curCost)
             self.yearlyProfit = self.yearlyProfit + curProfit
-            self.yearlyCost = self.runingCost
+            self.yearlyCost = self.runningCost
             self.yearlyIncome = self.yearlyIncome + curIncome
             self.yearlyCarbonCostSum = 0.0
             if(self.genCapacity>0.00001):

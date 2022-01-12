@@ -11,9 +11,9 @@ import Utils
 class policyMaker():
     
     
-    def __init__(self):
+    def __init__(self, path_save):
 
-        self.initialise()
+        self.initialise(path_save)
         
 
     def initialise(self, path_save):

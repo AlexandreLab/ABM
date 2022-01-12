@@ -80,8 +80,8 @@ if __name__ == '__main__':
     # path to where you want results output to
     RESULTS_FILE_PATH = 'Results/2050/'
 
-    maxYears = 41 #16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
-    timeSteps=8760
+    maxYears = 16 #16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
+    timeSteps = 8760
 
     boolDraw = True
     boolEnergyStorage = True
@@ -160,10 +160,11 @@ if __name__ == '__main__':
         mainPlantsOwnersFile = 'OtherDocuments/UKPowerPlans2010_Owners.csv'
         # mainPlantsOwnersFile = 'OtherDocuments/UKPowerPlans2010_Owners fortestonly.csv'
     GBGenPlantsOwners = Utils.readCSV(mainPlantsOwnersFile)
-
+    GBGenPlantsOwners.fillna(0, inplace=True)
+    
     for i in range(len(GBGenPlantsOwners['Station Name'])):
         tempName = GBGenPlantsOwners['Fuel'].iloc[i] #raw
-        tempbus = GBGenPlantsOwners['Bus'].iloc[i]
+        tempbus = int(GBGenPlantsOwners['Bus'].iloc[i])
         if(not (tempbus == 0) and tempName in genTechList):
             curCompName = GBGenPlantsOwners['Company Name'].iloc[i]
             if(not (curCompName in elecGenCompNAMESONLY)):
@@ -187,7 +188,7 @@ if __name__ == '__main__':
 
     for i in range(len(GBGenPlantsOwners['Station Name'])): # data from 2018 dukes report
         tempName = GBGenPlantsOwners['Fuel'].iloc[i]
-        tempbus = GBGenPlantsOwners['Bus'].iloc[i]
+        tempbus = int(GBGenPlantsOwners['Bus'].iloc[i])
         if (tempbus > 0) and tempName in genTechList: # Bus > 0 ==> the plant is for northern ireland
             curCompName = GBGenPlantsOwners['Company Name'].iloc[i]
             for eGC in elecGenCompanies:
@@ -197,7 +198,6 @@ if __name__ == '__main__':
                     lifetime = 0
                     tempRen = 0
                     tempCapKW = GBGenPlantsOwners['Installed Capacity(MW)'].iloc[i]*1000
-                    tempbus = GBGenPlantsOwners['Bus'].iloc[i]
                     capacityInstalledMW[tempName] = capacityInstalledMW[tempName] + tempCapKW/1000
                     lifetime = int(technologies_dataset.loc[tempName, 'Lifetime_Year'])
                     tempRen = int(technologies_dataset.loc[tempName, 'Renewable_Flag'])
@@ -239,25 +239,27 @@ if __name__ == '__main__':
     
     pvPlantsFile = 'OtherDocuments/OperationalPVs2017test_wOwner.csv' # these records are for end of 2017
     GBPVPlants = Utils.readCSV(pvPlantsFile)
-    
+    GBPVPlants.fillna(0, inplace=True)
+
     windOnPlantsFile = 'OtherDocuments/OperationalWindOnshore2017test_wOwner.csv'
     GBWindOnPlants = Utils.readCSV(windOnPlantsFile)
-    
+    GBWindOnPlants.fillna(0, inplace=True)
+
     windOffPlantsFile = 'OtherDocuments/OperationalWindOffshore2017test_wOwner.csv'
     GBWindOffPlants = Utils.readCSV(windOffPlantsFile)
+    GBWindOffPlants.fillna(0, inplace=True)
     print('Adding Additional Distributed Generation')
 
 
     for i in range(len(GBWindOffPlants['Name'])): # Adding in offshore plants already under construction that are due to come online soon
         
         sYear = GBWindOffPlants['StartYear'].iloc[i]
-        tempbus = GBWindOffPlants['Bus'].iloc[i]
+        tempbus = int(GBWindOffPlants['Bus'].iloc[i])
         if tempbus>0: #the plant is not in Northern Ireland
             if(sYear>2010 and sYear<2014):
                 tempName = GBWindOffPlants['Type'].iloc[i]
                 cap = GBWindOffPlants['Capacity(kW)'].iloc[i]
                 eYear = GBWindOffPlants['EndYear'].iloc[i]
-                tempbus = GBWindOffPlants['Bus'].iloc[i]
                 lifetime = eYear - sYear
                 renGen = renewableGenerator(5,8760, cap,0.0, tempbus,OneYearHeadroom[tempbus-1]) # temporary generator to estimate the annual costs
                 yearCost, yCostPerKWh = renGen.estAnnualCosts(cap)
@@ -811,6 +813,7 @@ if __name__ == '__main__':
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Capacity_Margin_%'] = capacityMargin
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Derated_Capacity_Margin_%'] = deRatedCapacityMargin
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Peak_Demand_kW'] = peakDemand
+        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Emissions_kgCO2'] = yearlyEmissions #kgCO2
 
         capacityPerTypePerBus = pd.DataFrame(columns=list(technologies_dataset.index)+['Battery'], index = [eC.busbar for eC in energyCustomers])
         capacityPerTypePerBus.fillna(0, inplace=True)
@@ -868,8 +871,6 @@ if __name__ == '__main__':
                 eGC.addBatterySize(batteryCapPerCompany)
                 eGC.curYearBatteryBuild = batteryCapPerCompany
         
-
-
         capacityPerBus.loc[currentYear+BASEYEAR, :] = 0 # init the values
 
         for eC in energyCustomers:
