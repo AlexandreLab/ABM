@@ -11,30 +11,28 @@ from energyStorage import energyStorage
 from random import choice
 from scipy import (dot, eye, randn, asarray, array, trace, log, exp, sqrt, mean, sum, argsort, square, arange)
 import pandas as pd
+import os
 
 class generationCompany():
     
     
-    def __init__(self,timeSteps, companyType, companyID):
+    def __init__(self,timeSteps, companyType, companyID, params, BASEYEAR):
 
-        self.initialise(timeSteps, companyType, companyID)
+        self.initialise(timeSteps, companyType, companyID, params, BASEYEAR)
 
-    def __init__(self,timeSteps):
+    def __init__(self,timeSteps, params, BASEYEAR):
 
-        self.initialise(timeSteps, 1, 1)
-        
+        self.initialise(timeSteps, 1, 1, params, BASEYEAR)
 
-    def initialise(self,timeSteps, companyType, companyID):
-        file2 = open("BASEYEAR.txt", "r") 
-        temp = file2.read()
-        self.BASEYEAR = int(temp)
-        file2.close()
-        
+
+    def initialise(self,timeSteps, companyType, companyID, params, BASEYEAR):
+
+        self.params = params
+
         self.timeSteps = timeSteps
         self.companyID = companyID #useless, to be removed
         self.companyType = companyType
-        self.opCostPkW = 0.14 # ignore***
-        self.opEmissionsPkW = 1.0 # ignore***
+
         self.heatGenerated = list()
         self.genCapacity = 1E11
         self.hourlyCost = list()
@@ -85,10 +83,6 @@ class generationCompany():
         self.BECCScap = 10
         self.Hydrogencap = 10
 
-
-
-
-
         self.yearlyTotalCapacity = list()
         self.yearlyDeRatedCapacity = list()
         self.getTotalCapacity()
@@ -98,8 +92,8 @@ class generationCompany():
         self.yearlyCapacityMargin = list()
         self.yearlyDeRatedCapacityMargin = list()
 
-
-        self.year = self.BASEYEAR
+        self.BASEYEAR = BASEYEAR
+        self.year = BASEYEAR
         self.years = list()
 
         self.energyStores = list()
@@ -932,11 +926,12 @@ class generationCompany():
 
 
     # method to add plants to construction queue so that they come online after build time has completed
-    def addToConstructionQueue(self, tGenName, tRenewableID, tCapacityKW, tStartYear, tEndYear, tAge, tcapSub, cfdBool, capMarketBool, BusNum):
+    def addToConstructionQueue(self, tGenName, tRenewableID, tCapacityKW, tLifetime, tStartYear, tEndYear, tAge, tcapSub, cfdBool, capMarketBool, BusNum):
         queuePlant = list()
         queuePlant.append(tGenName)
         queuePlant.append(tRenewableID)
         queuePlant.append(tCapacityKW)
+        queuePlant.append(tLifetime)
         queuePlant.append(tStartYear)
         queuePlant.append(tEndYear)
         queuePlant.append(tAge)
@@ -955,16 +950,18 @@ class generationCompany():
         while(i <len(self.constructionQueue) and len(self.constructionQueue)>0):
             if(self.constructionQueue[i][3]==self.year): # start year is now
                 name = self.constructionQueue[i][0]
-                renewableID = self.constructionQueue[i][1]
+                renewableFlag = self.constructionQueue[i][1]
                 capacityKW = self.constructionQueue[i][2]
-                startYear = self.constructionQueue[i][3]
-                endYear = self.constructionQueue[i][4]
-                age = self.constructionQueue[i][5]
-                capitalSub = self.constructionQueue[i][6]
-                cfdBool = self.constructionQueue[i][7]
-                capMarketBool = self.constructionQueue[i][8]
-                BusNum = self.constructionQueue[i][9]
-                self.addGeneration(name, -1, renewableID, capacityKW, startYear, endYear, age, capitalSub, cfdBool, capMarketBool, BusNum, OneYearHeadroom[BusNum-1])
+                lifetime = self.constructionQueue[i][3]
+                startYear = self.constructionQueue[i][4]
+                endYear = self.constructionQueue[i][5]
+                age = self.constructionQueue[i][6]
+                capitalSub = self.constructionQueue[i][7]
+                cfdBool = self.constructionQueue[i][8]
+                capMarketBool = self.constructionQueue[i][9]
+                BusNum = self.constructionQueue[i][10]
+
+                self.addGeneration(name, renewableFlag, capacityKW, lifetime, startYear, endYear, age, capitalSub, cfdBool, capMarketBool, BusNum, OneYearHeadroom[BusNum-1])
                 del self.constructionQueue[i]
             else:
                 i=i+1
@@ -1435,44 +1432,44 @@ class generationCompany():
         return self.curBatteryCap
 
     # method to remove all generation plants and initialize with new plant of 0 capacity (needed for looping through plants in mainSim)
-    def removeGeneration(self):
-        self.traditionalGen = list()
-        self.renewableGen = list()
-        renGenWindOn = renewableGenerator(4,self.timeSteps, 0, self.CFDPrice, 0,0)#bus number 0 is for initialisation
+    # def removeGeneration(self):
+    #     self.traditionalGen = list()
+    #     self.renewableGen = list()
+    #     renGenWindOn = renewableGenerator(4,self.timeSteps, 0, self.CFDPrice, 0,0)#bus number 0 is for initialisation
 
 
-             # 0 capacity
-        renGenWindOff = renewableGenerator(5,self.timeSteps, 0, self.CFDPrice, 0,0) # 0 capacity
-        renGenPV = renewableGenerator(0,self.timeSteps, 0, self.CFDPrice, 0,0) # 0 capacity
-        renGenHydro = renewableGenerator(2,self.timeSteps, 0, self.CFDPrice, 0,0) # 0 capacity
+    #          # 0 capacity
+    #     renGenWindOff = renewableGenerator(5,self.timeSteps, 0, self.CFDPrice, 0,0) # 0 capacity
+    #     renGenPV = renewableGenerator(0,self.timeSteps, 0, self.CFDPrice, 0,0) # 0 capacity
+    #     renGenHydro = renewableGenerator(2,self.timeSteps, 0, self.CFDPrice, 0,0) # 0 capacity
 
-        tradGenCoal = traditionalGenerator(0,0,0,0) # 0 capacity
-        tradGenGas = traditionalGenerator(1,0,0,0) # 0 capacity
-        tradGenNuclear = traditionalGenerator(2,0,0,0) # 0 capacity
-        tradGenOCGT = traditionalGenerator(3,0, 0,0) # 0 capacity
-        tradGenBECCS = traditionalGenerator(4,0, 0,0) # 0 capacity
-        tradGenBiomass = traditionalGenerator(5,0,0,0) # 0 capacity
-        tradGenHydrogen = traditionalGenerator(6,0,0,0) # 0 capacity        
-        self.renewableGen.append(renGenWindOn)
-        self.renewableGen.append(renGenWindOff)
-        self.renewableGen.append(renGenPV)
-        self.renewableGen.append(renGenHydro)
+    #     tradGenCoal = traditionalGenerator(0,0,0,0) # 0 capacity
+    #     tradGenGas = traditionalGenerator(1,0,0,0) # 0 capacity
+    #     tradGenNuclear = traditionalGenerator(2,0,0,0) # 0 capacity
+    #     tradGenOCGT = traditionalGenerator(3,0, 0,0) # 0 capacity
+    #     tradGenBECCS = traditionalGenerator(4,0, 0,0) # 0 capacity
+    #     tradGenBiomass = traditionalGenerator(5,0,0,0) # 0 capacity
+    #     tradGenHydrogen = traditionalGenerator(6,0,0,0) # 0 capacity        
+    #     self.renewableGen.append(renGenWindOn)
+    #     self.renewableGen.append(renGenWindOff)
+    #     self.renewableGen.append(renGenPV)
+    #     self.renewableGen.append(renGenHydro)
 
-        self.traditionalGen.append(tradGenNuclear)
-        self.traditionalGen.append(tradGenGas)
-        self.traditionalGen.append(tradGenCoal)
-        self.traditionalGen.append(tradGenOCGT)
-        self.traditionalGen.append(tradGenBECCS)
-        self.traditionalGen.append(tradGenBiomass)
-        self.traditionalGen.append(tradGenHydrogen)        
-        for i in range(len(self.renewableGen)):
-            self.renewableGen[i].startYear = 2000
-            self.renewableGen[i].endYear = 3000
-            self.renewableGen[i].age = 0
-        for i in range(len(self.traditionalGen)):
-            self.traditionalGen[i].startYear = 2000
-            self.traditionalGen[i].endYear = 3000
-            self.traditionalGen[i].age = 0
+    #     self.traditionalGen.append(tradGenNuclear)
+    #     self.traditionalGen.append(tradGenGas)
+    #     self.traditionalGen.append(tradGenCoal)
+    #     self.traditionalGen.append(tradGenOCGT)
+    #     self.traditionalGen.append(tradGenBECCS)
+    #     self.traditionalGen.append(tradGenBiomass)
+    #     self.traditionalGen.append(tradGenHydrogen)        
+    #     for i in range(len(self.renewableGen)):
+    #         self.renewableGen[i].startYear = 2000
+    #         self.renewableGen[i].endYear = 3000
+    #         self.renewableGen[i].age = 0
+    #     for i in range(len(self.traditionalGen)):
+    #         self.traditionalGen[i].startYear = 2000
+    #         self.traditionalGen[i].endYear = 3000
+    #         self.traditionalGen[i].age = 0
 
     # get id of plant name (although in general its probably better to just use name rather than IDs....)
     def genTechNameToClassID(self, name):
@@ -1517,20 +1514,22 @@ class generationCompany():
         return genID, renewableBool
         
     # method to add new generation plants to the generation company
-    def addGeneration(self, genName, genTypeID, renewableID, capacityKW, startYear, endYear, age, subsidy, cfdBool, capMarketBool, BusNum, Headroom):
-        addGen = False
+    def addGeneration(self, genName, renewableFlag, capacityKW, lifetime, startYear, endYear, age, subsidy, cfdBool, capMarketBool, BusNum, Headroom):
+        print("Name: {0}, RenewableFlag: {1}, CapKW: {2}, startY: {3}, endY: {4}".format(genName, str(renewableFlag), str(capacityKW), str(startYear), str(endYear)))
         if(cfdBool and capMarketBool):
             input('****** Problem, both capacity market bool and cfd bool are true......')
         elif(cfdBool):
             cfdSub = subsidy # GBP/kWh
             capitalSub = 0.0 # GBP/ kW Cap /year
             print('**** CfD ', cfdSub)
-            print("Name: %s, ID: %s, renID: %s, CapKW: %s, startY: %s, endY: %s" % (genName, str(genTypeID), str(renewableID), str(capacityKW), str(startYear), str(endYear)))
+            print("Name: {0}, RenewableFlag: {1}, CapKW: {2}, startY: {3}, endY: {4}".format(genName, str(renewableFlag), str(capacityKW), str(startYear), str(endYear)))
+
         elif(capMarketBool):
             cfdSub = 0.0 # GBP/kWh
             capitalSub = subsidy # GBP/ kW Cap /year
             print('**** Capactiy Market ', capitalSub)
-            print("Name: %s, ID: %s, renID: %s, CapKW: %s, startY: %s, endY: %s" % (genName, str(genTypeID), str(renewableID), str(capacityKW), str(startYear), str(endYear)))
+            print("Name: {0}, RenewableFlag: {1}, CapKW: {2}, startY: {3}, endY: {4}".format(genName, str(renewableFlag), str(capacityKW), str(startYear), str(endYear)))
+
        #     input('wait')
         else:
             capitalSub = 0.0 # GBP/ kW Cap /year
@@ -1538,60 +1537,51 @@ class generationCompany():
             
         if(startYear> self.year): # not built yet
             print('Add to construction queue')
-            self.addToConstructionQueue(genName, renewableID, capacityKW, startYear, endYear, age, subsidy, cfdBool, capMarketBool, BusNum)
+            self.addToConstructionQueue(genName, renewableFlag, capacityKW, lifetime, startYear, endYear, age, subsidy, cfdBool, capMarketBool, BusNum)
 
         elif(endYear<self.year):
             print('Plant already decommissioned, not adding to capacity!')
 
         else:
-            addGen = True
-            if(genTypeID==1 or genName =='Nuclear'):
-                tradGen = traditionalGenerator(2,capacityKW, BusNum, Headroom) # Nuclear, 2,
-                tradGen.CFDPrice = cfdSub
-            elif(genTypeID==2 or genName =='CCGT'):
-                tradGen = traditionalGenerator(1,capacityKW, BusNum, Headroom) # CCGT, 1
-            elif(genTypeID==3 or genName =='Coal'):
-                tradGen = traditionalGenerator(0,capacityKW, BusNum, Headroom) # Coal, 0
-            elif(genTypeID==4 or genName =='OCGT'): 
-                tradGen = traditionalGenerator(3,capacityKW, BusNum, Headroom) # OCGT, 3
-            elif(genTypeID==9 or genName =='BECCS'): 
-                tradGen = traditionalGenerator(4,capacityKW, BusNum, Headroom) # BECCS, 4
-            elif(genTypeID==10 or genName =='Biomass'): 
-                tradGen = traditionalGenerator(5,capacityKW,BusNum, Headroom) # 
-            elif(genTypeID==11 or genName =='Hydrogen'): 
-                tradGen = traditionalGenerator(6,capacityKW, BusNum, Headroom) # 
+            list_plants = list(self.params["technical_parameters"].index)
+            if genName in list_plants: #check if the genName is recognised
+ 
+                genTypeID = int(self.params["technical_parameters"].loc[genName, "TypeID"])
+                if renewableFlag:
+                    newGen = renewableGenerator(genName, genTypeID,self.timeSteps, capacityKW, lifetime, cfdSub, BusNum, Headroom) # offshore
+                    self.renewableGen.append(newGen)
+                else:
+                    newGen = traditionalGenerator(genName, genTypeID,capacityKW, lifetime, BusNum, Headroom)
+                    self.traditionalGen.append(newGen)
+                    
+            economic_param_df = self.params["economic_parameters"]
+            newGen.startYear = startYear
+            newGen.endYear = endYear
+            newGen.age = age
+            newGen.CFDPrice = cfdSub
+            newGen.capitalSub = capitalSub
+            newGen.capitalCost = economic_param_df.loc[(economic_param_df["Key"]==genName) & (economic_param_df["Cost Type"]=="CAPEX"), self.year].values[0]
+            newGen.fixedOandMCost = economic_param_df.loc[(economic_param_df["Key"]==genName) & (economic_param_df["Cost Type"]=="OPEX"), self.year].values[0]
+            newGen.variableOandMCost = economic_param_df.loc[(economic_param_df["Key"]==genName) & (economic_param_df["Cost Type"]=="Variable Other Work Costs"), self.year].values[0]
+            newGen.capitalCostPerHour = (newGen.capitalCost * newGen.genCapacity)/(8760.0 * newGen.lifetime) # GBP/hr
+            newGen.fixedOandMPerHour = (newGen.fixedOandMCost * newGen.genCapacity)/(8760.0) # GBP/hr
+            
 
-            elif(genTypeID==5 or genName =='Wind Offshore'): 
-                renGen = renewableGenerator(5,self.timeSteps, capacityKW,cfdSub, BusNum, Headroom) # offshore
-            elif(genTypeID==6 or genName =='Wind Onshore'): 
-                renGen = renewableGenerator(4,self.timeSteps, capacityKW,cfdSub, BusNum, Headroom) # onshore
-            elif(genTypeID==7 or genName =='Solar'): 
-                renGen = renewableGenerator(0,self.timeSteps, capacityKW,cfdSub, BusNum, Headroom) # 
-            elif(genTypeID==8 or genName =='Hydro'): 
-                renGen = renewableGenerator(2,self.timeSteps, capacityKW,cfdSub, BusNum, Headroom) #
-
-
-               
-        if(addGen):
-            if(renewableID==0):
-                tradGen.startYear = startYear
-                tradGen.endYear = endYear
-                tradGen.age = age
-                tradGen.CFDPrice = cfdSub
-                tradGen.capitalSub = capitalSub
-                self.traditionalGen.append(tradGen)
+            if renewableFlag:
+                print("Add Profile")
+                path_profiles = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Jan 2022 saved\Code_WH'
+                gen_profile_name = self.params["technical_parameters"].loc[genName, "Profile"]
+                newGen.loadScaleGenProfile_speed(path_profiles+os.path.sep+gen_profile_name)
             else:
-                renGen.startYear = startYear
-                renGen.endYear = endYear
-                renGen.age = age
-                renGen.CFDPrice = cfdSub
-                renGen.capitalSub = capitalSub
-                renGen.resetYearValueRecord()
-                renGen.recalcEconomics()
-                if((startYear>2010 or cfdSub<1) and genName =='Wind Offshore'):
-                    print('renGen.cfd ',renGen.CFDPrice)
-                    print('renGen.capitalSub ',renGen.capitalSub)
-                self.renewableGen.append(renGen)
+                print("Add wholesale prices for primary fuel")
+                path_wholesale_price = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Jan 2022 saved\Code_WH\WholesaleEnergyPrices'
+                targetFuel = self.params["technical_parameters"].loc[genName, "Primary_Fuel"]
+                fuelPricePath = Utils.getPathWholesalePriceOfFuel(path_wholesale_price, targetFuel, self.BASEYEAR)
+                newGen.loadFuelCost(fuelPricePath)
+
+            newGen.updateBuildRates() # resetting max build rates per company
+
+
                 
     # method to graph capacity
     def graph(self):

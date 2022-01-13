@@ -10,17 +10,53 @@ import statistics
 class electricityGenerator():
     
     
-    def __init__(self):
+    def __init__(self, genName, genTypeID, capacity, lifetime, numBus, headroom):
 
-        self.initialise() 
-        
+        self.name = genName
+        self.genCapacity = capacity
+        self.busbar = numBus
+        self.headroom = headroom
+        self.lifetime = lifetime
 
-    def initialise(self):
         self.age = 0
-        self.opEmissions = 0.0 # kg of CO2 emitted per hour
-        self.name = 'Unknown'
+        self.startYear = 0
+        self.endYear = 0
+
+        self.opEmissionsPkW = 0.0 # kg of CO2 emitted per kW generated
+        self.genTypeID = genTypeID
+
+        self.renewableBool = False
+
+        self.runningCost=0.0
+        self.runningEmissions=0.0
+        self.yearlyIncome = 0.0
+        self.yearlyCost = 0.0
+        self.yearlyEnergyGen=0.0
+        self.yearlyProfit=0.0
+
+        self.hourlyProfit = list()
+        self.hourlyIncome = list()
+        self.hourlyCost = list()
+        self.energyGenerated = list()
+        self.hourlyEmissions = list()
+
+        self.FuelCost = 0.0
+        self.CarbonCost = 0.0
+        self.fixedOandMCost = 0.0
+        self.variableOandMCost = 0.0
+        self.capitalCost = 0.0
+        self.yearlyCarbonCostSum = 0.0 
+        self.wasteCost = 0.0
+
+        self.availabilityFactor = 0.1
+
+        self.ConnectionFee = 0.5174*self.headroom*0.001-2415.7
+
+        
+        self.CFDPrice = 0 # GBP
+
+
         self.generalInfo()
-        self.renewableBool = True
 
     # method to initialize variable common to renewables and non renewables
     def generalInfo(self):

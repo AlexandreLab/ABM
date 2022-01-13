@@ -17,3 +17,7 @@ Each generationCompany can have a dataframe with the hourly generation by techno
 
 
 why is the bus 0 associated to northem ireland and sometimes to Scotland? This lead to creating 31 energy customers not 30? 
+
+
+
+for the electricity generators, the self.ConnectionFee is different for Rgen and Tgen! is it normal?  (0.5174*self.Headroom*0.001-2415.7)/8760 
