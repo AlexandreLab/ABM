@@ -66,7 +66,7 @@ def loadTextFile(file):
         f.close()
         for i in range(len(x)):
             x[i]= float(x[i])
-        return x
+        return np.array(x)
 
 def checkUnits(listOfVals):
     listCopy = listOfVals.copy()
@@ -133,7 +133,21 @@ def checkWeightUnits(listOfVals):
 
 
 
-
+def loadFuelCostFile(genName, FILEPATH):
+    fileIN = np.array(loadTextFile(FILEPATH))
+    
+    if(genName=="Coal"): # coal
+        fileIN = fileIN/1000 # tonnes to kg
+        fileIN = fileIN/2.46 # 1 kg of coal produces 2.46 kWh
+        fileIN = fileIN*0.77 # USD to GBP
+    elif(genName=="CCGT" or genName=="OCGT"): # CCGT and OCGT
+        fileIN = fileIN/100.0 # p/ therm to gbp/therm
+        fileIN = fileIN/29.31 # therms to kWh, 1 therm = 29.31 kWh
+    elif(genName=="Nuclear"): # Nuclear
+        fileIN = fileIN/100.0 # p/ kWh to gbp/kWh
+    #else self.name=="BECCS" or self.name == "Biomass"):
+    #noChange 
+    return fileIN
 
 
 
@@ -189,65 +203,6 @@ def randomOrderListIndx(myList):
 
 
 
-def updateCurYearCapInvest(technologies, curYearCapInvest):
-    TECHFILENAME = 'GEN_TYPE_LIST.txt'
-    CAPINVESTFILENAME = 'CUR_YEAR_GEN_CAP_INVEST_LIST.txt'
-     
-    if os.path.isfile(CAPINVESTFILENAME): # already investment in capacity this year      
-        file2 = open(CAPINVESTFILENAME, "r") 
-        totCurYearCapInvest = file2.read().split('\n')
-        file2.close()
-        totCurYearCapInvest.pop()
-
-        file2 = open(TECHFILENAME, "r") 
-        technologyList = file2.read().split('\n')
-        file2.close()
-        technologyList.pop()
-
-        for i in range(len(technologies)):
-            indx = technologyList.index(technologies[i])
-            if (len(totCurYearCapInvest)>0 and len(curYearCapInvest)>0):
-                temp = float(totCurYearCapInvest[indx]) + float(curYearCapInvest[i])
-                totCurYearCapInvest[indx] = temp
-
-            
-            
-
-        # delete old file so we can update with new one
-        try:
-            os.remove(CAPINVESTFILENAME)
-        except OSError as e:  ## if failed, report it back to the user ##
-            print ("Error: %s - %s." % (e.filename, e.strerror))
-
-        # writing new total capacity to file
-        file = open(CAPINVESTFILENAME, "w")
-        for i in range(len(totCurYearCapInvest)):
-            temp = str(totCurYearCapInvest[i])+'\n'
-            file.write(temp)
-        file.close()
-        
-        
-    else: # no investment yet
-        totCurYearCapInvest = curYearCapInvest
-        technologyList = technologies
-
-        file = open(CAPINVESTFILENAME, "w")
-        for i in range(len(totCurYearCapInvest)):
-            temp = str(totCurYearCapInvest[i])+'\n'
-            file.write(temp)
-        file.close()
-
-
-
-def resetCurYearCapInvest():
-    CAPINVESTFILENAME = 'CUR_YEAR_GEN_CAP_INVEST_LIST.txt'
-
-    try:
-        os.remove(CAPINVESTFILENAME)
-    except OSError as e:  ## if failed, report it back to the user ##
-        print ("Error: %s - %s." % (e.filename, e.strerror))
-
-
 
 def getPathWholesalePriceOfFuel(path, fuel, year):
     for subdir, dirs, files in os.walk(path):
@@ -277,74 +232,19 @@ def addToCapGenList(genTypeName, curCap, curCapList, technologyList):
     return newCapList
 
 
-def getCurYearCapInvest():
-    TECHFILENAME = 'GEN_TYPE_LIST.txt'
-    CAPINVESTFILENAME = 'CUR_YEAR_GEN_CAP_INVEST_LIST.txt'
-    
-    if os.path.isfile(CAPINVESTFILENAME): # already investment in capacity this year      
-        file2 = open(CAPINVESTFILENAME, "r") 
-        totCurYearCapInvest = file2.read().split('\n')
-        file2.close()
-        totCurYearCapInvest.pop()
-
-        file2 = open(TECHFILENAME, "r") 
-        technologyList = file2.read().split('\n')
-        file2.close()
-        technologyList.pop()
-
-        return technologyList, totCurYearCapInvest
-
-    else:
-        file2 = open(TECHFILENAME, "r") 
-        technologyList = file2.read().split('\n')
-        file2.close()
-        technologyList.pop()
-
-        totCurYearCapInvest = list()
-
-        for i in range(len(technologyList)):
-            totCurYearCapInvest.append(0.0)
-
-        return technologyList, totCurYearCapInvest
-
 
 def getWholesaleEPrice(elecGenCompanies):
-
-    # tech = list()
-    # margeC = list()
-    wholesaleEPrice = list()
+    wholesaleEPrice = np.zeros(8760) # init at 0
     nuclearMarginalCost = list()
     for eGC in elecGenCompanies:
-        for renGen in eGC.renewableGen:
-            if len(renGen.marginalCost)>0:
-                mCost = renGen.marginalCost
-                if(len(wholesaleEPrice)==0):
-                    wholesaleEPrice = mCost.copy()
-                else:
-                    for p in range(len(wholesaleEPrice)):
-                        if(mCost[p]>wholesaleEPrice[p]):
-                            wholesaleEPrice[p] = mCost[p]
+        for gen in eGC.renewableGen + eGC.traditionalGen:
+            gen.calculateHourlyData()
+            if len(gen.marginalCost)>0:
+                wholesaleEPrice = np.max([wholesaleEPrice, gen.marginalCost], axis=0)
 
-            # if not (renGen.name in tech) and (renGen.genCapacity>10):
-            #     tech.append(renGen.name)
-            #     margeC.append(renGen.marginalCost)
-                            
-        for tradGen in eGC.traditionalGen:
-            if tradGen.name =='Nuclear' and len(nuclearMarginalCost)==0 and tradGen.genCapacity>10:
-                nuclearMarginalCost = tradGen.marginalCost.copy()
-            if len(tradGen.marginalCost)>0:
-                mCost = tradGen.marginalCost
-                if(len(wholesaleEPrice)==0):
-                    wholesaleEPrice = mCost.copy()
-                else:
-                    for p in range(len(wholesaleEPrice)):
-                        if(mCost[p]>wholesaleEPrice[p]):
-                            wholesaleEPrice[p] = mCost[p]
-            # if not (tradGen.name in tech) and (tradGen.genCapacity>10):
-            #     tech.append(tradGen.name)
-            #     margeC.append(tradGen.marginalCost)
-                
-    
+            if gen.name =='Nuclear':
+                nuclearMarginalCost = gen.marginalCost.copy()
+
     return wholesaleEPrice, nuclearMarginalCost
 
 

@@ -21,3 +21,20 @@ why is the bus 0 associated to northem ireland and sometimes to Scotland? This l
 
 
 for the electricity generators, the self.ConnectionFee is different for Rgen and Tgen! is it normal?  (0.5174*self.Headroom*0.001-2415.7)/8760 
+
+
+
+getGeneration() function in traditionalGenerator need to account for lower capacity factor for Nuclear power during summer
+
+
+how is the buildrate used? what is done when it is updated?
+
+
+waste costs are currently not accounted.
+
+busheadRoom is currently not used for the CfdAuction
+
+the predevelopment time is not included in the construction time of any of the plants for the cfd auction, capacity auction, etc.
+
+
+The derated capacity calculated in getCapYear(self, capYear, deratedBool): may need to be reviewd. How is the derated capacity calculated for renewable energy.
