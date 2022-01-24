@@ -592,10 +592,10 @@ if __name__ == '__main__':
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Derated_Capacity_Margin_%'] = deRatedCapacityMargin
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Peak_Demand_kW'] = peakDemand
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Emissions_kgCO2'] = yearlyEmissions #kgCO2
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Carbon_Intensity_Target_gCO2/kWh'] = yearlyEmissions/totYearGridGenkWh*1000 
+        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Carbon_Intensity_Target_gCO2/kWh'] = policy.carbonIntensityTarget
+        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Carbon_Intensity_gCO2/kWh'] = yearlyEmissions/totYearGridGenkWh*1000 
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Carbon_Price_£/tCO2'] = policy.curCO2Price
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Generation_kWh'] = totYearGridGenkWh #kWh
-
 
         # Extract NPV values of all the plants
         npv_dict = {}

@@ -36,8 +36,8 @@ class policyMaker():
         if self.year<2018:
             self.carbonIntensityTarget = 250
         elif self.year<=2050:
-            CO2DecreaseFrac = (self.year - 2018)/(2050 - 2018) #change 35 to 50
-            newCO2P = 250 - (CO2DecreaseFrac*250)
+            CO2DecreaseFrac = (self.year - 2018)/(2050 - 2018)
+            newCO2P = 250 * (1-CO2DecreaseFrac)
             self.carbonIntensityTarget = newCO2P
         else:
             self.carbonIntensityTarget = 0
@@ -47,7 +47,7 @@ class policyMaker():
         elif (self.year + 5)<=2050:
             year5 = self.year + 5
             CO2DecreaseFrac = (year5 - 2018)/(2050 - 2018)
-            newCO2P = 250 - (CO2DecreaseFrac*250)
+            newCO2P = 250 * (1-CO2DecreaseFrac)
             self.CO2Target5Years = newCO2P
         else:
             self.CO2Target5Years = 0
@@ -61,7 +61,7 @@ class policyMaker():
         print('emissionsIntense from last year (gCO2/kWh)',carbonIntensity)
         print('yearCO2IntensityTarget (gCO2/kWh)',self.carbonIntensityTarget)
         BEISco2Price = self.yearlyCarbonCost[self.year-self.BASEYEAR]
-        if carbonIntensity>self.carbonIntensityTarget: # now looking at the co2 target 5 years in the future
+        if carbonIntensity>self.carbonIntensityTarget:
             CO210PC = self.curCO2Price *1.1
             if CO210PC > BEISco2Price:
                 self.curCO2Price = CO210PC
