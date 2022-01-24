@@ -21,7 +21,7 @@ class renewableGenerator(electricityGenerator):
 
         # load generation profile and scale to match desired capacity
     def loadScaleGenProfile(self,FILEPATH):
-        start = timer()
+        # start = timer()
         self.energyGenerated = np.array(Utils.loadTextFile(FILEPATH))
 
         if(self.name == 'Solar'): # solar
@@ -34,7 +34,7 @@ class renewableGenerator(electricityGenerator):
             fileGenCapacity = 4000000
 
         self.energyGenerated = self.energyGenerated*1000*self.genCapacity/fileGenCapacity
-        print("end loadScale function: {0}".format(timer()-start))
+        # print("end loadScale function: {0}".format(timer()-start))
   
     # used for testing
     def loadGenRandomProfile(self,timeSteps,minV, maxV):

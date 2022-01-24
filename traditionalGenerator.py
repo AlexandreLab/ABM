@@ -6,9 +6,7 @@ import math
 import Utils
 from electricityGenerator import electricityGenerator
 
-
 class traditionalGenerator(electricityGenerator):
-    
     
     def __init__(self, genName, genTypeID, capacity, lifetime, numBus, headroom, BASEYEAR):
         super().__init__(genName, genTypeID, capacity, lifetime, numBus, headroom, BASEYEAR)

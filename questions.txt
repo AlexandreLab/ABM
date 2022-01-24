@@ -38,3 +38,6 @@ the predevelopment time is not included in the construction time of any of the p
 
 
 The derated capacity calculated in getCapYear(self, capYear, deratedBool): may need to be reviewd. How is the derated capacity calculated for renewable energy.
+
+
+for already built wind offshore, the amount of cfd subsidy that these new plants receive need to be calculated. see function estimateCfDSubsidy in electricityGenerator.py.

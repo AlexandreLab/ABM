@@ -6,10 +6,10 @@ import numpy as np
 import pandas as pd
 import math
 import Utils
+import os
 
 
 class policyMaker():
-    
     
     def __init__(self, params, BASEYEAR):
         self.params = params
@@ -17,97 +17,64 @@ class policyMaker():
         self.year= self.BASEYEAR
         self.path_save = params["path_save"]
 
-
         self.buildRatePerType = pd.DataFrame() #dataframe of the build rate per technology type per year
 
         carbonFilePath = 'CarbonPrice/carbonPrice'+str(self.BASEYEAR)+'_2050.txt'
         self.yearlyCarbonCost = Utils.loadTextFile(carbonFilePath)
         wholesaleElecFilePath = 'WholesaleEnergyPrices/ElectricityBaseLoad'+str(self.BASEYEAR)+'_2050_GBPPerkWh.txt'
         self.yearlyWholesalePrice = Utils.loadTextFile(wholesaleElecFilePath)
-        self.curCO2Price = self.yearlyCarbonCost[0]
-        
-        self.yearEmissionsTarget = 50000000000 # 50Mt of CO2 ** ignore this
-        self.minDeRateCapMargin = 10000000 # 25000000 # 25 GW
-        self.maxDeRateCapMargin = 25000000 # 25 GW
-        self.yearCO2IntensityTarget = 250 #100 # gCO2/kWh, 50-100 in https://www.current-news.co.uk/news/uk-powers-to-new-grid-carbon-intensity-low-of-just-32g-co2-kwh
+        self.curCO2Price = self.yearlyCarbonCost[0] #£/tCO2
+        self.yearCO2IntensityTarget = 0 #gCO2/kWh 
 
-        self.curCFDPrice = list()
-
-        self.curCFDWindonPrice = 0.0
-        self.curCFDWindoffPrice = 0.0
-        self.curCFDBiomassPrice = 0.0
-        self.curCFDHydroPrice = 0.0
-        self.curCFDNuclearPrice = 0.0
-        self.curCFDBECCSPrice = 0.0
-        self.curCFDHydrogenPrice = 0.0        
-        self.yearlyCO2Price = list()
-        self.yearlyCFDPrice = list()
-
-
-        self.yearlyCFDWindonPrice = list()
-        self.yearlyCFDWindoffPrice = list()
-        self.yearlyCFDBiomassPrice = list()
-        self.yearlyCFDHydroPrice = list()
-        self.yearlyCFDNuclearPrice = list()
-        self.yearlyCFDBECCSPrice = list()
-        self.yearlyCFDHydrogenPrice = list()
-
-
-        self.recordYearData()      
         self.name = 'Government'
-        self.years = list()
-        self.years.append(self.year)
-        self.yearlyEmissionsIntensity = list()
-        self.yearlyEmissTarget = list()
+        self.updateCO2Target()
 
         self.genCompanies = list()
 
-    # update values for next year
-    def increaseYear(self):
-        if(self.year<2018):
-            self.yearCO2IntensityTarget = 250
-        elif(self.year<=2050):
+    def updateCO2Target(self):
+        # gCO2/kWh, 50-100 in https://www.current-news.co.uk/news/uk-powers-to-new-grid-carbon-intensity-low-of-just-32g-co2-kwh
+        if self.year<2018:
+            self.carbonIntensityTarget = 250
+        elif self.year<=2050:
             CO2DecreaseFrac = (self.year - 2018)/(2050 - 2018) #change 35 to 50
             newCO2P = 250 - (CO2DecreaseFrac*250)
-            self.yearCO2IntensityTarget = newCO2P
+            self.carbonIntensityTarget = newCO2P
         else:
-            self.yearCO2IntensityTarget = 0
+            self.carbonIntensityTarget = 0
                 
-        if((self.year+5)<2018):
+        if (self.year+5)<2018:
             self.CO2Target5Years = 250
-        elif((self.year + 5)<=2050):
+        elif (self.year + 5)<=2050:
             year5 = self.year + 5
             CO2DecreaseFrac = (year5 - 2018)/(2050 - 2018)
             newCO2P = 250 - (CO2DecreaseFrac*250)
             self.CO2Target5Years = newCO2P
         else:
             self.CO2Target5Years = 0
+
+    # update values for next year
+    def increaseYear(self):
         self.year = self.year + 1
-        self.years.append(self.year)
+        self.updateCO2Target()
 
     def getNextYearCO2Price(self, carbonIntensity):
-        print('new year ',self.year)
         print('emissionsIntense from last year (gCO2/kWh)',carbonIntensity)
-        print('yearCO2IntensityTarget (gCO2/kWh)',self.yearCO2IntensityTarget)
-        self.yearlyEmissionsIntensity.append(carbonIntensity)
-        self.yearlyEmissTarget.append(self.yearCO2IntensityTarget)
+        print('yearCO2IntensityTarget (gCO2/kWh)',self.carbonIntensityTarget)
         BEISco2Price = self.yearlyCarbonCost[self.year-self.BASEYEAR]
-        if(carbonIntensity>self.yearCO2IntensityTarget): # now looking at the co2 target 5 years in the future
+        if carbonIntensity>self.carbonIntensityTarget: # now looking at the co2 target 5 years in the future
             CO210PC = self.curCO2Price *1.1
-            if(CO210PC > BEISco2Price):
+            if CO210PC > BEISco2Price:
                 self.curCO2Price = CO210PC
             else:
                 self.curCO2Price = BEISco2Price
         else:
             curCO2 = self.curCO2Price
-            if(curCO2>BEISco2Price):
+            if curCO2>BEISco2Price:
                 self.curCO2Price = curCO2
             else:
                 self.curCO2Price = BEISco2Price
         
         return self.curCO2Price
-
-
 
     # estimate demand in a specific year
     def projectedPeakDemand(self, targetYear):
@@ -126,23 +93,30 @@ class policyMaker():
 
     # Method to cap the build rate of technologies
     # if capacity excess the build rate, bids are randomly removed
-    def capBuildRate(self, bids, bidColumn):
+    def capBuildRate(self, bids, bidColumn, ascending=True):
         frames = []
-        for genName in bids.index:
+        for genName in bids.index.unique():
+
             temp_df = bids.loc[genName, :].copy()
             if not isinstance(temp_df, pd.DataFrame): #there is only one line so it is a Serie
                 temp_df = temp_df.to_frame().T
             else:
                 temp_df = temp_df.sample(frac=1) # shuffle the dataset
-                temp_df.sort_values(bidColumn, ascending=True, inplace=True) 
+                temp_df.sort_values(bidColumn, ascending=ascending, inplace=True) 
             yearOfInstallation = temp_df["Start_Year"].mean()
             maxBuildingRate = int(self.buildRatePerType.loc[genName,yearOfInstallation])
-            temp_df["Cumulative_Capacity_kW"] = temp_df["Capacity_kW"].cumsum()
-            temp_df = temp_df.loc[temp_df["Cumulative_Capacity_kW"]<=maxBuildingRate, :]
-            capToBeInstalled = temp_df["Capacity_kW"].sum()
-            self.buildRatePerType.loc[genName,yearOfInstallation] = maxBuildingRate - capToBeInstalled
-            frames.append(temp_df)
-        return pd.concat(frames)
+            print("The build rate of {0} is {1} kW in {2}".format(genName, maxBuildingRate, yearOfInstallation))
+            if maxBuildingRate>0:
+                temp_df["Cumulative_Capacity_kW"] = temp_df["Capacity_kW"].cumsum()
+                temp_df = temp_df.loc[temp_df["Cumulative_Capacity_kW"]<=maxBuildingRate, :]
+                capToBeInstalled = temp_df["Capacity_kW"].sum()
+                self.buildRatePerType.loc[genName,yearOfInstallation] = maxBuildingRate - capToBeInstalled
+                frames.append(temp_df)
+        if len(frames)>0:
+            newBids = pd.concat(frames)
+        else:
+            newBids = pd.DataFrame()
+        return newBids
 
     # hold capacity auction
     def capacityAuction(self, timeHorizon, currentPeak,  boolEnergyStorage, busheadroom):
@@ -153,6 +127,7 @@ class policyMaker():
         # Book: Ter-Gazarian, A.G., Energy Storage for Power Systems, Page 18
         estPeakD = (self.projectedPeakDemand(demandYear)* scaleACS)
         estDeRCap = self.projectedCapacity(demandYear)
+        print(demandYear)
         print('Estimated Peak Demand ', estPeakD)
         print('Estimated Derated Capacity ', estDeRCap)
         
@@ -171,7 +146,6 @@ class policyMaker():
             allBids.sort_values(["Bid_Price_GBP/kW"], ascending=True, inplace=True)
             allBids["Cumulative_DeRated_Capacity_kW"] = allBids["DeRated_Capacity_kW"].cumsum()
             
-
             # Allocate cap subsidies until demand is met
             allBids.loc[allBids["Bid_Price_GBP/kW"]>capSubsisdy, "Bid_Price_GBP/kW"] = capSubsisdy
             unsuccessfulBids = allBids.loc[allBids["Cumulative_DeRated_Capacity_kW"]>capShortFall, :].index
@@ -187,19 +161,13 @@ class policyMaker():
                     cfdBool = False
                     capMarketBool = True
                     busbar = row["Busbar"]
-                    eGC = self.getGenerationCompany(eGCName)
+                    eGC = Utils.getGenerationCompany(eGCName, self.genCompanies)
                     eGC.addToConstructionQueue(genName, capacitykW, startYear, tcapSub, cfdBool, capMarketBool, busbar)
         else:
             print(' ----------------- No capacity auction ----------------------')
         return estPeakD, estDeRCap
 
-    # return the generationCompany object based on its name
-    def getGenerationCompany(self, genCoName):
-        eGC = None
-        for eGC in self.genCompanies:
-            if eGC.name == genCoName:
-                return eGC
-        return eGC
+
             
     # method to hold CfD auction
     def cfdAuction(self, capYears, commisCap, timeHorizon, busheadroom, avgElectricityPrice):
@@ -238,7 +206,7 @@ class policyMaker():
                     cfdBool = True
                     capMarketBool = False
                     busbar = row["Busbar"]
-                    eGC = self.getGenerationCompany(eGCName)
+                    eGC = Utils.getGenerationCompany(eGCName, self.genCompanies)
                     eGC.addToConstructionQueue(genName, capacitykW, startYear, tcapSub, cfdBool, capMarketBool, busbar)
         else:
             print('++++++++++++++++++ No CfD auction +++++++++++++++++++++++')
@@ -246,17 +214,6 @@ class policyMaker():
         return True
 
 
-    def recordYearData(self):
-        self.yearlyCO2Price.append(self.curCO2Price)
-        self.yearlyCFDPrice.append(self.curCFDPrice)
-
-        self.yearlyCFDWindonPrice.append(self.curCFDWindonPrice)
-        self.yearlyCFDWindoffPrice.append(self.curCFDWindoffPrice)
-        self.yearlyCFDBiomassPrice.append(self.curCFDBiomassPrice) 
-        self.yearlyCFDHydroPrice.append(self.curCFDHydroPrice) 
-        self.yearlyCFDNuclearPrice.append(self.curCFDNuclearPrice)
-        self.yearlyCFDBECCSPrice.append(self.curCFDBECCSPrice)
-        self.yearlyCFDHydrogenPrice.append(self.curCFDHydrogenPrice)
 
 
         
@@ -266,11 +223,55 @@ class policyMaker():
 
 
 
+if __name__ == '__main__': # to test some of the functions of the policy Maker
+    path_technology_dataset = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Dec 2021\Code_WH'
+    # list of generation technologies
+    technoloy_dataset_fn = "technology_technical_economic_parameters.xlsx"
+    temp_df = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "technical_parameters", index_col=0)
+    technology_technical_df = temp_df.loc[temp_df["Set"]=="Current", :].copy()
 
+    temp_df = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "economic_parameters")
+    technology_economic_df = temp_df.loc[temp_df["Set"]=="Current", :].copy()
+    technology_economic_df.fillna(0, inplace=True)
 
+    busbarConstraints = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "Bus constraints", index_col=0)
+    busbarConstraints.fillna(0, inplace=True)
 
+    params = {}
+    params["technical_parameters"] = technology_technical_df
+    params["economic_parameters"] = technology_economic_df
+    params["busbar_constraints"] = busbarConstraints
+    genTechList = list(technology_technical_df.index)
 
+    buildRatePerType = pd.DataFrame(index= genTechList+['Battery'],columns=[2010+y for y in range(70)])
+    buildRatePerType.fillna(2000000, inplace=True)
 
+    # path to where you want results output to
+    
+    params["path_save"] =  'Results/2050/'
+    params["path_wholesale_fuel_price"] = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Jan 2022 saved\Code_WH\WholesaleEnergyPrices'
+
+    bids_test = pd.DataFrame(Utils.getBids1())
+    bids_test.set_index('Unnamed: 0', inplace=True, drop=True)
+
+    other_bids = pd.DataFrame(Utils.getBids2())
+    other_bids.set_index('Unnamed: 0', inplace=True, drop=True) 
+
+    buildRatedf = pd.DataFrame(Utils.getBuildRate())
+    buildRatedf.set_index('Unnamed: 0', inplace=True, drop=True) 
+
+    policy = policyMaker(params, 2010)
+    policy.buildRatePerType = buildRatePerType
+    policy.year = 2036
+
+    new_bids = policy.capBuildRate(bids_test, 'Bid_Price_GBP/kW')
+    print(policy.buildRatePerType.loc[:, 2036:2045])
+    print(len(new_bids))
+
+    new_bids = policy.capBuildRate(other_bids, 'ROI', False)
+    print(policy.buildRatePerType.loc[:, 2036:2045])
+    print(len(new_bids))
+    print(new_bids)
 
 
 

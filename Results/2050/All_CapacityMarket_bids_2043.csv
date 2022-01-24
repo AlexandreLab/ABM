@@ -1,0 +1,16 @@
+,Bid_Price_GBP/kW,Busbar,Capacity_kW,DeRated_Capacity_kW,Start_Year,Battery_Flag,Generation_Company
+CCGT,0,25,250000,212500.0,2046,False,Baglan Generation Ltd
+CCGT,0,23,250000,212500.0,2046,False,Barking Power
+CCGT,0,22,250000,212500.0,2046,False,Centrica
+OCGT,0,22,500000,460000.0,2045,False,Citigen (London) UK Ltd
+CCGT,0,12,250000,212500.0,2046,False,Corby Power Ltd
+CCGT,0,21,250000,212500.0,2046,False,Cory Energy Company Ltd
+CCGT,107.03047713540083,18,250000,212500.0,2046,False,Derwent Cogeneration
+OCGT,0,4,500000,460000.0,2045,False,Drax Power Ltd
+Hydrogen,0,1,500000,425000.0,2046,False,EDF Energy
+CCGT,337.7737683267939,10,250000,212500.0,2046,False,EDF Energy
+Biomass,0,12,14000,12320.0,2045,False,EPR Ely Limited
+Biomass,0,25,14000,12320.0,2045,False,E.On UK
+CCGT,0,16,250000,212500.0,2046,False,E.On UK
+BECCS,0,16,500000,440000.0,2045,False,International Power/Mitsui
+Biomass,0,23,14000,12320.0,2045,False,Sembcorp Utilities (UK) Ltd

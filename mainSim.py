@@ -16,10 +16,10 @@ import os
 import pandas as pd
 
 
-def initBuildRate(genTechList, dfBuildRatePerType):
+def initBuildRate(genTechList, dfBuildRatePerType, tech_df):
     buildRatePerType = {}
     for genName in genTechList:
-        maxBuildRatekW = technology_technical_df.loc[genName, 'GBMaxBuildRate_kW']
+        maxBuildRatekW = tech_df.loc[genName, 'GBMaxBuildRate_kW']
         dfBuildRatePerType.loc[genName, :] = maxBuildRatekW
     return buildRatePerType
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     # Utils.resetCurYearCapInvest() # what does it do?
     BASEYEAR = 2010 # 2010
     RESULTS_FILE_PATH = 'Results/2050/'
-    maxYears = 16 #16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
+    maxYears = 41 #16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
     timeSteps = 8760
     boolEnergyStorage = False
     boolLinearBatteryGrowth = True
@@ -128,10 +128,14 @@ if __name__ == '__main__':
     busbarConstraints = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "Bus constraints", index_col=0)
     busbarConstraints.fillna(0, inplace=True)
 
+    technologyFamilies = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "technologies_families", index_col=0)
+    technologyFamilies.fillna(0, inplace=True)
+
     params = {}
     params["technical_parameters"] = technology_technical_df
     params["economic_parameters"] = technology_economic_df
     params["busbar_constraints"] = busbarConstraints
+
     genTechList = list(technology_technical_df.index)
 
     buildRatePerType = pd.DataFrame(index= genTechList+['Battery'],columns=[BASEYEAR+y for y in range(70)])
@@ -210,12 +214,12 @@ if __name__ == '__main__':
             if(not (curCompName in elecGenCompNAMESONLY)):
                 print(curCompName)
                 elecGenCompNAMESONLY.append(curCompName)
-                genCompany = generationCompany(timeSteps, params, BASEYEAR)
+                genCompany = generationCompany(timeSteps, params, policy.curCO2Price, BASEYEAR)
                 genCompany.name = curCompName        
                 elecGenCompanies.append(genCompany)
 
 
-    distGenCompany = generationCompany(timeSteps, params, BASEYEAR)
+    distGenCompany = generationCompany(timeSteps, params, policy.curCO2Price, BASEYEAR)
     distGenCompany.name = 'Distributed Generation'
     elecGenCompanies.append(distGenCompany)
 
@@ -248,7 +252,7 @@ if __name__ == '__main__':
                     tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
                     subsidy = 0
                     cfdBool = int(technology_technical_df.loc[tempName, 'CfD_Flag'])
-                    capMarketBool = int(technology_technical_df.loc[tempName, 'Capacity_Market_Flag'])
+                    capMarketBool = False
 
                     # print('Name {0}, lifetime {1}, renewable Flag {2}'.format(tempName, lifetime, tempRen))
 
@@ -264,7 +268,7 @@ if __name__ == '__main__':
                     if tempName == 'Wind Offshore':
                         genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
                         renGen = renewableGenerator('Wind Offshore', genTypeID, tempCapKW, lifetime, 0.0,1,OneYearHeadroom[tempbus-1], BASEYEAR) # temporary generator to estimate the annual costs
-                        yearCost, subsidy = renGen.estAnnualCosts(tempCapKW)
+                        subsidy = renGen.estimateCfDSubsidy()
 
                     tempStartYear = int(GBGenPlantsOwners['StartYear'].iloc[i])
                     tempEndYear = tempStartYear + lifetime
@@ -310,8 +314,8 @@ if __name__ == '__main__':
                 
                 lifetime = eYear - sYear
                 renGen = renewableGenerator(tempName, genTypeID, tempCapKW, lifetime, 0.0,1,OneYearHeadroom[tempbus-1], BASEYEAR)
-                yearCost, yCostPerKWh = renGen.estAnnualCosts(tempCapKW)
-                distGenCompany.addGeneration(tempName, tempRen, tempCapKW, lifetime ,sYear, 2052, 0, yearCost, True, False, tempbus, OneYearHeadroom[tempbus-1])
+                cfdSubsidy = renGen.estimateCfDSubsidy()
+                distGenCompany.addGeneration(tempName, tempRen, tempCapKW, lifetime ,sYear, 2052, 0, cfdSubsidy, True, False, tempbus, OneYearHeadroom[tempbus-1])
  
             
     for i in range(len(GBWindOnPlants['Name'])): # Adding in onshore plants already under construction that are due to come online soon
@@ -358,8 +362,10 @@ if __name__ == '__main__':
     genTypeID = int(technology_technical_df.loc['Wind Offshore', "TypeID"])
     lifetime = int(technology_technical_df.loc['Wind Offshore', 'Lifetime_Years'])
     renGen = renewableGenerator('Wind Offshore', genTypeID,  wOffCapkW, lifetime, 0.0,1,OneYearHeadroom[tempbus-1], BASEYEAR)  # temporary generator to estimate the annual costs, for cfd
-    yearCost, yCostPerKWh = renGen.estAnnualCosts(wOffCapkW)
-    distGenCompany.addGeneration('Wind Offshore', 1, wOffCapkW, lifetime, avgWindOffStartYear, 2052, (avgWindOffStartYear-BASEYEAR), yearCost, True, False,temprand, OneYearHeadroom[temprand-1])
+    
+    cfdSubsidy = renGen.estimateCfDSubsidy()
+
+    distGenCompany.addGeneration('Wind Offshore', 1, wOffCapkW, lifetime, avgWindOffStartYear, 2052, (avgWindOffStartYear-BASEYEAR), cfdSubsidy, True, False,temprand, OneYearHeadroom[temprand-1])
     
 
     # Add batteries to the elecGenCompanies
@@ -371,10 +377,20 @@ if __name__ == '__main__':
 
     policy.genCompanies = elecGenCompanies #add record of the generation companies to the Policy Maker object
     # Initialise the building rate for all the companies and technologies on year 0
-    initBuildRate(genTechList, buildRatePerType)
+    initBuildRate(genTechList, buildRatePerType, technology_technical_df)
     buildRatePerType.to_csv(RESULTS_FILE_PATH+"Initial_buildRateperType.csv")
     policy.buildRatePerType = buildRatePerType
-    
+
+    ## init the technologies that can be built by each company based on their current portfolio
+    for eGC in elecGenCompanies:
+        tempListTechnology = []
+        for genName in eGC.listTechnologyPortfolio:
+            
+            sameFamilyTechnologies = list(technologyFamilies[technologyFamilies[genName]>0].index)
+            tempListTechnology= tempListTechnology + sameFamilyTechnologies
+        eGC.listTechnologyPortfolio = list(set(tempListTechnology))
+        print("list technologies")
+        print(eGC.name, eGC.listTechnologyPortfolio)
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
     # ---------------------------- Simulation begins here ----------------------
@@ -390,7 +406,6 @@ if __name__ == '__main__':
         idx_8760 = [x for x in range(8760)]
 
         hourlyCurtail = np.array(timeSteps)
-        hourlyLossOfLoad = np.array(timeSteps)
         DfNetDemand = pd.DataFrame()
         allRGenPerCompany = pd.DataFrame(columns=list_companies_name, index=idx_8760) # df of total hourly renewable generation all year           
         allRGenPerCompany.fillna(0, inplace=True)
@@ -401,41 +416,8 @@ if __name__ == '__main__':
         allTGenPerTechnology = pd.DataFrame(columns=list_tgen, index=idx_8760)  # df showing the hourly generation for the traditional technologies
         allTGenPerTechnology.fillna(0, inplace=True)
 
-        
-        
         print('year ',(BASEYEAR+currentYear))
         print('y ',(currentYear))
-
-        #################### Add in some BECCS in 2019 ###############
-        lifetime = int(technology_technical_df.loc['BECCS', 'Lifetime_Years'])
-        if(BASEYEAR+currentYear == 2019):
-            cName = 'Drax Power Ltd'
-            BECCSAddBool = False
-            for eGC in elecGenCompanies:
-                if eGC.name == cName:
-                    temprand=random.choice([2,7,10,12,13,14,15,16,17,18,19,20,22,23,24,26,28,30])
-
-                    #addGeneration(self, genName, renewableFlag, capacityKW, lifetime, startYear, endYear, age, subsidy, cfdBool, capMarketBool, BusNum, Headroom):
-                    eGC.addGeneration('BECCS', 0, 500000.0, 25, 2019, 2019+25, 0, 0.0, False, False, temprand, OneYearHeadroom[temprand-1])
-                    BECCSAddBool = True
-                    print('BECCS added')
-            if(not BECCSAddBool):
-                input('BECCS not added ******')
-
-        # ################### Add in some Hydrogen in 2035 ###############
-        # lifetime = int(technology_technical_df.loc['Hydrogen', 'Lifetime_Years'])
-        # if(BASEYEAR+currentYear == 2035):
-        #     cHydrogenName = list(['Baglan Generation Ltd', 'Barking Power', 'Centrica','Citigen (London) UK Ltd', 'Coolkeeragh ESB Ltd','Corby Power Ltd', 'Cory Energy Company Ltd','Derwent Cogeneration','Drax Power Ltd','EDF Energy','E.On UK','GDF Suez','International Power/Mitsui','Premier Power Ltd','Rocksavage Power Co. Ltd','RWE Npower Plc','Thermal','Cruachan Thermal','Seabank Power Limited','Spalding Energy Company Ltd'])
-        #     HydrogenAddBool = False
-        #     for eGC in elecGenCompanies:
-        #         if eGC.name in cHydrogenName:
-        #             temprand=random.randint(1,30)
-        #             #addGeneration(self, genName, renewableFlag, capacityKW, lifetime, startYear, endYear, age, subsidy, cfdBool, capMarketBool, BusNum, Headroom):
-        #             eGC.addGeneration('Hydrogen', 0, 1.5, 2035, 2044, 0, 0.0, False, False, temprand, OneYearHeadroom[temprand-1])
-        #             HydrogenAddBool = True
-        #             print('Hydrogen added')
-        #     if(not HydrogenAddBool):
-        #         input('Hydrogen not added ******')      
         
         # Get the capacity installed for each technology type, by companies, and by bus
         capacityPerTypePerBus = pd.DataFrame()
@@ -592,13 +574,11 @@ if __name__ == '__main__':
         # update the current wholesaleEPrice to calculate the profit made by each plant 
         yearlyEmissions = 0.0
         for eGC in elecGenCompanies:
-            eGC.calcRevenue(wholesaleEPrice)
+            temp_df = eGC.calcRevenue(wholesaleEPrice) #return the ROI and NPV of all the plants owned by this generator company
             yearlyEmissions += eGC.calcEmissions() #kgCO2
 
-        hourlyLossOfLoad = tempNetD
-
         DfNetDemand['Curtailement'] = hourlyCurtail
-        DfNetDemand['Loss of load'] = hourlyLossOfLoad
+        DfNetDemand['Loss of load'] = tempNetD
 
         dercap_cols = [c for c in capacityPerType.columns if '_Derated_Capacity_kW' in c]
         cap_cols = [c for c in capacityPerType.columns if '_Capacity_kW' in c and 'Derated' not in c]
@@ -612,20 +592,24 @@ if __name__ == '__main__':
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Derated_Capacity_Margin_%'] = deRatedCapacityMargin
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Peak_Demand_kW'] = peakDemand
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Emissions_kgCO2'] = yearlyEmissions #kgCO2
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Generation_kWh'] = totYearGridGenkWh #kgCO2
-            
+        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Carbon_Intensity_Target_gCO2/kWh'] = yearlyEmissions/totYearGridGenkWh*1000 
+        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Carbon_Price_£/tCO2'] = policy.curCO2Price
+        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Generation_kWh'] = totYearGridGenkWh #kWh
+
+
+        # Extract NPV values of all the plants
+        npv_dict = {}
+        for eGC in elecGenCompanies:
+            for i,gen in enumerate(eGC.renewableGen+eGC.traditionalGen):
+                npv_dict[(eGC.name, gen.name+str(i))] = [gen.NPV]
+        fileOut = RESULTS_FILE_PATH + 'NPVPerPlant_'+str(BASEYEAR+currentYear)+'.csv'        
+        pd.DataFrame(npv_dict).to_csv(fileOut)
         ##########################################################################
         ################ End of year, update model for next year #################
         ##########################################################################
 
-
-        
-
-
         ####### Capacity auction ######
 
-
-        
         # introduce battery storage in 2018
         # this next part of code should only be used if using a linear increase in battery storage
         # Need to be updated
@@ -650,23 +634,45 @@ if __name__ == '__main__':
         #         eGC.addBatterySize(batteryPowerPerCompany)
         #         eGC.curYearBatteryBuild = batteryPowerPerCompany
         
-
-
         capacityPerBusValues = capacityPerTypePerBus.T.sum().values
         OneYearHeadroom = TNO.EvaluateHeadRoom(capacityPerBusValues,totalCustDemand)
         DfHeadroomYear[currentYear+BASEYEAR] = OneYearHeadroom.copy() # Store the headroom of the current year
 
         # cfd auction
-        policy.cfdAuction(3, 6000000, 4, OneYearHeadroom, np.mean(wholesaleEPrice)) # 3 years, 6 GW to be commissioned, max 4 years construction time
+        policy.cfdAuction(3, 6000000, 20, OneYearHeadroom, np.mean(wholesaleEPrice)) # 3 years, 6 GW to be commissioned, max 20 years construction time
 
-
-
-        #Capacity auction
+        # Capacity auction
         estPeakD, estDeRCap = policy.capacityAuction(4, peakDemand, False, OneYearHeadroom,)
 
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Capacity_Auction_Estimated_Peak_Demand_kW'] = estPeakD 
         DfSystemEvolution.loc[currentYear+BASEYEAR, 'Capacity_Auction_Estimated_DeRated_Capacity_kW'] = estDeRCap
 
+        print("Companies investments...")
+
+        # Capacity built by each company individually without the help of subsidies
+        frames = []
+        for eGC in elecGenCompanies:
+            temp_df = eGC.nextInvestment()
+            frames.append(temp_df)
+
+        fileOut = RESULTS_FILE_PATH + 'ROINPV_'+str(BASEYEAR+currentYear)+'.csv'
+        newCapacity = pd.concat(frames, axis=0) #Capacity that companies want to build
+        newCapacity = policy.capBuildRate(newCapacity, "ROI", False) #Capacity that will be built after removing capping the amount of technology of each type
+        if len(newCapacity)>0:
+            newCapacity.to_csv(fileOut)
+
+            for genName, row in newCapacity.iterrows():
+                eGCName = row["Generation_Company"]
+                eGC = Utils.getGenerationCompany(eGCName, elecGenCompanies)
+                capacitykW = row["Capacity_kW"]
+                startYear = row["Start_Year"]
+                tcapSub = 0
+                cfdBool = False
+                capMarketBool = False
+                busbar = row["Busbar"]
+                eGC.addToConstructionQueue(genName, capacitykW, startYear, tcapSub, cfdBool, capMarketBool, busbar)
+
+        policy.increaseYear()
         # update CO2 Price for next year
         newCO2Price = policy.getNextYearCO2Price(yearlyEmissions/totYearGridGenkWh*1000) #carbon intensity in gCO2/kWh input
 
@@ -674,49 +680,9 @@ if __name__ == '__main__':
         for eGC in elecGenCompanies:
             eGC.updateYear(OneYearHeadroom, newCO2Price)
 
-        # # capacity auction
-        # if(boolLinearBatteryGrowth and boolEnergyStorage):
-        #     technologyList, newCapList_CapacityAuction = policy.capacityAuction(4, peakDemand, elecGenCompanies, False, OneYearHeadroom)
-        # else:
-        #     technologyList, newCapList_CapacityAuction = policy.capacityAuction(4, peakDemand, elecGenCompanies, boolEnergyStorage, OneYearHeadroom)
-            
-
-        # totYearGridGenKWh = allTGenPerTechnology.sum().sum() + allRGenPerTechnology.sum().sum()
-        # gridCO2emisIntens = (yearlyEmissions/totYearGridGenKWh)*1000 # *1000 because want gCO2/kWh not kgCO2
-        # print('year ',(BASEYEAR+currentYear))
-        # print('gridCO2emisIntens (gCO2/kWh) ',gridCO2emisIntens)
-
-        policy.increaseYear()
-        # # update CO2 Price for next year
-        # newCO2Price = policy.getNextYearCO2Price(gridCO2emisIntens)
-        # policy.recordYearData()
-
-
-
-        # # update wholesale electricity price
-        # for eGC in elecGenCompanies: # loop through all gen companies
-        #     eGC.updateTechnologiesYear(newCO2Price)#wholesEPriceChange returns 0
-
         # demand elasticity
         for eC in energyCustomers:
             demandChangePC = eC.updateYear(0.0) #
-
-        # demandCoeff = 1.0 + (demandChangePC/100.0) #how mauch percentage change compared to 2018. e.g. 180%
-
-        # # each generation company agent makes decision to invest in new capacity
-        # for eGC in elecGenCompanies: # loop through all gen companies
-        #     if(boolLinearBatteryGrowth and boolEnergyStorage):
-        #         newCapList = eGC.updateCapacityDecision(peakDemand, False,OneYearHeadroom, newCapList)
-        #     else:
-        #         newCapList = eGC.updateCapacityDecision(peakDemand, boolEnergyStorage,OneYearHeadroom, newCapList)
-                
-        # batSubsReq = list()
-        # for eGC in elecGenCompanies:
-        #     batSubsReq.append(eGC.yearlyBatterySubsNeeded)
-        
-        # for eGC in elecGenCompanies: # reset values
-        #     eGC.resetYearlyValues()
-
             
         # writing results to file if at the end of simulation
         if(currentYear == maxYears-1): # End of simulation
@@ -730,34 +696,35 @@ if __name__ == '__main__':
             DfHeadroomYear.to_csv(fileOut)
 
         # Export to CSV
-        fileOut = RESULTS_FILE_PATH + 'NetDemand'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = RESULTS_FILE_PATH + 'NetDemand_'+str(currentYear+BASEYEAR)+'.csv'
         DfNetDemand.to_csv(fileOut)
 
-        fileOut = RESULTS_FILE_PATH + 'allRGenPerTechnology'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = RESULTS_FILE_PATH + 'allRGenPerTechnology_'+str(currentYear+BASEYEAR)+'.csv'
         allRGenPerTechnology.to_csv(fileOut)
 
-        fileOut = RESULTS_FILE_PATH + 'allRGenPerCompany'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = RESULTS_FILE_PATH + 'allRGenPerCompany_'+str(currentYear+BASEYEAR)+'.csv'
         allRGenPerCompany.to_csv(fileOut)
 
-        fileOut = RESULTS_FILE_PATH + 'allTGenPerTechnology'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = RESULTS_FILE_PATH + 'allTGenPerTechnology_'+str(currentYear+BASEYEAR)+'.csv'
         allTGenPerTechnology.to_csv(fileOut)
 
-        fileOut = RESULTS_FILE_PATH + 'allTGenPerCompany'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = RESULTS_FILE_PATH + 'allTGenPerCompany_'+str(currentYear+BASEYEAR)+'.csv'
         allTGenPerCompany.to_csv(fileOut)
 
-        fileOut = RESULTS_FILE_PATH + 'customerNLs'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = RESULTS_FILE_PATH + 'customerNLs_'+str(currentYear+BASEYEAR)+'.csv'
         customerNLs.to_csv(fileOut)
 
-        fileOut = RESULTS_FILE_PATH + 'capacityPerCompanies'+str(BASEYEAR+currentYear)+'.csv'
+        fileOut = RESULTS_FILE_PATH + 'capacityPerCompanies_'+str(BASEYEAR+currentYear)+'.csv'
         capacityPerCompanies.to_csv(fileOut)  
 
-        fileOut = RESULTS_FILE_PATH + 'capacityPerTypePerBus'+str(BASEYEAR+currentYear)+'.csv'
+        fileOut = RESULTS_FILE_PATH + 'capacityPerTypePerBus_'+str(BASEYEAR+currentYear)+'.csv'
         capacityPerTypePerBus.to_csv(fileOut)  
 
-        fileOut = RESULTS_FILE_PATH + 'WholesalePrice'+str(BASEYEAR+currentYear)+'.csv'
+        fileOut = RESULTS_FILE_PATH + 'WholesalePrice_'+str(BASEYEAR+currentYear)+'.csv'
         DfWholesalePrices.to_csv(fileOut)
 
-            
+        fileOut = RESULTS_FILE_PATH + 'buildRatePerType_'+str(BASEYEAR+currentYear)+'.csv'
+        policy.buildRatePerType.to_csv(fileOut)
 
     
    

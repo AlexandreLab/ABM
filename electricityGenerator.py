@@ -59,11 +59,11 @@ class electricityGenerator():
         self.yearlyProfitList = list() # not sure of the use of this variable
 
         self.fuelCost = 0.0 #£/kWh
-        self.carbonCost = 0.0 #£/kWh
+        self.curCO2Price = 0.0 #£/tCO2
         self.fixedOandMCost = 0.0 #£/kW
         self.variableOandMCost = 0.0 #£/kWh
         self.capitalCost = 0.0 #£/kW
-        self.yearlyCarbonCostSum = 0.0 
+        self.yearlycurCO2PriceSum = 0.0 
         self.wasteCost = 0.0
 
         self.connectionFee = 0.5174*self.headroom*0.001-2415.7
@@ -75,10 +75,10 @@ class electricityGenerator():
         self.yearlySolarFiT = np.array([]) # initialize as an empty array
 
     def calculateHourlyData(self):
-        temp_arr_emissions = self.energyGenerated*self.opEmissionsPkW
+        temp_arr_emissions = self.energyGenerated*self.opEmissionsPkW #kgCO2
         temp_arr_fuelCost = self.energyGenerated*self.fuelCost
         temp_arr_variableOM = self.energyGenerated*self.variableOandMCost
-        temp_arr_carbonCost = temp_arr_emissions/1000.0*self.carbonCost
+        temp_arr_carbonCost = temp_arr_emissions/1000.0*self.curCO2Price
         temp_arr_waste = self.energyGenerated*self.wasteCost
         
         # margin cost is 0 if the current generation is 0
@@ -120,13 +120,9 @@ class electricityGenerator():
         self.yearlyProfit = np.sum(temp_arr_hourlyProfit)
         self.yearlyIncome = np.sum(temp_arr_hourlyIncome)
 
-        if(self.genCapacity>0):
-            self.estimatedROI = (self.yearlyProfit * self.lifetime)/(self.capitalCost * self.genCapacity)
-        else:
-            self.estimatedROI = 0.0
-
-        # NPV is calculated considering that the plant is built in the current year
-        self.NPV = self.yearlyProfit*(1-(1+self.discountR)**-self.lifetime)/self.discountR + self.capitalCost*self.genCapacity + self.connectionFee
+        totalInitialInvestment = self.capitalCost*self.genCapacity + self.connectionFee
+        self.ROI = (self.yearlyProfit*(1-(1+self.discountR)**-self.lifetime)/self.discountR - totalInitialInvestment)/totalInitialInvestment
+        self.NPV = self.yearlyProfit*(1-(1+self.discountR)**-self.lifetime)/self.discountR - totalInitialInvestment
 
     # update date for next year
     def updateYear(self, CO2Price):
@@ -137,14 +133,13 @@ class electricityGenerator():
         self.age = self.age + 1
         y = self.year - self.BASEYEAR
         
-        self.carbonCost = CO2Price
+        self.curCO2Price = CO2Price
         if not self.renewableBool:
             self.fuelCost = self.yearlyFuelCost[y]    
             self.energyGenerated = np.zeros(self.timeSteps)
             self.hourlyEmissions = np.zeros(self.timeSteps)
         self.resetYearValueRecord()
         return True
-
 
     # estimate ROI and NPV 
     def estimateROIandNPV(self, newCfD, newCO2Price, boolUseCfD):
@@ -212,40 +207,9 @@ class electricityGenerator():
         return self.actualCapFac
 
 
-    # estimate annual cost for plant of specific capacity
-    def estAnnualCosts(self, testCap):
-        cap = self.genCapacity
-
-        yGenTemp = 0.0
-        yCost = 0.0
-        estCapitalCostPerHour = (self.capitalCost * testCap)/(8760.0 * self.lifetime) # GBP/hr
-        estFixedOandMPerHour = (self.fixedOandMCost * testCap)/(8760.0) # GBP/hr
-
-        for i in range(len(self.energyGenerated)):
-            if(not self.genCapacity == 0): 
-                curGen = (self.energyGenerated[i]/self.genCapacity)*testCap
-                yGenTemp = yGenTemp + curGen
-                fuel = self.fuelCost * curGen
-                fixedOM = estFixedOandMPerHour # GBP/hr
-                variableOM = self.variableOandMCost * curGen # GBP/kWh * kWh
-                capital = estCapitalCostPerHour # GBP/hr
-                if(self.renewableBool):
-                    curCost = fuel + fixedOM + variableOM + capital
-                else:
-                    curEmiss = self.opEmissionsPkW*curGen
-                    if(self.name=='BECCS'or self.name =='Biomass'or self.name =='Hydrogen'):
-                        carbon = 0.0
-                    else:
-                        carbon = ((curEmiss/1000.0)*self.carbonCost)
-                    waste = self.wasteCost*curGen
-                    curCost = fuel + fixedOM + variableOM + capital + carbon + waste
-                yCost = yCost + curCost
-            else:
-                yCost = 0
-
-        costPerKWh = yCost/yGenTemp
-        
-        return yCost, costPerKWh
+    def estimateCfDSubsidy(self):
+        estCfD = 0
+        return estCfD
 
 
 
