@@ -1,0 +1,13 @@
+
+
+technologies_dataset.csv
+
+DER_Capacity_Installed_2018_MW: actual 2018 capacities from BEIS Report
+
+DER_Capacity_Installed_2010_MW: 
+    solar: actual 2010 capacities from BEIS Report
+    wind onshore: actual 2010 capacities from https://www.statista.com/statistics/240178/uk-onshore-wind-power-capacity/
+    wind offshore: actual 2010 capacities from http://www.ewea.org/fileadmin/files/library/publications/statistics/20110121_Offshore_stats_Full_Doc_final.pdf
+
+
+

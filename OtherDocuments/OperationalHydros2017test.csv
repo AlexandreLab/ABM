@@ -1,0 +1,91 @@
+,Name,Type,TypeID,SiteID,Renewable,Capacity(MW),Capacity(kW),StartYear,EndYear
+0,Great Glen Scheme,Hydro,8,387,1,36.0,36000,1957,2030
+1,Glendoe Hydro Scheme,Hydro,8,388,1,100.0,100000,2008,2049
+2,Fasnakyle Hydro Extension,Hydro,8,390,1,7.5,7500,2006,2047
+3,Kinlochleven Hydro Power Station,Hydro,8,391,1,19.5,19500,2009,2050
+4,Gaur,Hydro,8,393,1,6.4,6400,1953,2030
+5,Pitlochry,Hydro,8,394,1,15.0,15000,1950,2030
+6,Loch Gair,Hydro,8,395,1,6.0,6000,1961,2030
+7,Sron Mor,Hydro,8,396,1,5.0,5000,1957,2030
+8,Striven,Hydro,8,397,1,8.0,8000,1951,2030
+9,Aigas,Hydro,8,398,1,20.0,20000,1962,2030
+10,Kilmorack,Hydro,8,399,1,20.0,20000,1962,2030
+11,Orrin,Hydro,8,400,1,18.0,18000,1959,2030
+12,Tor Achilty,Hydro,8,401,1,15.0,15000,1954,2030
+13,Ceannacroc,Hydro,8,402,1,20.0,20000,1956,2030
+14,Foyers Falls,Hydro,8,403,1,5.2,5200,1968,2030
+15,Invergarry,Hydro,8,404,1,20.0,20000,1956,2030
+16,Livishie,Hydro,8,405,1,15.0,15000,1962,2030
+17,Cassley,Hydro,8,406,1,10.0,10000,1959,2030
+18,Cashlie,Hydro,8,407,1,11.0,11000,2004,2045
+19,Dolgarrog,Hydro,8,4881,1,32.0,32000,1938,2030
+20,Cwm Dyli,Hydro,8,4882,1,9.9,9900,2006,2047
+21,Kielder,Hydro,8,4883,1,6.1,6100,1982,2023
+22,Lochaber,Hydro,8,6601,1,65.0,65000,2029,2070
+23,Loch Eilde Mor Hydro (Kinlochleven extension),Hydro,8,410,1,2.0,2000,2017,2058
+24,Beeston Weir Hydro Scheme,Hydro,8,414,1,1.7,1700,2000,2041
+25,Llyn Brianne Dam,Hydro,8,415,1,4.4,4400,1997,2038
+26,Elan Valley Hydro Scheme,Hydro,8,416,1,2.9,2900,1997,2038
+27,Turret water treatment works,Hydro,8,419,1,1.9,1900,1952,2030
+28,Inverfarigaig,Hydro,8,421,1,4.0,4000,1980,2030
+29,Kingairloch,Hydro,8,424,1,3.5,3500,2005,2046
+30,Douglas Water Hydro,Hydro,8,425,1,3.0,3000,2008,2049
+31,Inverlael Hydro,Hydro,8,426,1,2.5,2500,2009,2050
+32,River E Hydro Scheme,Hydro,8,428,1,3.0,3000,2007,2048
+33,Innerhadden Burn Hydro,Hydro,8,429,1,1.4,1400,2011,2052
+34,Cuileig Hydro Scheme,Hydro,8,434,1,3.3,3300,2002,2043
+35,Garrogie Hydro Scheme,Hydro,8,435,1,2.0,2000,2005,2046
+36,Inver Hydro,Hydro,8,437,1,2.0,2000,2012,2053
+37,Loch An Laoigh Hydro,Hydro,8,438,1,1.0,1000,2017,2058
+38,Leacann Hydro,Hydro,8,442,1,1.0,1000,2016,2057
+39,Uisge Dubh Hydro,Hydro,8,444,1,2.0,2000,2017,2058
+40,Ederline Hydro,Hydro,8,445,1,1.9,1900,2014,2055
+41,River Lochy Hydro,Hydro,8,447,1,2.0,2000,2016,2057
+42,River Taodail Hydro,Hydro,8,448,1,1.4,1400,2017,2058
+43,Donich Water Hydro,Hydro,8,450,1,1.4,1400,2016,2057
+44,Glen Fyne 'Merk' Hydro,Hydro,8,452,1,1.0,1000,2015,2056
+45,Beinn Eagagach Hydro,Hydro,8,453,1,1.1,1100,2016,2057
+46,Allt Garbh hydro,Hydro,8,454,1,1.5,1500,2017,2058
+47,Carnoch Hydro,Hydro,8,460,1,1.4,1400,2009,2050
+48,Kilmelfort,Hydro,8,461,1,2.0,2000,1956,2030
+49,Dalchonzie,Hydro,8,462,1,4.0,4000,1958,2030
+50,Lednock,Hydro,8,463,1,3.0,3000,1961,2030
+51,Lubreoch,Hydro,8,464,1,4.0,4000,1958,2030
+52,Loch Ericht,Hydro,8,465,1,2.2,2200,1962,2030
+53,Lussa,Hydro,8,466,1,2.4,2400,1952,2030
+54,Mullardoch Tunnel,Hydro,8,467,1,2.4,2400,1955,2030
+55,Achanalt,Hydro,8,468,1,3.0,3000,1956,2030
+56,Mucomir,Hydro,8,469,1,2.0,2000,1962,2030
+57,Lairg,Hydro,8,470,1,3.5,3500,1959,2030
+58,Cuaich,Hydro,8,471,1,2.5,2500,1959,2030
+59,Innerwick Hydro,Hydro,8,472,1,1.0,1000,2010,2051
+60,Allt Fionn - resubmission,Hydro,8,473,1,2.1,2100,2012,2053
+61,Derrydarroch,Hydro,8,474,1,1.9,1900,2015,2056
+62,Cia Aig Hydro,Hydro,8,475,1,3.0,3000,2016,2057
+63,Ardtalnaig Hydro Scheme (resubmission),Hydro,8,476,1,2.0,2000,2017,2058
+64,Invervar Hydro - resubmission,Hydro,8,477,1,1.2,1200,2015,2056
+65,Bruar Hydro Scheme,Hydro,8,478,1,1.9,1900,2015,2056
+66,Garbhaig Hydro Scheme,Hydro,8,479,1,2.0,2000,2016,2057
+67,Chonais Hydro,Hydro,8,480,1,2.0,2000,2015,2056
+68,Ardtornish Estate-Upgrade to existing,Hydro,8,482,1,1.5,1500,2012,2053
+69,Maldie Burn,Hydro,8,484,1,4.0,4000,2014,2055
+70,Black Rock,Hydro,8,485,1,3.5,3500,2012,2053
+71,Ben Glas,Hydro,8,487,1,1.3,1300,2016,2057
+72,Allt Ladaidh Hydro,Hydro,8,488,1,1.3,1300,2016,2057
+73,Badachro hydro scheme - resubmission,Hydro,8,491,1,1.5,1500,2016,2057
+74,Chaorach Hydro,Hydro,8,492,1,2.0,2000,2016,2057
+75,Grudie,Hydro,8,493,1,2.0,2000,2017,2058
+76,Langwell Estate hydro scheme,Hydro,8,494,1,1.2,1200,2016,2057
+77,Ghuilbinn Hydro Scheme,Hydro,8,495,1,2.0,2000,2017,2058
+78,Nevis Range,Hydro,8,496,1,1.1,1100,2017,2058
+79,Abhainn Gleann Nam Fiadh,Hydro,8,498,1,2.0,2000,2017,2058
+80,Allt Cheanna Mhuir Hydro,Hydro,8,502,1,1.3,1300,2015,2056
+81,Braevallich,Hydro,8,503,1,2.2,2200,2005,2046
+82,Keltneyburn Hydro,Hydro,8,504,1,2.0,2000,2010,2051
+83,Ceannacroc ,Hydro,8,4707,1,1.6,1600,2017,2058
+84,Bruach Caorainn Hydro Scheme,Hydro,8,4797,1,1.1,1100,2017,2058
+85,Llyn Celyn ,Hydro,8,4909,1,4.5,4500,1994,2035
+86,Caban Coch,Hydro,8,4910,1,1.1,1100,1997,2038
+87,River Coiltie Hydro Scheme,Hydro,8,5418,1,1.9,1900,2017,2058
+88,Eas a Ghaill,Hydro,8,5947,1,1.5,1500,2015,2056
+89,River Pattack (resubmission),Hydro,8,5965,1,2.0,2000,2017,2058
