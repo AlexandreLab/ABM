@@ -19,46 +19,7 @@ GLOBAL_DPI = 1000
 # These methods are all fairly self explanitory
 #____________________________________________________________
 
-# Normalize data
-def normalize(X):
-    # Find the min and max values for each column
-    x_min = X.min(axis=0)
-    x_max = X.max(axis=0)
-    # Normalize
-    for x in X:
-        for j in range(X.shape[1]):
-            x[j] = (x[j]-x_min[j])/(x_max[j]-x_min[j])
 
-def random_pick(some_list, probabilities):
-    x = random.uniform(0,1)
-    cumulative_probability = 0.0
-    for item, item_probability in zip(some_list, probabilities):
-        cumulative_probability += item_probability
-        if x < cumulative_probability:break
-    return item
-
-def scaleList(myList, PCChange):
-    newList = list()
-    for i in range(len(myList)):
-        x = myList[i]
-        newList.append(x + x*(PCChange/100.0))
-    return newList
-
-def timeList(myList, PCChange):
-    newList = list()
-    for i in range(len(myList)):
-        x = myList[i]
-        newList.append(x*PCChange)
-    return newList
-
-
-def multiplyList(myList, mult):
-    newList = list()
-    for i in range(len(myList)):
-        x = myList[i]
-        newList.append(x * mult)
-    return newList
-    
 
 def loadTextFile(file):
         f = open(file, 'r')
@@ -67,71 +28,6 @@ def loadTextFile(file):
         for i in range(len(x)):
             x[i]= float(x[i])
         return np.array(x)
-
-def checkUnits(listOfVals):
-    listCopy = listOfVals.copy()
-    unit = 'kW'
-    if(max(listCopy)<1000):
-        unit = 'kW'
-    elif(max(listCopy)<1000000):
-        unit = 'MW'
-        for i in range(len(listCopy)):
-            listCopy[i] = listCopy[i]/1000.0
-    elif(max(listCopy)<1000000000):
-        unit = 'GW'
-        for i in range(len(listCopy)):
-            listCopy[i] = listCopy[i]/1000000.0
-    else:
-        unit = 'TW'
-        for i in range(len(listCopy)):
-            listCopy[i] = listCopy[i]/1000000000.0
-    return listCopy, unit
-
-
-def checkSingleValUnit(val):
-    unit = 'kW'
-    newVal = 0.0
-    if(val<1000):
-        unit = 'kW'
-        newVal = 0.0
-    elif(val<1000000):
-        unit = 'MW'
-        newVal = val/1000.0
-    elif(val<1000000000):
-        unit = 'GW'
-        newVal = val/1000000.0
-    else:
-        unit = 'TW'
-        newVal = val/1000000000.0
-    return newVal, unit
-
-#Return a string formatted to be used as a filename by removing special character
-def getFormattedFileName(fn):
-    fn = fn.replace(":", "_").replace(",", "_")
-    return fn
-        
-    
-def checkWeightUnits(listOfVals):
-    listCopy = listOfVals.copy()
-    unit = 'kg'
-    if(max(listCopy)<1000):
-        unit = 'kg'
-    elif(max(listCopy)<1000000):
-        unit = '10E3 kg'
-        for i in range(len(listCopy)):
-            listCopy[i] = listCopy[i]/1000.0
-    elif(max(listCopy)<1000000000):
-        unit = '10E6 kg'
-        for i in range(len(listCopy)):
-            listCopy[i] = listCopy[i]/1000000.0
-    else:
-        unit = '10E9 kg'
-        for i in range(len(listCopy)):
-            listCopy[i] = listCopy[i]/1000000000.0
-    return listCopy, unit
-
-
-
 
 def loadFuelCostFile(genName, FILEPATH):
     fileIN = np.array(loadTextFile(FILEPATH))
@@ -149,49 +45,6 @@ def loadFuelCostFile(genName, FILEPATH):
     #noChange 
     return fileIN
 
-
-
-
-def writeListsToCSV(profiles,profNames,FILEPATH):
-
-    # print(profiles)
-    # print(profNames)
-#    print('profNames[0] ',profNames[0])
- #   print('profiles[0] ',profiles[0])
-
-    if len(profNames)>0:
-
-        df = pd.DataFrame({profNames[0]: profiles[0]})
-        for i in range(1,len(profiles)):
-    #      print('profNames[i] ',profNames[i])
-    #      print('profiles[i] ',profiles[i])
-            dat2 = pd.DataFrame({profNames[i]: profiles[i]})
-            df = pd.concat([df, dat2], axis=1)
-
-        df.to_csv(FILEPATH)
-
-
-
-
-def writeToCSV(profiles,profNames,FILEPATH):
-    df = pd.DataFrame({profNames[0]:profiles[0]})
-    for i in range(1,len(profiles)):
-        df[profNames[i]] = profiles[i]
-    df.to_csv(FILEPATH)
-
-
-def readCSV(FILEPATH):
-    contents = pd.read_csv(FILEPATH)
-    return contents
-
-
-def sumVals(listOfVals):
-    sumV=0.0
-    for i in range(len(listOfVals)):
-        sumV = sumV + listOfVals[i]
-    return sumV 
-
-
 def randomOrderListIndx(myList):
 
     randomIndx = list()
@@ -202,8 +55,6 @@ def randomOrderListIndx(myList):
     return randomIndx
 
 
-
-
 def getPathWholesalePriceOfFuel(path, fuel, year):
     for subdir, dirs, files in os.walk(path):
         for file in files:
@@ -212,26 +63,6 @@ def getPathWholesalePriceOfFuel(path, fuel, year):
                 # print(file)
                 return subdir + os.sep + file
     return False
-
-
-
-def addToCapGenList(genTypeName, curCap, curCapList, technologyList):
-
-    newCapList = curCapList.copy()
-
-    if(len(newCapList)==0):
-        for i in range(len(technologyList)):
-            if(genTypeName==technologyList[i]):
-                newCapList.append(curCap)
-            else:
-                newCapList.append(0.0)
-    else:
-        indx = technologyList.index(genTypeName)
-        newCapList[indx] += curCap
-
-    return newCapList
-
-
 
 def getWholesaleEPrice(elecGenCompanies):
     wholesaleEPrice = np.zeros(8760) # init at 0
@@ -256,10 +87,93 @@ def getGenerationCompany(genCoName, genCompanies):
             return eGC
     return eGC
 
+def initBuildRate(genTechList, dfBuildRatePerType, tech_df):
+    buildRatePerType = {}
+    for genName in genTechList:
+        maxBuildRatekW = tech_df.loc[genName, 'GBMaxBuildRate_kW']
+        dfBuildRatePerType.loc[genName, :] = maxBuildRatekW
+    return buildRatePerType
+
+def dispatchTradGen(demand, elecGenCompanies, tradGen, capacityPerType, capacityPerCompanies, dfGenPerTechnology,dfGenPerCompany, year): 
+    # tradGen is a dataframe with technical information about the generator to dispatch
+    # capacityPerType is a dataframe with the capacity installed of each technology
+    # year is the current year + BASEYEAR
+    # dfGenPerTechnology dataframe where the results are stored
+    #return the newDemand and the curtailement
+    randGenCompaniesIndx = randomOrderListIndx(elecGenCompanies)
+
+    tempNetD = demand.copy()
+    tempHourlyCurtail = np.zeros(len(demand))
+
+    for genName in tradGen.index:
+        deRCapSum = capacityPerType.loc[year, genName+'_Derated_Capacity_kW']
+        capSum = capacityPerType.loc[year, genName+'_Capacity_kW']
+        print('Dispatch of {0} (capacity installed {1} MW)...'. format(genName, capSum/1000))
+
+        if deRCapSum>0:
+            if(max(tempNetD)>deRCapSum): #the remaining demand can be supplied entirely by this technology type
+                for eGC in elecGenCompanies:
+                    hourGenProf, excessGen, tempNetD = eGC.getTraditionalGenerationByType(genName, tempNetD) # return the generation profile, the excess profile and the new demand
+                    #Store the results in the dataframes
+                    dfGenPerTechnology[genName] = dfGenPerTechnology[genName] + hourGenProf
+                    dfGenPerCompany[eGC.name] = dfGenPerCompany[eGC.name] + hourGenProf
+                    tempHourlyCurtail = np.add(tempHourlyCurtail,excessGen)
+            else:
+                tempTotalTGen = 0.0 # total generation of this technology type (used for testing at the end of the loop) 
+                totalExcess =0 
+                totalGen = 0
+                for eGCindex in randGenCompaniesIndx: # dispatch unit of the current technology type in companies based on the share of the technology installed in each of them
+                    eGC = elecGenCompanies[eGCindex]
+                    curCap = capacityPerCompanies.loc[eGC.name, genName+'_Capacity_kW']
+
+                    if(capSum>0): # need to make sure not dividing by 0 , for noe, other types,e.g. coal CCGT is zero
+                        capFrac = curCap/capSum 
+                    else:
+                        capFrac = 0.0
+
+                    curTempNetD = tempNetD.copy() 
+                    curNetD = [x*capFrac for x in curTempNetD]
+                    # since netdemand<generation capacity, it will be afforded by capacity share of each company, the excess gen will be curtailed
+                    hourGenProf, excessGen, curtempNetD = eGC.getTraditionalGenerationByType(genName, curNetD) #return a dataframe incl. generation and excess generation of the technology type and the new net demand
+                    tempTotalTGen = tempTotalTGen + np.sum(hourGenProf) - np.sum(excessGen)
+                    totalExcess += np.sum(excessGen) 
+                    totalGen += np.sum(hourGenProf)
+
+                    #Store the results in the dataframes
+
+                    dfGenPerTechnology[genName] = dfGenPerTechnology[genName] + hourGenProf
+                    dfGenPerCompany[eGC.name] = dfGenPerCompany[eGC.name] + hourGenProf
+                    tempHourlyCurtail = np.add(tempHourlyCurtail,excessGen)
+
+                # Test if the NetDemand is covered by the dispatch of these technoloy plants
+                if abs(np.sum(tempNetD) - tempTotalTGen)<1:
+                    tempNetD = np.zeros(len(tempNetD))
+                else:
+                    print(genName)
+                    dfGenPerTechnology["Net Demand"] = tempNetD
+                    dfGenPerTechnology["Curtail"] = excessGen
+                    dfGenPerTechnology["Gen generation"] = hourGenProf
+
+                    dfGenPerTechnology.to_csv("GenPerTech.csv")
+                    print('Excess', totalExcess)
+                    print('Gen', totalGen)
+
+                    print('curS ',  tempTotalTGen)
+                    print('sum(tempNetD)',np.sum(tempNetD))
+                    raise ValueError('The amount of generation does not match the amount of demand covered')
+
+                # Remove the generation of this technology type from the netDemand
+                tempNetD = np.subtract(tempNetD, dfGenPerTechnology[genName].values)
+                tempNetD = tempNetD.clip(min=0) # 0 if Demand-generation<0
+            # print(dfGenPerTechnology)
+    return tempNetD, tempHourlyCurtail
 
 
 
 
+
+
+#For testing purposes to be moved to testing units later
 
 def getBids1():
     test_dict = [{'Unnamed: 0': 'CCGT',

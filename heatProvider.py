@@ -44,21 +44,6 @@ class heatProvider():
             self.runingEmissions = self.runingEmissions + (curEmiss)
         return self.heatGenerated, newDemand
 
-
-    def graph(self):
-        import matplotlib.pyplot as plt
-        graphHeat,heatUnit = Utils.checkUnits(self.heatGenerated)
-        graphEmiss,emissUnit = Utils.checkWeightUnits(self.hourlyEmissions)
-        
-        fig, axs = plt.subplots(3,1)
-        fig.suptitle(self.name, fontsize=20)
-        axs[0].plot(graphHeat)
-        axs[0].set_ylabel('Heat Provided ('+heatUnit+')')
-        axs[1].plot(self.hourlyCost)
-        axs[1].set_ylabel('Generation Cost (GBP)')
-        axs[2].plot(graphEmiss)
-        axs[2].set_ylabel('CO2 Emissions ('+emissUnit+')')
-        fig.show()
     
     
 

@@ -16,86 +16,7 @@ import os
 import pandas as pd
 
 
-def initBuildRate(genTechList, dfBuildRatePerType, tech_df):
-    buildRatePerType = {}
-    for genName in genTechList:
-        maxBuildRatekW = tech_df.loc[genName, 'GBMaxBuildRate_kW']
-        dfBuildRatePerType.loc[genName, :] = maxBuildRatekW
-    return buildRatePerType
 
-def dispatchTradGen(demand, elecGenCompanies, tradGen, capacityPerType, capacityPerCompanies, dfGenPerTechnology,dfGenPerCompany, year): 
-    # tradGen is a dataframe with technical information about the generator to dispatch
-    # capacityPerType is a dataframe with the capacity installed of each technology
-    # year is the current year + BASEYEAR
-    # dfGenPerTechnology dataframe where the results are stored
-    #return the newDemand and the curtailement
-    randGenCompaniesIndx = Utils.randomOrderListIndx(elecGenCompanies)
-
-    tempNetD = demand.copy()
-    tempHourlyCurtail = np.zeros(len(demand))
-
-    for genName in tradGen.index:
-        deRCapSum = capacityPerType.loc[year, genName+'_Derated_Capacity_kW']
-        capSum = capacityPerType.loc[year, genName+'_Capacity_kW']
-        print('Dispatch of {0} (capacity installed {1} MW)...'. format(genName, capSum/1000))
-
-        if deRCapSum>0:
-            if(max(tempNetD)>deRCapSum): #the remaining demand can be supplied entirely by this technology type
-                for eGC in elecGenCompanies:
-                    hourGenProf, excessGen, tempNetD = eGC.getTraditionalGenerationByType(genName, tempNetD) # return the generation profile, the excess profile and the new demand
-                    #Store the results in the dataframes
-                    dfGenPerTechnology[genName] = dfGenPerTechnology[genName] + hourGenProf
-                    dfGenPerCompany[eGC.name] = dfGenPerCompany[eGC.name] + hourGenProf
-                    tempHourlyCurtail = np.add(tempHourlyCurtail,excessGen)
-            else:
-                tempTotalTGen = 0.0 # total generation of this technology type (used for testing at the end of the loop) 
-                totalExcess =0 
-                totalGen = 0
-                for eGCindex in randGenCompaniesIndx: # dispatch unit of the current technology type in companies based on the share of the technology installed in each of them
-                    eGC = elecGenCompanies[eGCindex]
-                    curCap = capacityPerCompanies.loc[eGC.name, genName+'_Capacity_kW']
-
-                    if(capSum>0): # need to make sure not dividing by 0 , for noe, other types,e.g. coal CCGT is zero
-                        capFrac = curCap/capSum 
-                    else:
-                        capFrac = 0.0
-
-                    curTempNetD = tempNetD.copy() 
-                    curNetD = [x*capFrac for x in curTempNetD]
-                    # since netdemand<generation capacity, it will be afforded by capacity share of each company, the excess gen will be curtailed
-                    hourGenProf, excessGen, curtempNetD = eGC.getTraditionalGenerationByType(genName, curNetD) #return a dataframe incl. generation and excess generation of the technology type and the new net demand
-                    tempTotalTGen = tempTotalTGen + np.sum(hourGenProf) - np.sum(excessGen)
-                    totalExcess += np.sum(excessGen) 
-                    totalGen += np.sum(hourGenProf)
-
-                    #Store the results in the dataframes
-
-                    dfGenPerTechnology[genName] = dfGenPerTechnology[genName] + hourGenProf
-                    dfGenPerCompany[eGC.name] = dfGenPerCompany[eGC.name] + hourGenProf
-                    tempHourlyCurtail = np.add(tempHourlyCurtail,excessGen)
-
-                # Test if the NetDemand is covered by the dispatch of these technoloy plants
-                if abs(np.sum(tempNetD) - tempTotalTGen)<1:
-                    tempNetD = np.zeros(len(tempNetD))
-                else:
-                    print(genName)
-                    dfGenPerTechnology["Net Demand"] = tempNetD
-                    dfGenPerTechnology["Curtail"] = excessGen
-                    dfGenPerTechnology["Gen generation"] = hourGenProf
-
-                    dfGenPerTechnology.to_csv("GenPerTech.csv")
-                    print('Excess', totalExcess)
-                    print('Gen', totalGen)
-
-                    print('curS ',  tempTotalTGen)
-                    print('sum(tempNetD)',np.sum(tempNetD))
-                    raise ValueError('The amount of generation does not match the amount of demand covered')
-
-                # Remove the generation of this technology type from the netDemand
-                tempNetD = np.subtract(tempNetD, dfGenPerTechnology[genName].values)
-                tempNetD = tempNetD.clip(min=0) # 0 if Demand-generation<0
-            # print(dfGenPerTechnology)
-    return tempNetD, tempHourlyCurtail
 
 ######### main method, code starts executing from here ##################
 if __name__ == '__main__':
@@ -203,7 +124,7 @@ if __name__ == '__main__':
     elif(BASEYEAR==2010):
         mainPlantsOwnersFile = 'OtherDocuments/UKPowerPlans2010_Owners.csv'
         # mainPlantsOwnersFile = 'OtherDocuments/UKPowerPlans2010_Owners fortestonly.csv'
-    GBGenPlantsOwners = Utils.readCSV(mainPlantsOwnersFile)
+    GBGenPlantsOwners = pd.read_csv(mainPlantsOwnersFile)
     GBGenPlantsOwners.fillna(0, inplace=True)
 
     for i in range(len(GBGenPlantsOwners['Station Name'])):
@@ -283,21 +204,18 @@ if __name__ == '__main__':
 
     # --------- Add generation from smaller distributed generation -------------
     
-
-
     pvPlantsFile = 'OtherDocuments/OperationalPVs2017test_wOwner.csv' # these records are for end of 2017
-    GBPVPlants = Utils.readCSV(pvPlantsFile)
+    GBPVPlants = pd.read_csv(pvPlantsFile)
     GBPVPlants.fillna(0, inplace=True)
 
     windOnPlantsFile = 'OtherDocuments/OperationalWindOnshore2017test_wOwner.csv'
-    GBWindOnPlants = Utils.readCSV(windOnPlantsFile)
+    GBWindOnPlants = pd.read_csv(windOnPlantsFile)
     GBWindOnPlants.fillna(0, inplace=True)
 
     windOffPlantsFile = 'OtherDocuments/OperationalWindOffshore2017test_wOwner.csv'
-    GBWindOffPlants = Utils.readCSV(windOffPlantsFile)
+    GBWindOffPlants = pd.read_csv(windOffPlantsFile)
     GBWindOffPlants.fillna(0, inplace=True)
     print('Adding Additional Distributed Generation')
-
 
     for i in range(len(GBWindOffPlants['Name'])): # Adding in offshore plants already under construction that are due to come online soon
         tempName = 'Wind Offshore'
@@ -377,7 +295,7 @@ if __name__ == '__main__':
 
     policy.genCompanies = elecGenCompanies #add record of the generation companies to the Policy Maker object
     # Initialise the building rate for all the companies and technologies on year 0
-    initBuildRate(genTechList, buildRatePerType, technology_technical_df)
+    Utils.initBuildRate(genTechList, buildRatePerType, technology_technical_df)
     buildRatePerType.to_csv(RESULTS_FILE_PATH+"Initial_buildRateperType.csv")
     policy.buildRatePerType = buildRatePerType
 
@@ -520,7 +438,7 @@ if __name__ == '__main__':
             tempNetD = netDemand.copy()
 
             print('Dispatch of {0}'.format(list(tradGen.index)))
-            tempNetD, tempHourlyCurtail = dispatchTradGen(netDemand, elecGenCompanies, tradGen,capacityPerType, capacityPerCompanies, allTGenPerTechnology,allTGenPerCompany, BASEYEAR+currentYear)
+            tempNetD, tempHourlyCurtail = Utils.dispatchTradGen(netDemand, elecGenCompanies, tradGen,capacityPerType, capacityPerCompanies, allTGenPerTechnology,allTGenPerCompany, BASEYEAR+currentYear)
             hourlyCurtail = np.add(hourlyCurtail,tempHourlyCurtail)
             netDemand = tempNetD
             DfNetDemand['TotalCustomerConsAfterTGen1'] = netDemand
@@ -547,7 +465,7 @@ if __name__ == '__main__':
 
             print('Dispatch of {0}'.format(list(tradGen.index)))
 
-            tempNetD, tempHourlyCurtail = dispatchTradGen(netDemand, elecGenCompanies, tradGen,capacityPerType, capacityPerCompanies, allTGenPerTechnology,allTGenPerCompany, BASEYEAR+currentYear)
+            tempNetD, tempHourlyCurtail = Utils.dispatchTradGen(netDemand, elecGenCompanies, tradGen,capacityPerType, capacityPerCompanies, allTGenPerTechnology,allTGenPerCompany, BASEYEAR+currentYear)
             hourlyCurtail = np.add(hourlyCurtail,tempHourlyCurtail)
             netDemand = tempNetD
             DfNetDemand['TotalCustomerConsAfterTGen2'] = netDemand
