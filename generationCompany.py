@@ -82,11 +82,9 @@ class generationCompany():
         return genROIandNPV
 
     def calcRevenue(self, wholesaleProf): # method to recalculate profit for all plants
-
         for gen in self.traditionalGen+self.renewableGen+self.energyStores:
             gen.wholesaleEPrice = wholesaleProf
             gen.calculateProfit()
-
         return True
 
     def calcEmissions(self): # method to recalculate profit for all plants

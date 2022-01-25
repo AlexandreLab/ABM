@@ -25,18 +25,21 @@ class traditionalGenerator(electricityGenerator):
         arr_demand = np.array(demand)
         temp_arr_excess = np.zeros(8760)
         energyGenerated = np.zeros(8760) + self.genCapacity*self.availabilityFactor #init with maximum energy generation kWh
+
+        energyGenerated = np.min([energyGenerated, arr_demand], axis=0) # get the minimum between the maximum energy generation from the unit and the demand
+
         if(self.name == 'Nuclear'):
-            # to add change of capacity factor during summer
-            minNuclearOpCap = self.genCapacity*0.65
+            # Minimum power capacity is 50% during summer months (June, July, August) day>151 and day<243 and 65% during the rest of the year
+            arr_minNuclearOp = np.zeros(8760)+self.genCapacity*0.65
+            arr_minNuclearOp[151*24:243*24] = self.genCapacity*0.5
+
+            #Cap the minimum generation of nuclear
+            energyGenerated = np.max([energyGenerated, arr_minNuclearOp], axis=0)
 
             # excess generation only for nuclear power plant
-            temp_arr_excess = arr_demand - minNuclearOpCap  #find indices where demand is lower than the minimum nuclear generation
+            temp_arr_excess = np.subtract(arr_demand, energyGenerated)  #find indices where demand is lower than the minimum nuclear generation
             temp_arr_excess[np.where(temp_arr_excess>0)] = 0 #remove values where energy generated is lower than demand
             temp_arr_excess = -temp_arr_excess 
-            energyGenerated[np.where(temp_arr_excess > 0)] = minNuclearOpCap
-
-        else:
-            energyGenerated = np.min([energyGenerated, arr_demand], axis=0) # get the minimum between the maximum energy generation from the unit and the demand
 
         newDemand = np.subtract(arr_demand, energyGenerated).clip(min=0)
 

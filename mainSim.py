@@ -107,7 +107,7 @@ if __name__ == '__main__':
     # Utils.resetCurYearCapInvest() # what does it do?
     BASEYEAR = 2010 # 2010
     RESULTS_FILE_PATH = 'Results/2050/'
-    maxYears = 41 #16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
+    maxYears = 5 #16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
     timeSteps = 8760
     boolEnergyStorage = False
     boolLinearBatteryGrowth = True
