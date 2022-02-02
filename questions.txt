@@ -1,9 +1,5 @@
 
 
-why is the bus 0 associated to northem ireland and sometimes to Scotland? This lead to creating 31 energy customers not 30? 
-
-waste costs are currently not accounted.
-
 busheadRoom is currently not used for the CfdAuction
 
 the predevelopment time is not included in the construction time of any of the plants for the cfd auction, capacity auction, etc.
@@ -12,8 +8,10 @@ The derated capacity calculated in getCapYear(self, capYear, deratedBool): may n
 
 for already built wind offshore, the amount of cfd subsidy that these new plants receive need to be calculated. see function estimateCfDSubsidy in electricityGenerator.py.
 
-
 the customer group does not deal with price elasticity or anything at the moment.
 
-
 testing units need to be developped for each class
+
+Decomissioning costs may need to be included in the model. waste costs are currently not accounted.
+
+The calculation of the strike price for CfD needs to be reviewed. there is currently no limit to the strike price

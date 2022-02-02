@@ -106,8 +106,8 @@ def dispatchTradGen(demand, elecGenCompanies, tradGen, capacityPerType, capacity
     tempHourlyCurtail = np.zeros(len(demand))
 
     for genName in tradGen.index:
-        deRCapSum = capacityPerType.loc[year, genName+'_Derated_Capacity_kW']
-        capSum = capacityPerType.loc[year, genName+'_Capacity_kW']
+        deRCapSum = capacityPerType[genName+'_Derated_Capacity_kW']
+        capSum = capacityPerType[genName+'_Capacity_kW']
         print('Dispatch of {0} (capacity installed {1} MW)...'. format(genName, capSum/1000))
 
         if deRCapSum>0:
@@ -170,7 +170,34 @@ def dispatchTradGen(demand, elecGenCompanies, tradGen, capacityPerType, capacity
 
 
 
+def getParams():
+    RESULTS_FILE_PATH = 'Results/2050/'
+    path_technology_dataset = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Dec 2021\Code_WH'
 
+    # list of generation technologies
+    technoloy_dataset_fn = "technology_technical_economic_parameters.xlsx"
+    temp_df = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "technical_parameters", index_col=0)
+    technologyTechnical = temp_df.loc[temp_df["Set"]=="Current", :].copy()
+
+    temp_df = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "economic_parameters")
+    technologyEconomic = temp_df.loc[temp_df["Set"]=="Current", :].copy()
+    technologyEconomic.fillna(0, inplace=True)
+
+    busbarConstraints = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "Bus constraints", index_col=0)
+    busbarConstraints.fillna(0, inplace=True)
+
+    technologyFamilies = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "technologies_families", index_col=0)
+    technologyFamilies.fillna(0, inplace=True)
+
+    params = {}
+    params["technical_parameters"] = technologyTechnical
+    params["technology_families"] = technologyFamilies
+    params["economic_parameters"] = technologyEconomic
+    params["busbar_constraints"] = busbarConstraints
+    params["path_save"] = RESULTS_FILE_PATH
+    params["path_wholesale_fuel_price"] = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Jan 2022 saved\Code_WH\WholesaleEnergyPrices'
+
+    return params
 
 
 #For testing purposes to be moved to testing units later

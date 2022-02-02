@@ -52,7 +52,7 @@ class customer():
 
 
     # update values for next year (demand elasticity)
-    def updateYear(self,priceChangePC): # reads in pc change in wholesale elec price, e.g. + 2% or -1%
+    def incrementYear(self,priceChangePC): # reads in pc change in wholesale elec price, e.g. + 2% or -1%
         self.year = self.year + 1
         self.updateLoadProfile()
 

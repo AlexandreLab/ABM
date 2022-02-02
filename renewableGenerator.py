@@ -34,6 +34,7 @@ class renewableGenerator(electricityGenerator):
             fileGenCapacity = 4000000
 
         self.energyGenerated = self.energyGenerated*1000*self.genCapacity/fileGenCapacity
+        self.yearlyEnergyGen = np.sum(self.energyGenerated)
         # print("end loadScale function: {0}".format(timer()-start))
   
     # used for testing

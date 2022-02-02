@@ -24,7 +24,7 @@ class electricityGenerator():
 
 
         #Technical parameters
-        self.opEmissionsPkW = 0.0 # kg of CO2 emitted per kW generated
+        self.opEmissionsPkW = 0.0 # kg of CO2 emitted per kWh generated
         self.lifetime = lifetime
         self.genCapacity = capacity #kW
         self.renewableBool = False
@@ -63,7 +63,6 @@ class electricityGenerator():
         self.fixedOandMCost = 0.0 #£/kW
         self.variableOandMCost = 0.0 #£/kWh
         self.capitalCost = 0.0 #£/kW
-        self.yearlycurCO2PriceSum = 0.0 
         self.wasteCost = 0.0
 
         self.connectionFee = 0.5174*self.headroom*0.001-2415.7
@@ -85,7 +84,7 @@ class electricityGenerator():
         temp_arr_marginalCost = np.sum([temp_arr_fuelCost,temp_arr_waste, temp_arr_variableOM, temp_arr_carbonCost], axis=0)
         temp_arr_marginalCost = np.divide(temp_arr_marginalCost, self.energyGenerated, out=np.zeros_like(temp_arr_marginalCost), where=self.energyGenerated!=0)
 
-        temp_arr_hourlyCost = temp_arr_marginalCost + self.fixedOandMCost*self.genCapacity/8760
+        temp_arr_hourlyCost = np.sum([temp_arr_fuelCost,temp_arr_waste, temp_arr_variableOM, temp_arr_carbonCost], axis=0) + self.fixedOandMCost*self.genCapacity/8760
 
         self.yearlyCarbonCost = np.sum(temp_arr_carbonCost)
         self.hourlyCost = temp_arr_hourlyCost
@@ -95,13 +94,7 @@ class electricityGenerator():
         self.yearlyEmissions = np.sum(temp_arr_emissions)
         return True
 
-    def calculateProfit(self):
-
-        if (self.name=='Nuclear' or self.name=='BECCS') and self.CFDPrice>0.0001: # nuclear and BECCS
-            temp_arr_hourlyIncome = self.energyGenerated*self.CFDPrice + ((self.capitalSub*self.genCapacity)/(365*24))
-        else:
-            temp_arr_hourlyIncome = self.energyGenerated*self.wholesaleEPrice + ((self.capitalSub*self.genCapacity)/(365*24))
-
+    def calcRevenue(self):
         if(self.CFDPrice>0):
             temp_arr_hourlyIncome = self.energyGenerated * self.CFDPrice
         else:
@@ -117,6 +110,7 @@ class electricityGenerator():
         temp_arr_hourlyProfit = np.subtract(temp_arr_hourlyIncome, self.hourlyCost)
             
         self.hourlyProfit = temp_arr_hourlyProfit
+        self.hourlyIncome = temp_arr_hourlyIncome
         self.yearlyProfit = np.sum(temp_arr_hourlyProfit)
         self.yearlyIncome = np.sum(temp_arr_hourlyIncome)
 
@@ -125,7 +119,7 @@ class electricityGenerator():
         self.NPV = self.yearlyProfit*(1-(1+self.discountR)**-self.lifetime)/self.discountR - totalInitialInvestment
 
     # update date for next year
-    def updateYear(self, CO2Price):
+    def incrementYear(self, CO2Price):
         self.yearlyProfitList.append(self.yearlyProfit)
         if(self.age>=15):
             self.CFDPrice = 0.0
@@ -141,53 +135,11 @@ class electricityGenerator():
         self.resetYearValueRecord()
         return True
 
-    # estimate ROI and NPV 
-    def estimateROIandNPV(self, newCfD, newCO2Price, boolUseCfD):
-        if((self.renewableBool or self.name =='Nuclear' or self.name =='BECCS'or self.name =='Biomass'or self.name =='Hydrogen') and boolUseCfD):
-            estIncome = newCfD*self.yearlyEnergyGen
-            estYearProfit = estIncome - self.yearlyCost
-        elif(self.renewableBool):
-            estIncome = 0.0
-            for i in range(len(self.energyGenerated)):
-                estIncome = estIncome + self.energyGenerated[i]*self.wholesaleEPriceProf[i]
-                
-            if(self.name=='Solar'):
-                y = self.year- self.BASEYEAR
-                if(y<len(self.yearlySolarFiT)):
-                    sellP = self.yearlySolarFiT[y]
-                    estIncome = sellP*self.yearlyEnergyGen
-                else:
-                    estIncome = 0.0
-                    for i in range(len(self.energyGenerated)):
-                        estIncome = estIncome + self.energyGenerated[i]*self.wholesaleEPriceProf[i]
-            estYearProfit = estIncome - self.yearlyCost
-        else:
-            estIncome = 0.0
-            for i in range(len(self.energyGenerated)):
-                estIncome = estIncome + self.energyGenerated[i]*self.wholesaleEPriceProf[i]
-            
-            oldCarbonCost = self.yearlyCarbonCostSum
-            if(self.name=='BECCS'or self.name =='Biomass'or self.name =='Hydrogen'):
-                newCarbonCost = 0.0
-            else:
-                newCarbonCost = ((self.yearlyEmissions/1000.0)*newCO2Price)
-            estCost = self.yearlyCost - oldCarbonCost + newCarbonCost
-            estYearProfit = estIncome - estCost
-
-        if(self.genCapacity>0.00001):
-            tempEstimatedROI = (estYearProfit * self.lifetime)/(self.capitalCost * self.genCapacity)
-        else:
-            tempEstimatedROI = 0.0
-            
-        estNPV = 0.0
-        for yr in range(self.lifetime): # for yr in range(self.year, self.endYear):
-            estNPV = estNPV + estYearProfit/((1+self.discountR)**yr)
-
-        return tempEstimatedROI, estNPV
-    
     # reset values for next year
     def resetYearValueRecord(self):
-        self.yearlyEnergyGen=0.0
+
+        if not self.renewableBool:
+            self.yearlyEnergyGen=0.0
         self.yearlyCost = 0.0
         self.yearlyProfit = 0
         self.yearlyIncome = 0
@@ -195,17 +147,14 @@ class electricityGenerator():
         self.yearlyCarbonCost = 0
         
         self.hourlyCost = np.zeros(self.timeSteps)
-        
         self.marginalCost = np.zeros(self.timeSteps)
         self.hourlyProfit = np.zeros(self.timeSteps)
         self.NPV = 0
         
-
     def getActCapFactor(self):
         maxEnergyGen = self.genCapacity*24*365
         self.actualCapFac = self.yearlyEnergyGen/maxEnergyGen
         return self.actualCapFac
-
 
     def estimateCfDSubsidy(self):
         estCfD = 0
@@ -214,30 +163,6 @@ class electricityGenerator():
 
 
 
-    # estimate revenue for a specific capacity
-    def estAnnualRevenue(self, testCap):
-        yGenTemp = 0.0
-        yRevenue = 0.0
-        
-        for i in range(len(self.energyGenerated)):
-            curGen = (self.energyGenerated[i]/self.genCapacity)*testCap
-            
-            yGenTemp = yGenTemp + curGen
-            curIncome = self.wholesaleEPriceProf[i]*curGen
-            yRevenue = yRevenue + curIncome
-
-        if(not yGenTemp>0.0001):
-        #    print('estAnnualRevenue')
-        #    print('yGenTemp ', yGenTemp)
-        #    print('testCap ', testCap)
-        #    print('cur gen Cap ', self.genCapacity)
-        #    print('self.energyGenerated ', self.energyGenerated)
-        #    input('Error, divide by zero')
-             yGenTemp = 0.0001
-        revenuePerKWh = yRevenue/yGenTemp
-        
-
-        return yRevenue, revenuePerKWh
 
 
 

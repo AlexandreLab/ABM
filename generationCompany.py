@@ -13,32 +13,12 @@ import pandas as pd
 import os
 
 class generationCompany():
-    def __init__(self,timeSteps, companyType, companyID, params, currentCarbonPrice, BASEYEAR):
-
-        self.initialise(timeSteps, companyType, companyID, params, currentCarbonPrice,BASEYEAR)
-
-    def __init__(self,timeSteps, params, currentCarbonPrice,BASEYEAR):
-
-        self.initialise(timeSteps, 1, 1, params,currentCarbonPrice, BASEYEAR)
-
-    def initialise(self,timeSteps, companyType, companyID, params, currentCarbonPrice, BASEYEAR):
-
+    def __init__(self,name, timeSteps, params, currentCarbonPrice,BASEYEAR):
         self.params = params
 
         self.timeSteps = timeSteps
-        self.companyID = companyID #useless, to be removed
-        self.companyType = companyType
 
-        self.heatGenerated = list()
-        self.genCapacity = 1E11
-        self.hourlyCost = np.zeros(timeSteps)
-        self.hourlyEmissions = np.zeros(timeSteps)
-        self.yearlyCost=0.0
-        self.yearlyEmissions=0.0
-        self.totalEmissionsYear = 0.0 # total emissions of all technologies for cur year
-        self.name = 'Generation Company '+ str(self.companyID)+': '
-        self.elecLoss = 0.0 #0.1
-        self.CFDPrice = 0.0 #0.12
+        self.name = name
         self.discountR = 0.1 # 10%
 
         self.traditionalGen = list()
@@ -52,8 +32,6 @@ class generationCompany():
         self.batteryDuration = 3 #7 #3 # hours
 
         self.constructionQueue = list()
-
-        self.capacityPerType = pd.DataFrame() #capacity per type for each year
         self.capacityPerTypePerBus = pd.DataFrame() #capacity per type and by bus
 
         self.BASEYEAR = BASEYEAR
@@ -84,7 +62,7 @@ class generationCompany():
     def calcRevenue(self, wholesaleProf): # method to recalculate profit for all plants
         for gen in self.traditionalGen+self.renewableGen+self.energyStores:
             gen.wholesaleEPrice = wholesaleProf
-            gen.calculateProfit()
+            gen.calcRevenue()
         return True
 
     def calcEmissions(self): # method to recalculate profit for all plants
@@ -162,15 +140,18 @@ class generationCompany():
         return totalPowerKW
 
     # make decision to invest in new generation plants 
-    def updateYear(self, OneYearHeadroom, newCO2Price):
+    def incrementYear(self, OneYearHeadroom, newCO2Price):
         self.removeOldCapacity()
         self.removeUnprofitableCapacity()
         self.year = self.year + 1
         self.curCO2Price = newCO2Price
+        
         for gen in self.traditionalGen + self.renewableGen:
-            gen.updateYear(newCO2Price)  
+            gen.incrementYear(newCO2Price)  
         # add any new plants that are in the construction queue and are meant to come online
         self.checkConstructionQueue(OneYearHeadroom)
+
+        self.hourlyGenPerType = {}
         return True
         
     # method to add plants to construction queue so that they come online after build time has completed
@@ -280,33 +261,37 @@ class generationCompany():
 
         dfStrikePrices = pd.DataFrame(index= self.listTechnologyPortfolio, columns=["Strike_Price_GBP/kWh","Busbar", "Capacity_kW",  "Start_Year", "Generation_Company"]) #store the strike prices of the technologies 
         dfStrikePrices.fillna(0, inplace=True)
+
         # Calculating the bid for each technology 
         for genName in self.listTechnologyPortfolio:
+            market_readiness = int(self.params["technical_parameters"].loc[genName, "Expected_Market_Ready_Time"]) # when is the technology market ready
+            
             if int(self.params["technical_parameters"].loc[genName, "CfD_eligible"]): #the technology is CfD eligible
-                #Select a busbar where the technology can be built (not based on headroom at the moment)
-                busbarConstraints = self.params["busbar_constraints"]
-                busbar = random.choice(list(busbarConstraints[busbarConstraints[genName]>0].index))
-                constructionTime = int(self.params["technical_parameters"].loc[genName, "Construction_Time_Years"]) # years
-                startYear = constructionTime + self.year
-                capacityBid = int(self.params["technical_parameters"].loc[genName, "Typical_Capacity_kW"]) # years #capacity to be installed of the technology
-                if capacityBid>0:
-                    totalCapacityInstalled = self.capacityPerTypePerBus[genName+'_Capacity_kW'].sum() # capacity installed of this technology in the company
-                    if totalCapacityInstalled > 0:
-                        hourlyGen = self.hourlyGenPerType[genName].copy() #estimate hourly generation of this technology and this capacity
-                        
-                        hourlyGen = hourlyGen/totalCapacityInstalled*capacityBid #scale the hourly gen
-                        totalGen = np.sum(hourlyGen)
-                    else:
-                        capacityFactor = float(self.params["technical_parameters"].loc[genName, "Capacity_Factor"])
-                        totalGen = capacityFactor * capacityBid
+                if market_readiness<=self.year: #the technology is ready for market
+                    #Select a busbar where the technology can be built (not based on headroom at the moment)
+                    busbarConstraints = self.params["busbar_constraints"]
+                    busbar = random.choice(list(busbarConstraints[busbarConstraints[genName]>0].index))
+                    constructionTime = int(self.params["technical_parameters"].loc[genName, "Construction_Time_Years"]) # years
+                    startYear = constructionTime + self.year
+                    capacityBid = int(self.params["technical_parameters"].loc[genName, "Typical_Capacity_kW"]) # years #capacity to be installed of the technology
+                    if capacityBid>0:
+                        totalCapacityInstalled = self.capacityPerTypePerBus[genName+'_Capacity_kW'].sum() # capacity installed of this technology in the company
+                        if totalCapacityInstalled > 0:
+                            hourlyGen = self.hourlyGenPerType[genName].copy() #estimate hourly generation of this technology and this capacity
+                            
+                            hourlyGen = hourlyGen/totalCapacityInstalled*capacityBid #scale the hourly gen
+                            totalGen = np.sum(hourlyGen)
+                        else:
+                            capacityFactor = float(self.params["technical_parameters"].loc[genName, "Capacity_Factor"])
+                            totalGen = capacityFactor * capacityBid
 
-                    if constructionTime<=timeHorizon: # The construction time is equal or below the construction time required by the CfD auction
-                        strikePrice = self.calculateStrikePrice(genName, capacityBid, totalGen)
-                        dfStrikePrices.loc[genName, "Strike_Price_GBP/kWh"] = strikePrice
-                        dfStrikePrices.loc[genName, "Busbar"] = busbar
-                        dfStrikePrices.loc[genName, "Capacity_kW"] = capacityBid
-                        dfStrikePrices.loc[genName, "Start_Year"] = startYear
-                        dfStrikePrices.loc[genName, "Generation_Company"] = self.name
+                        if constructionTime<=timeHorizon: # The construction time is equal or below the construction time required by the CfD auction
+                            strikePrice = self.calculateStrikePrice(genName, capacityBid, totalGen)
+                            dfStrikePrices.loc[genName, "Strike_Price_GBP/kWh"] = strikePrice
+                            dfStrikePrices.loc[genName, "Busbar"] = busbar
+                            dfStrikePrices.loc[genName, "Capacity_kW"] = capacityBid
+                            dfStrikePrices.loc[genName, "Start_Year"] = startYear
+                            dfStrikePrices.loc[genName, "Generation_Company"] = self.name
         
         return dfStrikePrices
 
@@ -324,12 +309,12 @@ class generationCompany():
                 capacityBid = int(self.params["technical_parameters"].loc[genName, "Typical_Capacity_kW"]) #capacity to be installed of the technology
                 deRCap = capacityBid*gen.availabilityFactor
                 if deRCap>0:
-                    if(gen.NPV>0):
+                    if(gen.NPV>0): # no need to go through the capacity market
                         bidPrice = 0
                     else:
                         lossPerKW = -gen.NPV / gen.genCapacity
                         bidPrice = lossPerKW
-                    dfCapacityAuctionBids.loc[genName, :] = [bidPrice, busbar, capacityBid, deRCap, startYear, False, self.name]
+                        dfCapacityAuctionBids.loc[genName, :] = [bidPrice, busbar, capacityBid, deRCap, startYear, False, self.name]
                 else:
                     print(capacityBid,gen.availabilityFactor)
 

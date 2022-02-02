@@ -29,31 +29,21 @@ class policyMaker():
         self.name = 'Government'
         self.updateCO2Target()
 
-        self.genCompanies = list()
+        self.elecGenCompanies = list()
 
     def updateCO2Target(self):
         # gCO2/kWh, 50-100 in https://www.current-news.co.uk/news/uk-powers-to-new-grid-carbon-intensity-low-of-just-32g-co2-kwh
         if self.year<2018:
             self.carbonIntensityTarget = 250
-        elif self.year<=2050:
-            CO2DecreaseFrac = (self.year - 2018)/(2050 - 2018)
+        elif self.year<=2035:
+            CO2DecreaseFrac = (self.year - 2018)/(2035 - 2018)
             newCO2P = 250 * (1-CO2DecreaseFrac)
             self.carbonIntensityTarget = newCO2P
         else:
             self.carbonIntensityTarget = 0
-                
-        if (self.year+5)<2018:
-            self.CO2Target5Years = 250
-        elif (self.year + 5)<=2050:
-            year5 = self.year + 5
-            CO2DecreaseFrac = (year5 - 2018)/(2050 - 2018)
-            newCO2P = 250 * (1-CO2DecreaseFrac)
-            self.CO2Target5Years = newCO2P
-        else:
-            self.CO2Target5Years = 0
 
     # update values for next year
-    def increaseYear(self):
+    def incrementYear(self):
         self.year = self.year + 1
         self.updateCO2Target()
 
@@ -87,7 +77,7 @@ class policyMaker():
     # estimate capacity in a specific year
     def projectedCapacity(self, targetYear):
         totCap = 0.0
-        for eGC in self.genCompanies:
+        for eGC in self.elecGenCompanies:
             totCap = totCap + eGC.getCapYear(targetYear,True) # true for derated capacity
         return totCap
 
@@ -136,7 +126,7 @@ class policyMaker():
             capShortFall = estPeakD - estDeRCap
 
             framesBids =[]
-            for eGC in self.genCompanies:
+            for eGC in self.elecGenCompanies:
                 temp_dfBids = eGC.getCapAuctionBid(timeHorizon, busheadroom)
                 framesBids.append(temp_dfBids)
             allBids = pd.concat(framesBids)
@@ -161,7 +151,7 @@ class policyMaker():
                     cfdBool = False
                     capMarketBool = True
                     busbar = row["Busbar"]
-                    eGC = Utils.getGenerationCompany(eGCName, self.genCompanies)
+                    eGC = Utils.getGenerationCompany(eGCName, self.elecGenCompanies)
                     eGC.addToConstructionQueue(genName, capacitykW, startYear, tcapSub, cfdBool, capMarketBool, busbar)
         else:
             print(' ----------------- No capacity auction ----------------------')
@@ -178,36 +168,36 @@ class policyMaker():
             print('++++++++++++++++++ Holding CfD auction +++++++++++++++++++++++')
             print("year", y)
             frames = []
-            for eGC in self.genCompanies:
+            for eGC in self.elecGenCompanies:
                 # print(eGC.name)
                 temp_bids_df = eGC.getCFDAuctionBid(timeHorizon, busheadroom)
                 frames.append(temp_bids_df)   
+            if len(frames)>0:
+                # Merge the bids together and select the accepted bids
+                allBids = pd.concat(frames)
+                allBids = allBids.loc[allBids["Capacity_kW"]>0].copy()
+                allBids = self.capBuildRate(allBids, 'Strike_Price_GBP/kWh')
 
-            # Merge the bids together and select the accepted bids
-            allBids = pd.concat(frames)
-            allBids = allBids.loc[allBids["Capacity_kW"]>0].copy()
-            allBids = self.capBuildRate(allBids, 'Strike_Price_GBP/kWh')
+                allBids.sort_values(by=['Strike_Price_GBP/kWh'], inplace=True)
+                allBids.to_csv(self.path_save+"All_CfD_bids_"+str(self.year)+".csv")
+                print("Average electricity price {0}".format(avgElectricityPrice))
+                allBids = allBids.loc[allBids['Strike_Price_GBP/kWh']>avgElectricityPrice, :]
+                allBids["Cumulative_capacity_kW"] = allBids["Capacity_kW"].cumsum()
+                successfulBids = allBids.loc[allBids["Cumulative_capacity_kW"]<=commisCap, :] #accepted bids
 
-            allBids.sort_values(by=['Strike_Price_GBP/kWh'], inplace=True)
-            allBids.to_csv(self.path_save+"All_CfD_bids_"+str(self.year)+".csv")
-            print("Average electricity price {0}".format(avgElectricityPrice))
-            allBids = allBids.loc[allBids['Strike_Price_GBP/kWh']>avgElectricityPrice, :]
-            allBids["Cumulative_capacity_kW"] = allBids["Capacity_kW"].cumsum()
-            successfulBids = allBids.loc[allBids["Cumulative_capacity_kW"]<=commisCap, :] #accepted bids
+                if len(successfulBids)>0:
+                    successfulBids.to_csv(self.path_save+"Successful_CfD_bids_"+str(self.year)+".csv")
 
-            if len(successfulBids)>0:
-                successfulBids.to_csv(self.path_save+"Successful_CfD_bids_"+str(self.year)+".csv")
-
-                for genName, row in successfulBids.iterrows(): # Add eligible plant to the construction queue
-                    eGCName = row["Generation_Company"]
-                    capacitykW = row["Capacity_kW"]
-                    startYear = row["Start_Year"]
-                    tcapSub = avgElectricityPrice-row['Strike_Price_GBP/kWh']
-                    cfdBool = True
-                    capMarketBool = False
-                    busbar = row["Busbar"]
-                    eGC = Utils.getGenerationCompany(eGCName, self.genCompanies)
-                    eGC.addToConstructionQueue(genName, capacitykW, startYear, tcapSub, cfdBool, capMarketBool, busbar)
+                    for genName, row in successfulBids.iterrows(): # Add eligible plant to the construction queue
+                        eGCName = row["Generation_Company"]
+                        capacitykW = row["Capacity_kW"]
+                        startYear = row["Start_Year"]
+                        tcapSub = -(avgElectricityPrice-row['Strike_Price_GBP/kWh'])
+                        cfdBool = True
+                        capMarketBool = False
+                        busbar = row["Busbar"]
+                        eGC = Utils.getGenerationCompany(eGCName, self.elecGenCompanies)
+                        eGC.addToConstructionQueue(genName, capacitykW, startYear, tcapSub, cfdBool, capMarketBool, busbar)
         else:
             print('++++++++++++++++++ No CfD auction +++++++++++++++++++++++')
 
@@ -216,10 +206,7 @@ class policyMaker():
 
 
 
-        
-
-
-
+    
 
 
 
