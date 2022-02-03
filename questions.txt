@@ -15,3 +15,6 @@ testing units need to be developped for each class
 Decomissioning costs may need to be included in the model. waste costs are currently not accounted.
 
 The calculation of the strike price for CfD needs to be reviewed. there is currently no limit to the strike price
+
+
+Wind onshore and offshore built between 2010 and 2017 are added to the construction queue. is it too much hardcoding? 

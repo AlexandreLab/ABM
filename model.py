@@ -21,6 +21,7 @@ class ABM():
         self.year = self.BASEYEAR
         self.boolEnergyStorage = boolEnergyStorage 
         self.timesteps = timesteps
+        
 
         self.numberCustomers = 1 #Number of energy consumers set to 1 by default
 
@@ -33,7 +34,7 @@ class ABM():
 
         # variable to store the results
         self.customerNLs = pd.DataFrame() #list of a number of customers, each customer has 8760 hour data
-
+        self.peakDemand = 0 #store the peak demand of the year
         self.buildRatePerType = pd.DataFrame(index = self.genTechList,columns=np.arange(self.year, self.year+100))
         self.buildRatePerType.fillna(0, inplace=True)
 
@@ -44,9 +45,12 @@ class ABM():
         self.capacityPerCompanies = pd.DataFrame()
         self.allGenPerCompany = pd.DataFrame()
         self.allGenPerTechnology = pd.DataFrame()
+        self.summaryEnergyDispatch = pd.DataFrame()
+        self.hourlyNetDemand = np.zeros(self.timesteps) # include the total demand of the customers as well as the demand after renewable dispatch, tradggen dispatch, etc.
+        self.hourlyCurtail = np.zeros(self.timesteps)
 
     def initResultsVariables(self):
-        # need to be initialised after generation companies are created
+        # need to be initialised after generation companies are created and after every year to be reset to 0
         idx_8760 = np.arange(0, 8760)
         self.allGenPerCompany = pd.DataFrame(columns=self.elecGenCompaniesNames, index=idx_8760) # df of total hourly renewable generation all year           
         self.allGenPerCompany.fillna(0, inplace=True)
@@ -56,6 +60,10 @@ class ABM():
         temp_cols = [x+'_Derated_Capacity_kW' for x in self.genTechList] + [x+'_Capacity_kW' for x in self.genTechList]
         self.capacityPerCompanies = pd.DataFrame(columns=temp_cols , index=self.elecGenCompaniesNames) # store the capacity by technology type for each companies
         self.capacityPerCompanies.fillna(0, inplace=True)
+        self.hourlyNetDemand = np.zeros(self.timesteps)
+        self.summaryEnergyDispatch = pd.DataFrame()
+        self.hourlyCurtail = np.zeros(self.timesteps)
+        self.peakDemand = 0
         return True
     
     def createEnergyCustomers(self, numberCustomers):
@@ -168,6 +176,51 @@ class ABM():
                         tempAge = tempStartYear - self.BASEYEAR
                         eGC.addGeneration(tempName, tempRen, tempCapKW, lifetime ,tempStartYear, tempEndYear, tempAge, subsidy, cfdBool, capMarketBool, tempbus, self.OneYearHeadroom[tempbus-1])
     
+
+        # Add plants to the construction queue of the distributed generation company
+
+        windOnPlantsFile = 'OtherDocuments/OperationalWindOnshore2017test_wOwner.csv'
+        GBWindOnPlants = pd.read_csv(windOnPlantsFile)
+        GBWindOnPlants.fillna(0, inplace=True)
+
+        windOffPlantsFile = 'OtherDocuments/OperationalWindOffshore2017test_wOwner.csv'
+        GBWindOffPlants = pd.read_csv(windOffPlantsFile)
+        GBWindOffPlants.fillna(0, inplace=True)
+        print('Adding Additional Distributed Generation')
+
+        for i in range(len(GBWindOffPlants['Name'])): # Adding in offshore plants already under construction that are due to come online soon
+            tempName = 'Wind Offshore'
+            genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
+            tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
+            sYear = GBWindOffPlants['StartYear'].iloc[i]
+            tempbus = int(GBWindOffPlants['Bus'].iloc[i])
+
+            if tempbus>0: #the plant is not in Northern Ireland
+                if(sYear>2010 and sYear<2014):
+                    tempName = GBWindOffPlants['Type'].iloc[i]
+                    tempCapKW = GBWindOffPlants['Capacity(kW)'].iloc[i]
+                    eYear = GBWindOffPlants['EndYear'].iloc[i]
+                    
+                    lifetime = eYear - sYear
+                    renGen = renewableGenerator(tempName, genTypeID, tempCapKW, lifetime, 0.0,1, self.OneYearHeadroom[tempbus-1], self.BASEYEAR)
+                    cfdSubsidy = renGen.estimateCfDSubsidy()
+                    distGenCompany.addGeneration(tempName, tempRen, tempCapKW, lifetime ,sYear, 2052, 0, cfdSubsidy, True, False, tempbus, self.OneYearHeadroom[tempbus-1])
+    
+                
+        for i in range(len(GBWindOnPlants['Name'])): # Adding in onshore plants already under construction that are due to come online soon
+            tempName = 'Wind Onshore'
+            genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
+            tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
+            sYear = GBWindOnPlants['StartYear'].iloc[i]
+            tempbus = GBWindOnPlants['Bus'].iloc[i]
+            if tempbus>0: #the plant is not in Northern Ireland
+                if(sYear>2010 and sYear<2013):
+                    tempName = GBWindOnPlants['Type'].iloc[i]
+                    cap = GBWindOnPlants['Capacity(kW)'].iloc[i]
+                    eYear = GBWindOnPlants['EndYear'].iloc[i]
+                    lifetime = eYear - sYear
+                    distGenCompany.addGeneration(tempName, tempRen, tempCapKW, lifetime ,sYear, eYear, 0, 0, False, False, tempbus, self.OneYearHeadroom[tempbus-1])
+
         print(capacityInstalledMW)
         self.capacityInstalledMW = capacityInstalledMW
         self.elecGenCompanies = elecGenCompanies
@@ -177,39 +230,6 @@ class ABM():
         self.policyMaker.elecGenCompanies = elecGenCompanies #add record of the generation companies to the Policy Maker object
         Utils.initBuildRate(self.genTechList, self.buildRatePerType, technology_technical_df) # Initialise the building rate for all the companies and technologies on year 0
         self.policyMaker.buildRatePerType = self.buildRatePerType
-
-        # for i in range(len(GBWindOffPlants['Name'])): # Adding in offshore plants already under construction that are due to come online soon
-        #     tempName = 'Wind Offshore'
-        #     genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
-        #     tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
-        #     sYear = GBWindOffPlants['StartYear'].iloc[i]
-        #     tempbus = int(GBWindOffPlants['Bus'].iloc[i])
-
-        #     if tempbus>0: #the plant is not in Northern Ireland
-        #         if(sYear>2010 and sYear<2014):
-        #             tempName = GBWindOffPlants['Type'].iloc[i]
-        #             tempCapKW = GBWindOffPlants['Capacity(kW)'].iloc[i]
-        #             eYear = GBWindOffPlants['EndYear'].iloc[i]
-                    
-        #             lifetime = eYear - sYear
-        #             renGen = renewableGenerator(tempName, genTypeID, tempCapKW, lifetime, 0.0,1,OneYearHeadroom[tempbus-1], BASEYEAR)
-        #             cfdSubsidy = renGen.estimateCfDSubsidy()
-        #             distGenCompany.addGeneration(tempName, tempRen, tempCapKW, lifetime ,sYear, 2052, 0, cfdSubsidy, True, False, tempbus, OneYearHeadroom[tempbus-1])
-    
-                
-        # for i in range(len(GBWindOnPlants['Name'])): # Adding in onshore plants already under construction that are due to come online soon
-        #     tempName = 'Wind Onshore'
-        #     genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
-        #     tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
-        #     sYear = GBWindOnPlants['StartYear'].iloc[i]
-        #     tempbus = GBWindOnPlants['Bus'].iloc[i]
-        #     if tempbus>0: #the plant is not in Northern Ireland
-        #         if(sYear>2010 and sYear<2013):
-        #             tempName = GBWindOnPlants['Type'].iloc[i]
-        #             cap = GBWindOnPlants['Capacity(kW)'].iloc[i]
-        #             eYear = GBWindOnPlants['EndYear'].iloc[i]
-        #             lifetime = eYear - sYear
-        #             distGenCompany.addGeneration(tempName, tempRen, tempCapKW, lifetime ,sYear, eYear, 0, 0, False, False, tempbus, OneYearHeadroom[tempbus-1])
 
         return True
 
@@ -311,11 +331,14 @@ class ABM():
 
         #------------- get total customer electricity demand -------------
         totalCustDemand = np.array(self.customerNLs.sum(axis=1).values)
-        peakDemand = np.max(totalCustDemand)
-        return peakDemand, totalCustDemand
+        self.hourlyNetDemand = totalCustDemand
+        self.summaryEnergyDispatch['TotalCustomerCons'] = self.hourlyNetDemand.copy()
+        self.peakDemand = np.max(totalCustDemand)
+        return True
 
 
-    def dispatchRenewables(self, netDemand):
+    def dispatchRenewables(self):
+        netDemand = self.hourlyNetDemand.copy()
         print("dispatchRenewables...")
         dfTech = self.params["technical_parameters"]
         listRgen = list(dfTech.loc[dfTech['Renewable_Flag']==1, :].index)
@@ -339,42 +362,54 @@ class ABM():
 
         netDemand = np.subtract(netDemand, totalRenewGen)
         hourlyCurtail = -netDemand
-        hourlyCurtail = hourlyCurtail.clip(min=0) #x<0 when demand>generation
-        netDemand = netDemand.clip(min=0)
-
+        self.hourlyCurtail  = hourlyCurtail.clip(min=0) #x<0 when demand>generation
+        self.hourlyNetDemand = netDemand.clip(min=0)
+        
+        self.summaryEnergyDispatch['TotalCustomerConsAfterRGen'] = self.hourlyNetDemand.copy()
         print("End of dispatchRenewables")
-        return netDemand, hourlyCurtail
+        return True
 
 
-    def dispatchTradGen(self, netDemand, hourlyCurtail, DispatchBeforeStorage):
+    def dispatchTradGen(self, dispatchBeforeStorage):
+        netDemand = self.hourlyNetDemand.copy()
+        hourlyCurtail = self.hourlyCurtail.copy()
         dfTech = self.params["technical_parameters"]
-        tradGen = dfTech.loc[(dfTech['Dispatch_Before_Storage']==DispatchBeforeStorage) & (dfTech['Renewable_Flag']==0), :].copy()
+        tradGen = dfTech.loc[(dfTech['Dispatch_Before_Storage']==dispatchBeforeStorage) & (dfTech['Renewable_Flag']==0), :].copy()
         tradGen = tradGen.sort_values(by='MeritOrder', ascending=True)
         temp_cols = [x+'_Derated_Capacity_kW' for x in self.genTechList] + [x+'_Capacity_kW' for x in self.genTechList]
         tempNetD = netDemand.copy()
         capacityPerType = self.capacityPerTypePerBus[temp_cols].sum()
         print('Dispatch of {0}'.format(list(tradGen.index)))
         tempNetD, tempHourlyCurtail = Utils.dispatchTradGen(netDemand, self.elecGenCompanies, tradGen,capacityPerType, self.capacityPerCompanies, self.allGenPerTechnology,self.allGenPerCompany, self.year)
-        hourlyCurtail = np.add(hourlyCurtail,tempHourlyCurtail)
-        netDemand = tempNetD
+        self.hourlyCurtail  = np.add(hourlyCurtail,tempHourlyCurtail)
+        self.hourlyNetDemand = tempNetD
 
-        return netDemand, hourlyCurtail
+        if dispatchBeforeStorage:
+            self.summaryEnergyDispatch['TotalCustomerConsAfterTGen1'] = self.hourlyNetDemand.copy()
+        else:
+            self.summaryEnergyDispatch['TotalCustomerConsAfterTGen2'] = self.hourlyNetDemand.copy()
+            self.summaryEnergyDispatch['Curtailement'] = self.hourlyCurtail
+            self.summaryEnergyDispatch['Loss of load'] = self.hourlyNetDemand
+        return True
 
-    def dispatchBatteries(self, netDemand):
+    def dispatchBatteries(self):
+        netDemand = self.hourlyNetDemand.copy()
         if self.boolEnergyStorage:
             print('Charging/Discharging of batteries...')
             tNetDemand = netDemand.copy()
             for eGC in self.elecGenCompanies:
                 tNetDemand = eGC.chargeDischargeBatteryTime(tNetDemand)
             netDemand = tNetDemand # final net demand after account for all companies
-        return netDemand
+            self.summaryEnergyDispatch['TotalCustomerConsAfterBattery'] = netDemand
+        return True
 
 
-    def getWholeSalePrice(self, hourlyCurtail):
+    def getWholeSalePrice(self):
+
         # calculating wholesale electricity price from marginal cost of each generator
         wholesaleEPrice, nuclearMarginalCost = Utils.getWholesaleEPrice(self.elecGenCompanies)
         for k in range(len(wholesaleEPrice)): #8760
-            if hourlyCurtail[k]>0:
+            if self.hourlyCurtail[k]>0:
                 wholesaleEPrice[k] = 0 - nuclearMarginalCost[k]
         return wholesaleEPrice
 
@@ -404,16 +439,16 @@ class ABM():
         return True
 
 
-    def installNewCapacity(self, totalCustDemand, wholesaleEPrice):
+    def installNewCapacity(self, wholesaleEPrice):
+
         capacityPerBusValues = self.capacityPerTypePerBus.T.sum().values
-        self.OneYearHeadroom = TNO.EvaluateHeadRoom(capacityPerBusValues,totalCustDemand)
-        peakDemand = np.max(totalCustDemand)
-        
+        self.OneYearHeadroom = TNO.EvaluateHeadRoom(capacityPerBusValues,self.summaryEnergyDispatch['TotalCustomerCons'] )
+
         # cfd auction
         self.policyMaker.cfdAuction(3, 6000000, 20, self.OneYearHeadroom, np.mean(wholesaleEPrice)) # 3 years, 6 GW to be commissioned, max 20 years construction time
 
         # Capacity auction
-        estPeakD, estDeRCap = self.policyMaker.capacityAuction(4, peakDemand, False, self.OneYearHeadroom,)
+        estPeakD, estDeRCap = self.policyMaker.capacityAuction(4, self.peakDemand, False, self.OneYearHeadroom,)
 
         # Capacity built by each company individually without the help of subsidies
         print("Companies investments...")
