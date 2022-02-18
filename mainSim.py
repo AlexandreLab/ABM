@@ -1,19 +1,7 @@
-from __future__ import division
-
 import random
 import numpy as np
-from customerGroup import customerGroup
-from renewableGenerator import renewableGenerator
-
-from generationCompany import generationCompany
-from policyMaker import policyMaker
-from heatProvider import heatProvider
 from model import ABM
 import Utils
-import random
-import pandas as pd 
-
-import os
 import pandas as pd
 
    
@@ -25,59 +13,74 @@ if __name__ == '__main__':
 
     print('========================begin======================== ')
 
-    # Parameters of the simulation 
+    # Parameters of the simulation
     BASEYEAR = 2010
-    maxYears = 41 #16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
-    timeSteps = 8760
-    boolEnergyStorage = False
-    boolLinearBatteryGrowth = True
- 
+    MAXYEARS = 11 #11 = 2020, 16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
+    timesteps = 8760
+    bool_energy_storage = False
+    bool_linear_battery_growth = True
+
     # Initialisation of variables
-    idx_year = np.arange(BASEYEAR, BASEYEAR+maxYears)
-    params = Utils.getParams()
+    IDX_YEAR = np.arange(BASEYEAR, BASEYEAR+MAXYEARS)
+    PARAMS = Utils.getParams(bool_energy_storage)
 
     #Creation of the agents
-    ABMmodel = ABM(params, BASEYEAR, boolEnergyStorage)
+    ABMmodel = ABM(PARAMS, BASEYEAR, bool_energy_storage)
     ABMmodel.createPolicyMaker()
-    ABMmodel.createEnergyCustomers(30)
+    nb_customers = 30 # 30 busbars
+    ABMmodel.createEnergyCustomers(nb_customers)
     ABMmodel.createGenerationCompanies()
     ABMmodel.addDistributedGeneration()
     ABMmodel.initTechPortoflio()
     ABMmodel.initResultsVariables()
+    
 
     # Initialisation of variables 2
-    technology_technical_df = params["technical_parameters"]
-    genTechList = list(technology_technical_df.index)
-    temp_cols = [x+'_Derated_Capacity_kW' for x in genTechList] + [x+'_Capacity_kW' for x in genTechList]
-    deRCapCols = [x+'_Derated_Capacity_kW' for x in ABMmodel.genTechList]
-    capCols = [x+'_Capacity_kW' for x in ABMmodel.genTechList]
+    tech_df = PARAMS["technical_parameters"]
+    gen_tech_list = PARAMS["gen_tech_list"]
+    storage_tech_list = PARAMS["storage_tech_list"]
 
-    # Components where results are stored
-    capacityPerType = pd.DataFrame(columns=temp_cols, index=idx_year) # store the capacity by technology type for each year of the simulation
-    capacityPerType.fillna(0, inplace=True)
+    gen_capacity_cols = [x+'_Derated_Capacity_kW' for x in gen_tech_list] + [x+'_Capacity_kW' for x in gen_tech_list]
+    derated_cap_cols = [x+'_Derated_Capacity_kW' for x in ABMmodel.gen_tech_list]
+    cap_cols = [x+'_Capacity_kW' for x in ABMmodel.gen_tech_list]
+    busbar_cols = np.arange(1, nb_customers+1)
+    storage_capacity_cols = [x+'_Capacity_kWh' for x in storage_tech_list]
 
-    DfSystemEvolution = pd.DataFrame() # Store the capacity, derated capacity, peak demand, capacity margin
-    DfHeadroomYear = pd.DataFrame() 
 
-    DfWholesalePrices = pd.DataFrame()
+    # variables where results are stored
+
+    gen_capacity_per_type = pd.DataFrame(columns=gen_capacity_cols, index=IDX_YEAR) # store the capacity by technology type for each year of the simulation
+    gen_capacity_per_type.fillna(0, inplace=True)
+
+    storage_capacity_per_type = pd.DataFrame(columns=storage_capacity_cols, index=IDX_YEAR) # store the capacity by technology type for each year of the simulation
+    storage_capacity_per_type.fillna(0, inplace=True)
+
+    system_evolution_df = pd.DataFrame() # Store the capacity, derated capacity, peak demand, capacity margin
+    merit_order_per_year_df = pd.DataFrame(columns = ABMmodel.merit_order, index=IDX_YEAR) 
+    wholesaleprice_per_year_df = pd.DataFrame()
+
+    TNUoS_charges_per_bus_per_year_df = pd.DataFrame(columns = busbar_cols)
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
     # ---------------------------- Simulation begins here ----------------------
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
-    
-    for currentYear in range(maxYears): # Loop through years
+    for current_year in range(MAXYEARS): # Loop through years
 
-        print('year {0}'.format(BASEYEAR+currentYear))
+        print('year {0}'.format(BASEYEAR+current_year))
         ######### Initialisation 
-        
+        ABMmodel.get_capacity_installed() #get the capacity installed of the different technologies
+        ABMmodel.update_TNUoS_charges()
+        TNUoS_charges_per_bus_per_year_df.loc[BASEYEAR+current_year, :] = ABMmodel.TNUoS_charges.loc["TNUoS_charges_GBP/kW", busbar_cols].values
+        gen_capacity_per_type.loc[BASEYEAR+current_year, gen_capacity_cols] = ABMmodel.gen_cap_per_type_per_bus[gen_capacity_cols].sum().values
+        storage_capacity_per_type.loc[BASEYEAR+current_year, storage_capacity_cols] = ABMmodel.storage_cap_per_type_per_bus[storage_capacity_cols].sum().values
 
-        ABMmodel.getCapacityInstalled() #get the capacity installed of the different technologies
-        capacityPerType.loc[BASEYEAR+currentYear, temp_cols] = ABMmodel.capacityPerTypePerBus[temp_cols].sum().values
-        DfSystemEvolution.loc[BASEYEAR+currentYear, 'Capacity_kW'] = ABMmodel.capacityPerTypePerBus[capCols].to_numpy().sum()
-        DfSystemEvolution.loc[BASEYEAR+currentYear, 'Derated_Capacity_kW'] = ABMmodel.capacityPerTypePerBus[deRCapCols].to_numpy().sum()
+        system_evolution_df.loc[BASEYEAR+current_year, 'Capacity_kW'] = ABMmodel.gen_cap_per_type_per_bus[cap_cols].to_numpy().sum()
+        system_evolution_df.loc[BASEYEAR+current_year, 'Derated_Capacity_kW'] = ABMmodel.gen_cap_per_type_per_bus[derated_cap_cols].to_numpy().sum()
+        system_evolution_df.loc[BASEYEAR+current_year, 'Storage_Capacity_kWh'] = ABMmodel.storage_cap_per_type_per_bus[storage_capacity_cols].to_numpy().sum()
 
+        merit_order_per_year_df.loc[BASEYEAR+current_year, :] = [ABMmodel.merit_order.index(gen_name) for gen_name in merit_order_per_year_df.columns]
         ABMmodel.getCustomerElectricityDemand()
         #===========================================================================================================================
         # ------------------------------------------- Dispatch RenewableEnergy Generation to meet net demand ----------------------------
@@ -103,87 +106,86 @@ if __name__ == '__main__':
         totYearGridGenkWh = ABMmodel.allGenPerTechnology.to_numpy().sum()
 
         wholesaleEPrice = ABMmodel.getWholeSalePrice()
-        DfWholesalePrices[BASEYEAR+currentYear] = wholesaleEPrice
+        wholesaleprice_per_year_df[BASEYEAR+current_year] = wholesaleEPrice
 
         yearlyEmissions = ABMmodel.getEmissions(wholesaleEPrice)
 
-        dercap_cols = [c for c in capacityPerType.columns if '_Derated_Capacity_kW' in c]
-        cap_cols = [c for c in capacityPerType.columns if '_Capacity_kW' in c and 'Derated' not in c]
-        sumTotCap = capacityPerType.loc[BASEYEAR+currentYear, cap_cols].sum()
-        sumDeRateTotCap = capacityPerType.loc[BASEYEAR+currentYear, dercap_cols].sum()
+        dercap_cols = [c for c in gen_capacity_per_type.columns if '_Derated_Capacity_kW' in c]
+        cap_cols = [c for c in gen_capacity_per_type.columns if '_Capacity_kW' in c and 'Derated' not in c]
+        sumTotCap = gen_capacity_per_type.loc[BASEYEAR+current_year, cap_cols].sum()
+        sumDeRateTotCap = gen_capacity_per_type.loc[BASEYEAR+current_year, dercap_cols].sum()
 
-        capacityMargin = (sumTotCap - ABMmodel.peakDemand)/ABMmodel.peakDemand # calculate margins
-        deRatedCapacityMargin = (sumDeRateTotCap - ABMmodel.peakDemand)/ABMmodel.peakDemand
+        capacityMargin = (sumTotCap - ABMmodel.peak_demand)/ABMmodel.peak_demand # calculate margins
+        deRatedCapacityMargin = (sumDeRateTotCap - ABMmodel.peak_demand)/ABMmodel.peak_demand
 
         carbonIntensity = yearlyEmissions/totYearGridGenkWh*1000
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Capacity_Margin_%'] = capacityMargin
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Derated_Capacity_Margin_%'] = deRatedCapacityMargin
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Peak_Demand_kW'] = ABMmodel.peakDemand
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Emissions_kgCO2'] = yearlyEmissions #kgCO2
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Carbon_Intensity_Target_gCO2/kWh'] = ABMmodel.policyMaker.carbonIntensityTarget
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Carbon_Intensity_gCO2/kWh'] = carbonIntensity
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Carbon_Price_£/tCO2'] = ABMmodel.policyMaker.curCO2Price
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Generation_kWh'] = totYearGridGenkWh #kWh
+        system_evolution_df.loc[current_year+BASEYEAR, 'Capacity_Margin_%'] = capacityMargin
+        system_evolution_df.loc[current_year+BASEYEAR, 'Derated_Capacity_Margin_%'] = deRatedCapacityMargin
+        system_evolution_df.loc[current_year+BASEYEAR, 'Peak_Demand_kW'] = ABMmodel.peak_demand
+        system_evolution_df.loc[current_year+BASEYEAR, 'Emissions_kgCO2'] = yearlyEmissions #kgCO2
+        system_evolution_df.loc[current_year+BASEYEAR, 'Carbon_Intensity_Target_gCO2/kWh'] = ABMmodel.policyMaker.carbonIntensityTarget
+        system_evolution_df.loc[current_year+BASEYEAR, 'Carbon_Intensity_gCO2/kWh'] = carbonIntensity
+        system_evolution_df.loc[current_year+BASEYEAR, 'Carbon_Price_£/tCO2'] = ABMmodel.policyMaker.curCO2Price
+        system_evolution_df.loc[current_year+BASEYEAR, 'Generation_kWh'] = totYearGridGenkWh #kWh
 
         ABMmodel.exportPlantsEconomics()
+
         ##########################################################################
         ################ End of year, update model for next year #################
         ##########################################################################
 
         estPeakD, estDeRCap = ABMmodel.installNewCapacity(wholesaleEPrice)
 
-        DfHeadroomYear[currentYear+BASEYEAR] = ABMmodel.OneYearHeadroom.copy() # Store the headroom of the current year
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Capacity_Auction_Estimated_Peak_Demand_kW'] = estPeakD 
-        DfSystemEvolution.loc[currentYear+BASEYEAR, 'Capacity_Auction_Estimated_DeRated_Capacity_kW'] = estDeRCap
-
+        system_evolution_df.loc[current_year+BASEYEAR, 'Capacity_Auction_Estimated_Peak_Demand_kW'] = estPeakD 
+        system_evolution_df.loc[current_year+BASEYEAR, 'Capacity_Auction_Estimated_DeRated_Capacity_kW'] = estDeRCap
 
         # writing results to file if at the end of simulation
-        if(currentYear == maxYears-1): # End of simulation
-            fileOut = params["path_save"] + 'capacityPerType.csv'
-            capacityPerType.to_csv(fileOut)  	
+        if(current_year == MAXYEARS-1): # End of simulation
+            fileOut = PARAMS["path_save"] + 'gen_capacity_per_type.csv'
+            gen_capacity_per_type.to_csv(fileOut)  	
 
-            fileOut = params["path_save"] + 'SystemEvolution.csv'
-            DfSystemEvolution.to_csv(fileOut)
+            fileOut = PARAMS["path_save"] + 'SystemEvolution.csv'
+            system_evolution_df.to_csv(fileOut)
 
-            fileOut = params["path_save"] + 'HeadroomBus.csv'
-            DfHeadroomYear.to_csv(fileOut)
 
-            fileOut = params["path_save"] + 'WholesalePrices.csv'
-            DfWholesalePrices.to_csv(fileOut)
+            fileOut = PARAMS["path_save"] + 'WholesalePrices.csv'
+            wholesaleprice_per_year_df.to_csv(fileOut)
+
+            fileOut = PARAMS["path_save"] + 'MeritOrder.csv'
+            merit_order_per_year_df.to_csv(fileOut)
+
+            fileOut = PARAMS["path_save"] + 'TNUoS_charges_per_bus_per_year.csv'
+            TNUoS_charges_per_bus_per_year_df.to_csv(fileOut)
+
 
         # Export to CSV
-        fileOut = params["path_save"] + 'NetDemand_'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = PARAMS["path_save"] + 'NetDemand_'+str(current_year+BASEYEAR)+'.csv'
         ABMmodel.summaryEnergyDispatch.to_csv(fileOut)
 
-        fileOut = params["path_save"] + 'allGenPerTechnology_'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = PARAMS["path_save"] + 'allGenPerTechnology_'+str(current_year+BASEYEAR)+'.csv'
         ABMmodel.allGenPerTechnology.to_csv(fileOut)
 
-        fileOut = params["path_save"] + 'allGenPerCompany_'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = PARAMS["path_save"] + 'allGenPerCompany_'+str(current_year+BASEYEAR)+'.csv'
         ABMmodel.allGenPerCompany.to_csv(fileOut)
 
-        fileOut = params["path_save"] + 'customerNLs_'+str(currentYear+BASEYEAR)+'.csv'
+        fileOut = PARAMS["path_save"] + 'customerNLs_'+str(current_year+BASEYEAR)+'.csv'
         ABMmodel.customerNLs.to_csv(fileOut)
 
-        fileOut = params["path_save"] + 'capacityPerCompanies_'+str(BASEYEAR+currentYear)+'.csv'
-        ABMmodel.capacityPerCompanies.to_csv(fileOut)  
+        fileOut = PARAMS["path_save"] + 'gen_cap_per_companies_'+str(BASEYEAR+current_year)+'.csv'
+        ABMmodel.gen_cap_per_companies.to_csv(fileOut)  
 
-        fileOut = params["path_save"] + 'capacityPerTypePerBus_'+str(BASEYEAR+currentYear)+'.csv'
-        ABMmodel.capacityPerTypePerBus.to_csv(fileOut)  
+        fileOut = PARAMS["path_save"] + 'gen_cap_per_type_per_bus_'+str(BASEYEAR+current_year)+'.csv'
+        ABMmodel.gen_cap_per_type_per_bus.to_csv(fileOut)  
 
-        fileOut = params["path_save"] + 'buildRatePerType_'+str(BASEYEAR+currentYear)+'.csv'
+        fileOut = PARAMS["path_save"] + 'storage_cap_per_type_per_bus_'+str(BASEYEAR+current_year)+'.csv'
+        ABMmodel.storage_cap_per_type_per_bus.to_csv(fileOut)  
+
+        fileOut = PARAMS["path_save"] + 'storage_cap_per_companies_'+str(BASEYEAR+current_year)+'.csv'
+        ABMmodel.storage_cap_per_companies.to_csv(fileOut) 
+
+
+        fileOut = PARAMS["path_save"] + 'buildRatePerType_'+str(BASEYEAR+current_year)+'.csv'
         ABMmodel.policyMaker.buildRatePerType.to_csv(fileOut)
 
         # Prepare the model for next year by updating some parameters in the agents (e.g., carbon price)
-        ABMmodel.incrementYear(carbonIntensity)
-
-
-
-
-
-
-
-
-
-
-
-
+        ABMmodel.increment_year(carbonIntensity)

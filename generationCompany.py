@@ -1,205 +1,181 @@
 import random
-from collections import namedtuple
 import numpy as np
-import math
-import statistics
 import Utils
 from renewableGenerator import renewableGenerator
 from traditionalGenerator import traditionalGenerator
 from energyStorage import energyStorage
-from random import choice
-from scipy import (dot, eye, randn, asarray, array, trace, log, exp, sqrt, mean, sum, argsort, square, arange)
 import pandas as pd
 import os
 
 class generationCompany():
-    def __init__(self,name, timeSteps, params, currentCarbonPrice,BASEYEAR):
+    def __init__(self, name, timesteps, params, currentCarbonPrice,BASEYEAR):
         self.params = params
 
-        self.timeSteps = timeSteps
+        self.timesteps = timesteps
 
         self.name = name
-        self.discountR = 0.1 # 10%
+        self.discount_rate = 0.1 # 10%
 
-        self.traditionalGen = list()
-        self.renewableGen = list() # list of renewableGenerator objects
-        self.listTechnologyPortfolio = list() # list of technology names owned by this company
+        self.traditional_gen = list()
+        self.renewable_gen = list() # list of renewable_generator objects
+        self.list_technology_portfolio = list() # list of technology names owned by this company
 
-        self.hourlyGenPerType = dict() # store the hourly generation profile for each technology type
+        self.hourly_gen_per_type = dict() # store the hourly generation profile for each technology type
+        columns = ["name", "capacity_kW", "start_year", "end_year", "capacity_market_sub_GBP/kW", "CfD_price_GBP/kWh", "busbar"]
+        self.construction_queue = pd.DataFrame(columns=columns)
 
-        self.curYearBatteryBuild = 0.0
-
-        self.batteryDuration = 3 #7 #3 # hours
-
-        self.constructionQueue = list()
-        self.capacityPerTypePerBus = pd.DataFrame() #capacity per type and by bus
-
+        self.gen_cap_per_type_per_bus = pd.DataFrame() #generation capacity per type and by bus
+        self.storage_cap_per_type_per_bus = pd.DataFrame() #storage capacity per type and by bus
         self.BASEYEAR = BASEYEAR
         self.year = BASEYEAR
 
-        self.energyStores = list()
+        self.energy_stores = list()
 
-        self.curCO2Price = currentCarbonPrice
+        self.current_CO2_price = currentCarbonPrice
 
     #function that looks at the profitability of plants and choose what will be the next investment of company
-    def nextInvestment(self):
-        genROIandNPV = pd.DataFrame(columns=["ObjectID", "Generation_Company", "Busbar", "Capacity_kW",  "Start_Year", "ROI", "NPV"])
+    def nextInvestment(self, priority_busbars):
+        genROIandNPV = pd.DataFrame(columns=["object_ID", "generation_company", "busbar", "capacity_kW", "start_year", "end_year", "ROI", "NPV"])
         genROIandNPV.index.name = "Technology"
-        for gen in self.traditionalGen+self.renewableGen+self.energyStores:
+        for gen in self.traditional_gen+self.renewable_gen+self.energy_stores:
             genID = id(gen)
-            if gen.ROI>0:
-                genName = gen.name
-                busbarConstraints = self.params["busbar_constraints"]
-                busbar = random.choice(list(busbarConstraints[busbarConstraints[genName]>0].index))
-                capacity = int(self.params["technical_parameters"].loc[genName, "Typical_Capacity_kW"]) # years #capacity to be installed of the technology
-                constructionTime = int(self.params["technical_parameters"].loc[genName, "Construction_Time_Years"]) # years
-                startYear = constructionTime + self.year
-                genROIandNPV.loc[genName, :] = [genID, self.name, busbar, capacity, startYear, gen.ROI, gen.NPV]
+            if gen.ROI > 0:
+                unit_name = gen.name
+                busbar = self.get_busbar(unit_name, priority_busbars)
+                capacity = int(self.params["technical_parameters"].loc[unit_name, "Typical_Capacity_kW"]) # years #capacity to be installed of the technology
+                construction_time = int(self.params["technical_parameters"].loc[unit_name, "Construction_Time_Years"]) # years
+                start_year = construction_time + self.year
+                lifetime = int(self.params["technical_parameters"].loc[unit_name, "Lifetime_Years"]) # years
+                end_year = start_year + lifetime
+                genROIandNPV.loc[unit_name, :] = [genID, self.name, busbar, capacity, start_year, end_year, gen.ROI, gen.NPV]
 
         # Keep investment with a positive ROI (if ROI>0 NPV will also be >0)
         return genROIandNPV
 
-    def calcRevenue(self, wholesaleProf): # method to recalculate profit for all plants
-        for gen in self.traditionalGen+self.renewableGen+self.energyStores:
-            gen.wholesaleEPrice = wholesaleProf
-            gen.calcRevenue()
+    def calc_revenue(self, wholesaleProf): # method to recalculate profit for all plants
+        for gen in self.traditional_gen+self.renewable_gen+self.energy_stores:
+            gen.calc_revenue(wholesaleProf)
         return True
 
     def calcEmissions(self): # method to recalculate profit for all plants
         totalGenCoEmissions = 0
-        for gen in self.traditionalGen+self.renewableGen+self.energyStores:
-            totalGenCoEmissions += gen.yearlyEmissions
+        for gen in self.traditional_gen+self.renewable_gen+self.energy_stores:
+            totalGenCoEmissions += gen.yearly_emissions
         return totalGenCoEmissions
 
     # The batteries are controlled at the level of the generation company
-    # method to charge/ discharge battery and return net demand - battery
-    def chargeDischargeBatteryTime(self, netDemand):
+    # method to charge/ discharge battery and return net demand - battery usage
+    def chargeDischargeBatteryTime(self, netDemand, battery_cat):
         # if netDemand>dailyAverage => battery discharge
         # else: battery charge
+
+        #Difference between hourly demand of a day and the mean demand for the same day
         arr_discharging24Hr = np.array([arr_day-np.mean(arr_day) for arr_day in np.split(netDemand, 8760/24)])
         arr_discharging24Hr = arr_discharging24Hr.flatten()
         arr_charging24Hr = -arr_discharging24Hr.copy()
         arr_discharging24Hr = arr_discharging24Hr.clip(min=0)
         arr_charging24Hr = arr_charging24Hr.clip(min=0)
-        arr_charging24Hr = np.array([arr_dayCharging/np.sum(arr_dayCharging) for arr_dayCharging in np.split(arr_charging24Hr, 8760/24)])
-        arr_discharging24Hr = np.array([arr_dayDischarging/np.sum(arr_dayDischarging) for arr_dayDischarging in np.split(arr_discharging24Hr, 8760/24)])
+        arr_charging24Hr = np.array([arr_dayCharging/np.sum(arr_dayCharging) for arr_dayCharging in np.split(arr_charging24Hr, 8760/24)]) #charging rate
+        arr_discharging24Hr = np.array([arr_dayDischarging/np.sum(arr_dayDischarging) for arr_dayDischarging in np.split(arr_discharging24Hr, 8760/24)]) #discharging rate
 
         arr_charging24Hr = arr_charging24Hr.flatten()
         arr_discharging24Hr = arr_discharging24Hr.flatten()
         tempNetDemand = netDemand.copy()
         pd.DataFrame([arr_charging24Hr, arr_discharging24Hr, tempNetDemand]).to_csv("battery.csv")
-        for eStore in self.energyStores:
-            tempNetDemand = eStore.chargingDischargingBattery(arr_charging24Hr, arr_discharging24Hr, tempNetDemand)
-            eStore.updateProfit()
-
+        for eStore in self.energy_stores:
+            if eStore.name == battery_cat:
+                tempNetDemand = eStore.chargingDischargingBattery(arr_charging24Hr, arr_discharging24Hr, tempNetDemand)
         return tempNetDemand
-
-    # reset values at the end of a year
-    def resetYearlyValues(self):
-        for i in range(len(self.energyStores)):
-            self.energyStores[i].resetYearValueRecord()
-
-        for i in range(len(self.traditionalGen)):
-            self.traditionalGen[i].resetYearValueRecord()
-
-        for i in range(len(self.renewableGen)):
-            self.renewableGen[i].resetYearValueRecord()
             
     # get generation from specific technology type ,e.g. Wind, solar, etc.
-    def getRenewableGenerationByType(self, genName):
-        arr_curGen = np.zeros(self.timeSteps)
-        for rgen in self.renewableGen:
+    def getRenewableGenerationByType(self, unit_name):
+        arr_curGen = np.zeros(self.timesteps)
+        for rgen in self.renewable_gen:
             # print(genTypeID, tgen.genTypeID)
-            if rgen.name==genName:
-                curGen = rgen.energyGenerated
+            if rgen.name == unit_name:
+                curGen = rgen.hourly_energy_generated
                 arr_curGen = np.add(arr_curGen, curGen)
-        self.hourlyGenPerType[genName] = arr_curGen
+        self.hourly_gen_per_type[unit_name] = arr_curGen
         return arr_curGen
 
     # get generation from specific technology type ,e.g. CCGT
-    def getTraditionalGenerationByType(self, genName, curNetD):
+    def getTraditionalGenerationByType(self, unit_name, curNetD):
         tempNetD = curNetD.copy()
-        arr_curGen = np.zeros(self.timeSteps)
-        arr_currExcessGen = np.zeros(self.timeSteps)
-        for tgen in self.traditionalGen:
+        arr_curGen = np.zeros(self.timesteps)
+        arr_currExcessGen = np.zeros(self.timesteps)
+        for tgen in self.traditional_gen:
             # print(genTypeID, tgen.genTypeID)
-            if(tgen.name==genName):
-                curGen,newNetD, curExcessGen = tgen.getGeneration(tempNetD)
+            if tgen.name == unit_name:
+                curGen, newNetD, curExcessGen = tgen.dispatch(tempNetD)
                 # print(np.sum(curGen))
                 tempNetD = newNetD
                 arr_curGen = np.add(arr_curGen, curGen)
                 arr_currExcessGen = np.add(arr_currExcessGen, curExcessGen)
-        self.hourlyGenPerType[genName] = arr_curGen
+        self.hourly_gen_per_type[unit_name] = arr_curGen
         return arr_curGen, arr_currExcessGen, tempNetD
 
     # get capacity of all battery storage in kW
-    def getBatteryPowerKW(self):
+    def getBatteryPowerKw(self):
         totalPowerKW = 0.0
-        for eStore in self.energyStores:
-            totalPowerKW = totalPowerKW + eStore.dischargeRate
+        for eStore in self.energy_stores:
+            totalPowerKW = totalPowerKW + eStore.discharge_rate
         return totalPowerKW
 
-    # make decision to invest in new generation plants 
-    def incrementYear(self, OneYearHeadroom, newCO2Price):
+    # make decision to invest in new generation plants
+    def increment_year(self, newCO2Price):
         self.removeOldCapacity()
         self.removeUnprofitableCapacity()
         self.year = self.year + 1
-        self.curCO2Price = newCO2Price
+        self.current_CO2_price = newCO2Price
         
-        for gen in self.traditionalGen + self.renewableGen:
-            gen.incrementYear(newCO2Price)  
+        for gen in self.traditional_gen + self.renewable_gen:
+            gen.increment_year(newCO2Price)
         # add any new plants that are in the construction queue and are meant to come online
-        self.checkConstructionQueue(OneYearHeadroom)
+        self.checkConstructionQueue()
 
-        self.hourlyGenPerType = {}
+        self.hourly_gen_per_type = {}
         return True
         
     # method to add plants to construction queue so that they come online after build time has completed
-    def addToConstructionQueue(self, tGenName, tCapacityKW, tStartYear, tcapSub, cfdBool, capMarketBool, BusNum):
-        print("Adding {0} to the construction queue of the company {1}".format(tGenName, self.name))
-        queuePlant = list()
-        queuePlant.append(tGenName) #0
-        queuePlant.append(tCapacityKW)#1
-        queuePlant.append(tStartYear)#2
-        queuePlant.append(tcapSub)#3
-        queuePlant.append(cfdBool)#4
-        queuePlant.append(capMarketBool)#5
-        queuePlant.append(BusNum)#6
-        self.constructionQueue.append(queuePlant)
+    def addToConstructionQueue(self, unit_name, capacity, start_year, end_year, capacity_market_sub, CfD_price, busbar):
+
+        print("Adding {0} to the construction queue of the company {1}".format(unit_name, self.name))
+        if len(self.construction_queue.index) == 0:
+            new_idx = 1
+        else:
+            new_idx = self.construction_queue.index[-1]+1
+        # ["name", "capacity_kW", "start_year", "end_year", "capacity_market_sub_GBP/kW", "CfD_price_GBP/kWh", "busbar"]
+        self.construction_queue.loc[new_idx, :] = [unit_name, capacity, start_year, end_year, capacity_market_sub, CfD_price, busbar]
+        return True
 
     # check plants that are in construction queue to see if ready to come online
-    def checkConstructionQueue(self,OneYearHeadroom):
-        newConstructionQueue = []
-        for genRow in self.constructionQueue:
-            startYear = genRow[2]
-            if startYear == self.year:  # start year is now
-                genName = genRow[0]
-                capacityKW = genRow[1]
-                capitalSub = genRow[3]
-                cfdBool = genRow[4]
-                capMarketBool = genRow[5]
-                BusNum = genRow[6]
-                renewableFlag = int(self.params["technical_parameters"].loc[genName, 'Renewable_Flag'])
-                lifetime = lifetime = int(self.params["technical_parameters"].loc[genName, "Lifetime_Years"]) # years
-                endYear = startYear + lifetime
-                age = 0
-                self.addGeneration(genName, renewableFlag, capacityKW, lifetime, startYear, endYear, age, capitalSub, cfdBool, capMarketBool, BusNum, OneYearHeadroom[BusNum-1])
-            else:
-                newConstructionQueue.append(genRow)
-        self.constructionQueue = newConstructionQueue
+    def checkConstructionQueue(self):
+        units_to_build = self.construction_queue.loc[self.construction_queue["start_year"] == self.year, :]
+        self.construction_queue = self.construction_queue.loc[self.construction_queue["start_year"] > self.year, :]
+
+        if len(units_to_build) > 0:
+            for idx, row in units_to_build.iterrows():
+                unit_name = row["name"]
+                capacity = row["capacity_kW"]
+                start_year = row["start_year"]
+                end_year = row["end_year"]
+                capacity_market_sub = row["capacity_market_sub_GBP/kW"]
+                CfD_price = row["CfD_price_GBP/kWh"]
+                busbar = row["busbar"]
+                self.add_unit(unit_name, capacity, start_year, end_year, capacity_market_sub, CfD_price, busbar)
+
+        return True
+
+
 
     # method to remove old capacity whos age>lifetime
     def removeOldCapacity(self):
-        for gen in self.traditionalGen + self.renewableGen:
-            if gen.endYear <= self.year:
-                # print('Removing Old Capacity')
-                # print('type ',gen.name)
-                # print('capacity ',gen.genCapacity)
-                # print('Cur Year: %s,   End Year: %s'%(str(self.year), str(gen.endYear)))
-                if gen in self.traditionalGen:
-                    self.traditionalGen.remove(gen)
+        for gen in self.traditional_gen + self.renewable_gen + self.energy_stores:
+            if gen.end_year <= self.year:
+                if gen in self.traditional_gen:
+                    self.traditional_gen.remove(gen)
                 else:
-                    self.renewableGen.remove(gen)
+                    self.renewable_gen.remove(gen)
         return True
         
     # method to remove unprofitable generation plants
@@ -207,250 +183,319 @@ class generationCompany():
         # remove at most 1 plant (renewable or non renewable) that is not profitable
         removed = False
         yearsWait = 8 # number of years allowed to make a loss for before removed
-        shuffled_list = [x for x in range(len(self.traditionalGen+self.renewableGen))]
+        shuffled_list = [x for x in range(len(self.traditional_gen+self.renewable_gen+self.energy_stores))]
         random.shuffle(shuffled_list)
 
         for idx in shuffled_list:
             count=0
             if not removed:
-                gen = (self.traditionalGen+self.renewableGen)[idx]
-                for yProfit in reversed (gen.yearlyProfitList): # loop through yearly profits from most recent
+                gen = (self.traditional_gen+self.renewable_gen+self.energy_stores)[idx]
+                for yProfit in reversed (gen.yearly_profit_list): # loop through yearly profits from most recent
                     if yProfit < 0:
                         count +=1
                     # if not profitable for x years and no plant has been removed yet
-                    if count== yearsWait : 
-                        # print('Removing Unprofitable Capacity')
-                        # print('Profit ',gen.yearlyProfitList)
-                        # print('type ',gen.name)
-                        # print('capacity ',gen.genCapacity)
-                        if gen in self.traditionalGen:
-                            self.traditionalGen.remove(gen)
+                    if count == yearsWait: 
+                        if gen in self.traditional_gen:
+                            self.traditional_gen.remove(gen)
+                        elif gen in self.renewable_gen:
+                            self.renewable_gen.remove(gen)
                         else:
-                            self.renewableGen.remove(gen)
+                            self.energy_stores(gen)
                         removed = True
                         break
         return True
 
-    def calculateStrikePrice(self, genName, capacity, totalGen):
+    def calculateStrikePrice(self, unit_name, capacity, totalGen):
+
+        #add a try/catch to raise error
         # load parameters to calculate the strike price for this technology
         economic_param_df = self.params["economic_parameters"]
-        renewableFlag = int(self.params["technical_parameters"].loc[genName, 'Renewable_Flag'])
-        lifetime = int(self.params["technical_parameters"].loc[genName, "Lifetime_Years"]) # years
-        capitalCost = economic_param_df.loc[(economic_param_df["Key"]==genName) & (economic_param_df["Cost Type"]=="CAPEX"), self.year].values[0]/1000*capacity
-        fixedOandMCost = economic_param_df.loc[(economic_param_df["Key"]==genName) & (economic_param_df["Cost Type"]=="OPEX"), self.year].values[0]/1000*capacity
-        variableOandMCost = economic_param_df.loc[(economic_param_df["Key"]==genName) & (economic_param_df["Cost Type"]=="Variable Other Work Costs"), self.year].values[0]/1000
-        capitalCostAnnualised = (capitalCost*self.discountR)/(1-(1+self.discountR)**-lifetime)  # EAC GBP/year
+        renewableFlag = int(self.params["technical_parameters"].loc[unit_name, 'Renewable_Flag'])
+        lifetime = int(self.params["technical_parameters"].loc[unit_name, "Lifetime_Years"]) # years
+        capital_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="CAPEX"), self.year].values[0]/1000*capacity
+        fixed_OM_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="OPEX"), self.year].values[0]/1000*capacity
+        variable_OM_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="Variable Other Work Costs"), self.year].values[0]/1000
+        # capitalCostAnnualised = (capital_cost*self.discount_rate)/(1-(1+self.discount_rate)**-lifetime)  # EAC GBP/year
         wasteCost = 0 #GBP/kWh
-        capacityFactor = float(self.params["technical_parameters"].loc[genName, "Capacity_Factor"])
-        opEmissionsPkW = float(self.params["technical_parameters"].loc[genName, "GHG_Emissions_kgCO2/kWh"]) # kgCO2/kWh
+        # capacity_factor = float(self.params["technical_parameters"].loc[unit_name, "Capacity_Factor"])
+        ghg_emissions_per_kWh = float(self.params["technical_parameters"].loc[unit_name, "GHG_Emissions_kgCO2/kWh"]) # kgCO2/kWh
 
         fuelCost = 0
         if not renewableFlag:
             path_wholesale_price = self.params["path_wholesale_fuel_price"]
-            targetFuel = self.params["technical_parameters"].loc[genName, "Primary_Fuel"]
+            targetFuel = self.params["technical_parameters"].loc[unit_name, "Primary_Fuel"]
             fuelPricePath = Utils.getPathWholesalePriceOfFuel(path_wholesale_price, targetFuel, self.BASEYEAR)
-            fuelCost = Utils.loadFuelCostFile(genName, fuelPricePath)[self.year-self.BASEYEAR]
+            fuelCost = Utils.loadFuelCostFile(unit_name, fuelPricePath)[self.year-self.BASEYEAR]
 
-        totalVariableOandMCost = (variableOandMCost+opEmissionsPkW/1000*self.curCO2Price+ wasteCost+fuelCost)*totalGen #GBP/kWh
-        strikePrice = (capitalCostAnnualised + fixedOandMCost + totalVariableOandMCost)/totalGen #GBP/kWh
+        totalVariableOandMCost = (variable_OM_cost+ghg_emissions_per_kWh/1000*self.current_CO2_price+ wasteCost+fuelCost)*totalGen #GBP/kWh
+
+        NPV_total_cost = (fixed_OM_cost + totalVariableOandMCost)*(1-(1+self.discount_rate)**-lifetime)/self.discount_rate + capital_cost
+        NPV_electricity_generated = (totalGen)*(1-(1+self.discount_rate)**-lifetime)/self.discount_rate
+        strikePrice = NPV_total_cost/NPV_electricity_generated #GBP/kWh
         return strikePrice
 
+    def get_busbar(self, unit_name, priority_busbars): #get the busbar where to install new capacity 
+       
+        busbarConstraints = self.params["busbar_constraints"]
+        if unit_name not in busbarConstraints.columns:
+            eligible_busbars = priority_busbars
+        else:
+            eligible_busbars = list(busbarConstraints[busbarConstraints[unit_name] > 0].index)
+            eligible_busbars = [b for b in priority_busbars if b in eligible_busbars]
+        busbar = random.choice(eligible_busbars[:3]) # choose a busbar in the top 3 eligible busbars
+
+        return busbar
 
     # method to get bid for CFD auction
-    def getCFDAuctionBid(self, timeHorizon, busheadroom):
+    def getCFDAuctionBid(self, timeHorizon, priority_busbars):
 
-        dfStrikePrices = pd.DataFrame(index= self.listTechnologyPortfolio, columns=["Strike_Price_GBP/kWh","Busbar", "Capacity_kW",  "Start_Year", "Generation_Company"]) #store the strike prices of the technologies 
+        dfStrikePrices = pd.DataFrame(index = self.list_technology_portfolio, columns=["strike_price_GBP/kWh", "busbar", "capacity_kW", "start_Year", "end_year", "generation_company"]) #store the strike prices of the technologies 
         dfStrikePrices.fillna(0, inplace=True)
 
         # Calculating the bid for each technology 
-        for genName in self.listTechnologyPortfolio:
-            market_readiness = int(self.params["technical_parameters"].loc[genName, "Expected_Market_Ready_Time"]) # when is the technology market ready
+        for unit_name in self.list_technology_portfolio:
+            market_readiness = int(self.params["technical_parameters"].loc[unit_name, "Expected_Market_Ready_Time"]) # when is the technology market ready
             
-            if int(self.params["technical_parameters"].loc[genName, "CfD_eligible"]): #the technology is CfD eligible
+            if int(self.params["technical_parameters"].loc[unit_name, "CfD_eligible"]): #the technology is CfD eligible
                 if market_readiness<=self.year: #the technology is ready for market
-                    #Select a busbar where the technology can be built (not based on headroom at the moment)
-                    busbarConstraints = self.params["busbar_constraints"]
-                    busbar = random.choice(list(busbarConstraints[busbarConstraints[genName]>0].index))
-                    constructionTime = int(self.params["technical_parameters"].loc[genName, "Construction_Time_Years"]) # years
-                    startYear = constructionTime + self.year
-                    capacityBid = int(self.params["technical_parameters"].loc[genName, "Typical_Capacity_kW"]) # years #capacity to be installed of the technology
-                    if capacityBid>0:
-                        totalCapacityInstalled = self.capacityPerTypePerBus[genName+'_Capacity_kW'].sum() # capacity installed of this technology in the company
+                    #Select a busbar where the technology can be built
+
+                    busbar = self.get_busbar(unit_name, priority_busbars)
+                    construction_time = int(self.params["technical_parameters"].loc[unit_name, "Construction_Time_Years"]) # years
+                    lifetime = int(self.params["technical_parameters"].loc[unit_name, "Lifetime_Years"]) # years
+                    start_year = construction_time + self.year
+                    capacityBid = int(self.params["technical_parameters"].loc[unit_name, "Typical_Capacity_kW"]) # years #capacity to be installed of the technology
+                    if capacityBid > 0:
+                        totalCapacityInstalled = self.gen_cap_per_type_per_bus[unit_name+'_Capacity_kW'].sum() # capacity installed of this technology in the company
                         if totalCapacityInstalled > 0:
-                            hourlyGen = self.hourlyGenPerType[genName].copy() #estimate hourly generation of this technology and this capacity
+                            hourlyGen = self.hourly_gen_per_type[unit_name].copy() #estimate hourly generation of this technology and this capacity
                             
                             hourlyGen = hourlyGen/totalCapacityInstalled*capacityBid #scale the hourly gen
                             totalGen = np.sum(hourlyGen)
                         else:
-                            capacityFactor = float(self.params["technical_parameters"].loc[genName, "Capacity_Factor"])
-                            totalGen = capacityFactor * capacityBid
+                            capacity_factor = float(self.params["technical_parameters"].loc[unit_name, "Capacity_Factor"])
+                            totalGen = capacity_factor * capacityBid
 
-                        if constructionTime<=timeHorizon: # The construction time is equal or below the construction time required by the CfD auction
-                            strikePrice = self.calculateStrikePrice(genName, capacityBid, totalGen)
-                            dfStrikePrices.loc[genName, "Strike_Price_GBP/kWh"] = strikePrice
-                            dfStrikePrices.loc[genName, "Busbar"] = busbar
-                            dfStrikePrices.loc[genName, "Capacity_kW"] = capacityBid
-                            dfStrikePrices.loc[genName, "Start_Year"] = startYear
-                            dfStrikePrices.loc[genName, "Generation_Company"] = self.name
+                        if construction_time<=timeHorizon: # The construction time is equal or below the construction time required by the CfD auction
+                            strikePrice = self.calculateStrikePrice(unit_name, capacityBid, totalGen)
+                            dfStrikePrices.loc[unit_name, "strike_price_GBP/kWh"] = strikePrice
+                            dfStrikePrices.loc[unit_name, "busbar"] = busbar
+                            dfStrikePrices.loc[unit_name, "capacity_kW"] = capacityBid
+                            dfStrikePrices.loc[unit_name, "start_year"] = start_year
+                            dfStrikePrices.loc[unit_name, "end_year"] = start_year + lifetime
+                            dfStrikePrices.loc[unit_name, "generation_company"] = self.name
         
         return dfStrikePrices
 
     # method to get cap auction bid
-    def getCapAuctionBid(self, timeHorizon, busheadroom):
-        dfCapacityAuctionBids = pd.DataFrame(columns=["Bid_Price_GBP/kW", "Busbar","Capacity_kW", "DeRated_Capacity_kW", "Start_Year", "Battery_Flag", "Generation_Company"])
-        for gen in self.traditionalGen:
-            genName = gen.name
-            startYear = gen.constructionTime + self.year
-            #  can technology be built in time horizon, e.g. 4 years
-            if gen.constructionTime <= timeHorizon and (not genName in dfCapacityAuctionBids.index):
+    def getCapAuctionBid(self, timeHorizon, priority_busbars):
+        dfCapacityAuctionBids = pd.DataFrame(columns=["bid_price_GBP/kW", "busbar", "capacity_kW", "derated_capacity_kW", "start_year", "end_year", "generation_company"])
+        for unit in self.traditional_gen+self.energy_stores:
+            unit_name = unit.name
+            start_year = unit.construction_time + self.year
+            lifetime = int(self.params["technical_parameters"].loc[unit_name, "Lifetime_Years"]) # years
+            end_year = start_year + lifetime
+            #  can technology be built in time horizon, e.g. 4 years and is it already in the list of bids (only one unit of each tech can be submitted by each eC)
+            if unit.construction_time <= timeHorizon and (not unit_name in dfCapacityAuctionBids.index):
                 #Select a busbar where the technology can be built (not based on headroom at the moment)
-                busbarConstraints = self.params["busbar_constraints"]
-                busbar = random.choice(list(busbarConstraints[busbarConstraints[genName]>0].index))
-                capacityBid = int(self.params["technical_parameters"].loc[genName, "Typical_Capacity_kW"]) #capacity to be installed of the technology
-                deRCap = capacityBid*gen.availabilityFactor
-                if deRCap>0:
-                    if(gen.NPV>0): # no need to go through the capacity market
+                busbar = self.get_busbar(unit_name, priority_busbars)
+                capacityBid = int(self.params["technical_parameters"].loc[unit_name , "Typical_Capacity_kW"]) #capacity to be installed of the technology
+                deRCap = capacityBid*unit.availability_factor
+                if deRCap > 0:
+                    if(unit.NPV > 0): # no need to go through the capacity market
                         bidPrice = 0
                     else:
-                        lossPerKW = -gen.NPV / gen.genCapacity
+                        lossPerKW = (-unit.NPV / unit.capacity)/lifetime
                         bidPrice = lossPerKW
-                        dfCapacityAuctionBids.loc[genName, :] = [bidPrice, busbar, capacityBid, deRCap, startYear, False, self.name]
+                        dfCapacityAuctionBids.loc[unit_name, :] = [bidPrice, busbar, capacityBid, deRCap, start_year, end_year, self.name]
                 else:
-                    print(capacityBid,gen.availabilityFactor)
+                    print(capacityBid, unit.availability_factor)
 
         return dfCapacityAuctionBids
     
 
     # method to get (derated) capacity in a specific year in the future, this is used for the capacity market auction
-    #construction queue indices : tGenName #0,  tCapacityKW #1, tStartYear #2, tcapSub #3, cfdBool #4, capMarketBool #5, BusNum#6
+    #construction queue indices : tGenName #0,  tCapacityKW #1, tStartYear #2, tcapSub #3, cfdBool #4, capMarketBool #5, busbar#6
     def getCapYear(self, capYear, deratedBool):
         runCap = 0.0
-        for gen in self.traditionalGen+self.renewableGen:
-            if gen.endYear>capYear and gen.startYear<=capYear:
+        for gen in self.traditional_gen+self.renewable_gen+self.energy_stores:
+            if gen.end_year > capYear and gen.start_year <= capYear:
                 if deratedBool:
-                    runCap = runCap + gen.genCapacity*gen.availabilityFactor
+                    runCap = runCap + gen.capacity*gen.availability_factor
                 else:
-                    runCap = runCap + gen.genCapacity
+                    runCap = runCap + gen.capacity
 
-        for i in range(len(self.constructionQueue)):
-            constructSYear = self.constructionQueue[i][2]
-            if constructSYear<=capYear:
-                if deratedBool:
-                    genName = self.constructionQueue[i][0]
-                    tempAvailabilityF = float(self.params["technical_parameters"].loc[genName, 'Availability_Factor']) 
-                    runCap = runCap + (self.constructionQueue[i][1] * tempAvailabilityF)
-                else:
-                    runCap = runCap + self.constructionQueue[i][1]
-
+        to_be_built = self.construction_queue.loc[self.construction_queue["start_year"]<=capYear, :]
+        for i, row in to_be_built.iterrows():
+            unit_name = row["name"]
+            capacity = row["capacity_kW"]
+            if deratedBool:
+                tempAvailabilityF = float(self.params["technical_parameters"].loc[unit_name, 'Availability_Factor'])
+                runCap = runCap + capacity * tempAvailabilityF
+            else:
+                runCap = runCap + capacity
+            
         return  runCap
 
     # method to get capacity by generation type, e.g. all solar plants, etc.
-    def calculateCapacityByType(self, listTechnologies, listBusBars):
-        temp_cols = [x+'_Derated_Capacity_kW' for x in listTechnologies] + [x+'_Capacity_kW' for x in listTechnologies]
-        capacityPerTypePerBus = pd.DataFrame(index=listBusBars, columns=temp_cols)
-        capacityPerTypePerBus.index.name = "Busbars"
-        capacityPerTypePerBus.fillna(0, inplace=True)
+    def calculateCapacityByType(self, list_gen_tech, list_storage_tech, listBusBars):
+        temp_cols = [x+'_Derated_Capacity_kW' for x in list_gen_tech] + [x+'_Capacity_kW' for x in list_gen_tech]
+        gen_cap_per_type_per_bus = pd.DataFrame(index=listBusBars, columns=temp_cols)
+        gen_cap_per_type_per_bus.index.name = "Busbars"
+        gen_cap_per_type_per_bus.fillna(0, inplace=True)
 
-        for gen in self.traditionalGen + self.renewableGen:
+        temp_cols = [x+'_Capacity_kWh' for x in list_storage_tech]
+        storage_cap_per_type_per_bus = pd.DataFrame(index=listBusBars, columns=temp_cols)
+        storage_cap_per_type_per_bus.index.name = "Busbars"
+        storage_cap_per_type_per_bus.fillna(0, inplace=True)
+        storage_cap_per_type_per_bus
+
+        for gen in self.traditional_gen + self.renewable_gen:
             name = gen.name
-            capacity = gen.genCapacity
+            capacity = gen.capacity
             bus = gen.busbar
-            availabilityFactor = gen.availabilityFactor
-            curDeRCap = capacity*availabilityFactor
+
+            curDeRCap = capacity*gen.availability_factor
             curCap = capacity
-            capacityPerTypePerBus.loc[bus, name+'_Derated_Capacity_kW'] += curDeRCap 
-            capacityPerTypePerBus.loc[bus, name+'_Capacity_kW'] += curCap 
+            gen_cap_per_type_per_bus.loc[bus, name+'_Derated_Capacity_kW'] += curDeRCap
+            gen_cap_per_type_per_bus.loc[bus, name+'_Capacity_kW'] += curCap
 
-        for store in self.energyStores:
-            capacity = store.maxCapacity
-            bus = store.busbar
-            name = 'Battery'
-            capacityPerTypePerBus.loc[bus, name+'_Derated_Capacity_kW'] += capacity 
-            capacityPerTypePerBus.loc[bus, name+'_Capacity_kW'] += capacity
+        for st in self.energy_stores:
+            capacity = st.capacity
+            bus = st.busbar
+            name = st.name
+            curDeRCap = st.charge_rate*st.availability_factor
+            curCap = st.charge_rate
+            gen_cap_per_type_per_bus.loc[bus, name+'_Capacity_kW'] += curCap #kW
+            gen_cap_per_type_per_bus.loc[bus, name+'_Derated_Capacity_kW'] += curDeRCap #kW
+            storage_cap_per_type_per_bus.loc[bus, name+'_Capacity_kWh'] += capacity # kWh
 
-        self.capacityPerTypePerBus = capacityPerTypePerBus
+        self.storage_cap_per_type_per_bus = storage_cap_per_type_per_bus
+        self.gen_cap_per_type_per_bus = gen_cap_per_type_per_bus
         return True
 
-    # add a new battery
-    def addBattery(self, batteryPower, busbar): 
-        capkWh = batteryPower*self.batteryDuration # kWh
-        chargeRate = batteryPower # kW
-        dischargeRate = batteryPower # kW
-        battery = energyStorage(capkWh,chargeRate,dischargeRate,self.year, busbar, self.BASEYEAR)
-        self.energyStores.append(battery)
-        return battery
+    def add_unit(self, unit_name, capacity, start_year, end_year, capacity_market_sub, CfD_price, busbar):
+        renewable_flag = int(self.params["technical_parameters"].loc[unit_name, "Renewable_Flag"])
+        storage_flag = int(self.params["technical_parameters"].loc[unit_name, "Storage_Flag"])
 
-    # method to add new generation plants to the generation company
-    def addGeneration(self, genName, renewableFlag, capacityKW, lifetime, startYear, endYear, age, subsidy, cfdBool, capMarketBool, BusNum, Headroom):
-        # print("Name: {0}, RenewableFlag: {1}, CapKW: {2}, startY: {3}, endY: {4}".format(genName, str(renewableFlag), str(capacityKW), str(startYear), str(endYear)))
-        if(cfdBool and capMarketBool):
-            input('****** Problem, both capacity market bool and cfd bool are true......')
-        elif(cfdBool):
-            cfdSub = subsidy # GBP/kWh
-            capitalSub = 0.0 # GBP/ kW Cap /year
-            # print('**** CfD ', cfdSub)
-            # print("Name: {0}, RenewableFlag: {1}, CapKW: {2}, startY: {3}, endY: {4}".format(genName, str(renewableFlag), str(capacityKW), str(startYear), str(endYear)))
-        elif(capMarketBool):
-            cfdSub = 0.0 # GBP/kWh
-            capitalSub = subsidy # GBP/ kW Cap /year
-            # print('**** Capactiy Market ', capitalSub)
-            # print("Name: {0}, RenewableFlag: {1}, CapKW: {2}, startY: {3}, endY: {4}".format(genName, str(renewableFlag), str(capacityKW), str(startYear), str(endYear)))
-        else:
-            capitalSub = 0.0 # GBP/ kW Cap /year
-            cfdSub = 0.0 # GBP/kWh
-            
-        if(startYear> self.year): # not built yet
+        if start_year > self.year: # not built yet
             print('Add to construction queue')
-            self.addToConstructionQueue(genName, capacityKW, startYear, subsidy, cfdBool, capMarketBool, BusNum)
-
-        elif(endYear<self.year):
+            self.addToConstructionQueue(unit_name, capacity, start_year, capacity_market_sub, CfD_price, busbar)
+        elif end_year < self.year:
             print('Plant already decommissioned, not adding to capacity!')
 
+        if(capacity_market_sub > 0 and CfD_price > 0):
+            raise ValueError('****** Problem, both capacity market bool and cfd bool are true......')
         else:
-            list_plants = list(self.params["technical_parameters"].index)
-            if genName in list_plants: #check if the genName is recognised
- 
-                genTypeID = int(self.params["technical_parameters"].loc[genName, "TypeID"])
-                if renewableFlag:
-                    newGen = renewableGenerator(genName, genTypeID,capacityKW, lifetime, cfdSub, BusNum, Headroom, self.BASEYEAR) # offshore
-                    self.renewableGen.append(newGen)
-                else:
-                    newGen = traditionalGenerator(genName, genTypeID,capacityKW, lifetime, BusNum, Headroom, self.BASEYEAR)
-                    self.traditionalGen.append(newGen)
-                    
-            economic_param_df = self.params["economic_parameters"]
-            newGen.startYear = startYear
-            newGen.endYear = endYear
-            newGen.age = age
-            newGen.CFDPrice = cfdSub
-            newGen.capitalSub = capitalSub
-            newGen.capitalCost = economic_param_df.loc[(economic_param_df["Key"]==genName) & (economic_param_df["Cost Type"]=="CAPEX"), self.year].values[0]/1000
-            newGen.fixedOandMCost = economic_param_df.loc[(economic_param_df["Key"]==genName) & (economic_param_df["Cost Type"]=="OPEX"), self.year].values[0]/1000
-            newGen.variableOandMCost = economic_param_df.loc[(economic_param_df["Key"]==genName) & (economic_param_df["Cost Type"]=="Variable Other Work Costs"), self.year].values[0]/1000
-            newGen.preDevTime = int(self.params["technical_parameters"].loc[genName, "PrevDevTime_Years"]) # years (not used)
-            newGen.constructionTime = int(self.params["technical_parameters"].loc[genName, "Construction_Time_Years"]) # years
-            newGen.totConstructionTime = newGen.preDevTime + newGen.constructionTime# years (not used)
-            newGen.capacityFactor = float(self.params["technical_parameters"].loc[genName, "Capacity_Factor"]) 
-            newGen.availabilityFactor = float(self.params["technical_parameters"].loc[genName, "Availability_Factor"]) 
-            newGen.opEmissionsPkW = float(self.params["technical_parameters"].loc[genName, "GHG_Emissions_kgCO2/kWh"]) # kgCO2/kWh
-            newGen.curCO2Price = self.curCO2Price
-            newGen.discountR = self.discountR
-            if renewableFlag:
-                # print("Add Profile")
-                path_profiles = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Jan 2022 saved\Code_WH'
-                gen_profile_name = self.params["technical_parameters"].loc[genName, "Profile"]
-                newGen.loadScaleGenProfile(path_profiles+os.path.sep+gen_profile_name)
+            if storage_flag:
+                battery_duration = float(self.params["technical_parameters"].loc[unit_name, "Storage_duration_hour"])
+                capkWh = capacity*battery_duration # kWh
+                charge_rate = capacity # kW
+                discharge_rate = capacity # kW
+                
+                unit = energyStorage(unit_name, capkWh, charge_rate, discharge_rate, self.year, busbar, self.BASEYEAR)
+                self.energy_stores.append(unit)
             else:
-                # print("Add wholesale prices for primary fuel")
-                path_wholesale_price = self.params["path_wholesale_fuel_price"]
-                targetFuel = self.params["technical_parameters"].loc[genName, "Primary_Fuel"]
-                fuelPricePath = Utils.getPathWholesalePriceOfFuel(path_wholesale_price, targetFuel, self.BASEYEAR)
-                newGen.loadFuelCost(fuelPricePath)
+                if renewable_flag:
+                    unit = renewableGenerator(unit_name, capacity, busbar, self.BASEYEAR) # offshore
+                    path_profiles = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Jan 2022 saved\Code_WH'
+                    gen_profile_name = self.params["technical_parameters"].loc[unit_name, "Profile"]
+                    unit.loadScaleGenProfile(path_profiles+os.path.sep+gen_profile_name)
+
+                    self.renewable_gen.append(unit)
+                else:
+                    unit = traditionalGenerator(unit_name, capacity, busbar, self.BASEYEAR)
+                    unit.efficiency = float(self.params["technical_parameters"].loc[unit_name, "Efficiency"]) 
+                    # print("Add wholesale prices for primary fuel")
+                    path_wholesale_price = self.params["path_wholesale_fuel_price"]
+                    targetFuel = self.params["technical_parameters"].loc[unit_name, "Primary_Fuel"]
+                    fuelPricePath = Utils.getPathWholesalePriceOfFuel(path_wholesale_price, targetFuel, self.BASEYEAR)
+                    unit.loadFuelCost(fuelPricePath)
+                    self.traditional_gen.append(unit)
+                        
+            economic_param_df = self.params["economic_parameters"]
+            unit.start_year = start_year
+            unit.end_year = end_year
+            unit.CfD_price = CfD_price
+            unit.capacity_market_sub = capacity_market_sub
+            unit.capacity_factor = float(self.params["technical_parameters"].loc[unit_name, "Capacity_Factor"])
+            unit.capital_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="CAPEX"), self.year].values[0]/1000
+            unit.fixed_OM_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="OPEX"), self.year].values[0]/1000
+            unit.variable_OM_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="Variable Other Work Costs"), self.year].values[0]/1000
+            unit.construction_time = int(self.params["technical_parameters"].loc[unit_name, "Construction_Time_Years"]) # years
+            unit.availability_factor = float(self.params["technical_parameters"].loc[unit_name, "Availability_Factor"]) 
+            unit.ghg_emissions_per_kWh = float(self.params["technical_parameters"].loc[unit_name, "GHG_Emissions_kgCO2/kWh"]) # kgCO2/kWh
+            unit.current_CO2_price = self.current_CO2_price
+            unit.discount_rate = self.discount_rate
 
             # add the technology name to the list of plants that can be built by this company
-            if genName not in self.listTechnologyPortfolio:
-                self.listTechnologyPortfolio.append(genName)
-        return True
+            if unit_name not in self.list_technology_portfolio:
+                self.list_technology_portfolio.append(unit_name)
+
+            return True
+
+    # # add a new battery
+    # def addBattery(self, name, batteryPower, capacity_market_sub, CfD_price, busbar):
+
+    #     return battery
+
+    # # method to add new generation plants to the generation company
+    # def addGeneration(self, unit_name, capacityKW, lifetime, start_year, end_year, age, capacity_market_sub, CfD_price, busbar):
+    #     renewableFlag = int(self.params["technical_parameters"].loc[unit_name, "Renewable_Flag"])
+    #     # print("Name: {0}, RenewableFlag: {1}, CapKW: {2}, startY: {3}, endY: {4}".format(unit_name, str(renewableFlag), str(capacityKW), str(start_year), str(end_year)))
+    #     if(capacity_market_sub > 0 and CfD_price > 0):
+    #         raise ValueError('****** Problem, both capacity market bool and cfd bool are true......')
+    #     if start_year > self.year: # not built yet
+    #         print('Add to construction queue')
+    #         self.addToConstructionQueue(unit_name, capacityKW, start_year, capacity_market_sub, CfD_price, busbar)
+    #     elif end_year < self.year:
+    #         print('Plant already decommissioned, not adding to capacity!')
+
+    #     else:
+    #         if unit_name in self.params["gen_tech_list"]: #check if the unit_name is recognised
+    #             if renewableFlag:
+    #                 unit = renewable_generator(unit_name, capacityKW, lifetime, CfD_price, busbar, self.BASEYEAR) # offshore
+    #                 self.renewable_gen.append(unit)
+    #             else:
+    #                 unit = traditionalGenerator(unit_name, capacityKW, lifetime, busbar, self.BASEYEAR)
+    #                 self.traditional_gen.append(unit)
+                    
+    #         economic_param_df = self.params["economic_parameters"]
+    #         unit.start_year = start_year
+    #         unit.end_year = end_year
+    #         unit.age = age
+    #         unit.CfD_price = CfD_price
+    #         unit.capacity_market_sub = capacity_market_sub
+             
+    #         unit.capital_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="CAPEX"), self.year].values[0]/1000
+    #         unit.fixed_OM_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="OPEX"), self.year].values[0]/1000
+    #         unit.variable_OM_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="Variable Other Work Costs"), self.year].values[0]/1000
+    #         unit.preDevTime = int(self.params["technical_parameters"].loc[unit_name, "PrevDevTime_Years"]) # years (not used)
+    #         unit.construction_time = int(self.params["technical_parameters"].loc[unit_name, "Construction_Time_Years"]) # years
+    #         unit.totConstructionTime = unit.preDevTime + unit.construction_time# years (not used)
+    #         unit.capacity_factor = float(self.params["technical_parameters"].loc[unit_name, "Capacity_Factor"]) 
+    #         unit.availability_factor = float(self.params["technical_parameters"].loc[unit_name, "Availability_Factor"]) 
+    #         unit.ghg_emissions_per_kWh = float(self.params["technical_parameters"].loc[unit_name, "GHG_Emissions_kgCO2/kWh"]) # kgCO2/kWh
+    #         unit.current_CO2_price = self.current_CO2_price
+    #         unit.discount_rate = self.discount_rate
+
+    #         if renewableFlag:
+    #             # print("Add Profile")
+    #             path_profiles = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Jan 2022 saved\Code_WH'
+    #             gen_profile_name = self.params["technical_parameters"].loc[unit_name, "Profile"]
+    #             unit.loadScaleGenProfile(path_profiles+os.path.sep+gen_profile_name)
+    #         else:
+    #             unit.efficiency = float(self.params["technical_parameters"].loc[unit_name, "Efficiency"]) 
+    #             # print("Add wholesale prices for primary fuel")
+    #             path_wholesale_price = self.params["path_wholesale_fuel_price"]
+    #             targetFuel = self.params["technical_parameters"].loc[unit_name, "Primary_Fuel"]
+    #             fuelPricePath = Utils.getPathWholesalePriceOfFuel(path_wholesale_price, targetFuel, self.BASEYEAR)
+    #             unit.loadFuelCost(fuelPricePath)
+
+    #         # add the technology name to the list of plants that can be built by this company
+    #         if unit_name not in self.list_technology_portfolio:
+    #             self.list_technology_portfolio.append(unit_name)
+    #     return True
     
 
 

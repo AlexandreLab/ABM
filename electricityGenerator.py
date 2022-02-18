@@ -1,159 +1,158 @@
-import random
-from random import randint
-from collections import namedtuple
 import numpy as np
-import math
-import Utils
-import statistics
+from asset import asset
 
-
-class electricityGenerator():
+class electricityGenerator(asset):
     
     
-    def __init__(self, genName, genTypeID, capacity, lifetime, numBus, headroom, BASEYEAR):
+    def __init__(self, genName, capacity, numBus, BASEYEAR):
 
         self.name = genName
-        self.timeSteps = 8760
+        self.timesteps = 8760
         
         self.busbar = numBus
-        self.headroom = headroom
-
-        self.genTypeID = genTypeID
-        if lifetime == 0 :
-            raise ValueError('The lifetime cannot be equal to 0 for the asset {0} with a capacity of {1}'.format(genName, capacity))
-
 
         #Technical parameters
-        self.opEmissionsPkW = 0.0 # kg of CO2 emitted per kWh generated
-        self.lifetime = lifetime
-        self.genCapacity = capacity #kW
-        self.renewableBool = False
-        self.yearlyEmissions=0.0
-        self.yearlyEnergyGen=0.0
-        self.energyGenerated = np.zeros(self.timeSteps)
-        self.hourlyEmissions = np.zeros(self.timeSteps)
-        self.capacityFactor = 0
-        self.availabilityFactor = 0
+        self.ghg_emissions_per_kWh = 0.0 # kg of CO2 emitted per kWh generated
+        self.lifetime = 0
+        self.efficiency = 0
+        self.capacity = capacity #kW
+        self.renewable_flag = False
+        self.yearly_emissions = 0.0
+        self.yearly_energy_generated = 0.0
+        self.hourly_energy_generated = np.zeros(self.timesteps)
+        self.hourly_emissions = np.zeros(self.timesteps)
+        self.capacity_factor = 0
+        self.availability_factor = 0
 
         # Construction parameters
-        self.preDevTime = 0 # years
-        self.constructionTime = 0 # years
-        self.totConstructionTime = 0 # years
+        self.pre_dev_time = 0 # years
+        self.construction_time = 0 # years
+        self.total_construction_time = 0 # years
 
-        self.age = 0
-        self.startYear = 0
-        self.endYear = 0
+        self.start_year = 0
+        self.end_year = 0
         self.BASEYEAR = BASEYEAR
         self.year = self.BASEYEAR
 
         #Economic parameters
-        self.yearlyIncome = 0.0
-        self.yearlyCost = 0.0
-        self.yearlyProfit=0.0
-        self.hourlyProfit = np.zeros(self.timeSteps)
-        self.hourlyIncome = np.zeros(self.timeSteps)
-        self.hourlyCost = np.zeros(self.timeSteps)
-        self.marginalCost = np.zeros(self.timeSteps)
-        self.yearlyFuelCost = list()
+        self.yearly_income = 0.0
+        self.yearly_cost = 0.0
+        self.yearly_profit =0.0
+        self.hourly_profit = np.zeros(self.timesteps)
+        self.hourly_income = np.zeros(self.timesteps)
+        self.hourly_cost = np.zeros(self.timesteps)
+        self.marginal_cost = np.zeros(self.timesteps)
+        self.future_fuel_cost = list() # list of projected fuel costs
 
-        self.yearlyProfitList = list() # not sure of the use of this variable
+        self.yearly_profit_list = list() # keep track of the past profit of a plant to see if it is profitable
 
-        self.fuelCost = 0.0 #£/kWh
-        self.curCO2Price = 0.0 #£/tCO2
-        self.fixedOandMCost = 0.0 #£/kW
-        self.variableOandMCost = 0.0 #£/kWh
-        self.capitalCost = 0.0 #£/kW
-        self.wasteCost = 0.0
+        self.fuel_cost = 0.0 #£/kWh_electricity
+        self.currrent_CO2_price = 0.0 #£/tCO2
+        self.fixed_OM_cost = 0.0 #£/kW
+        self.variable_OM_cost = 0.0 #£/kWh_electricity
+        self.capital_cost = 0.0 #£/kW
+        self.waste_cost = 0.0
+        self.cost_of_generating_electricity = 0  #£/kWh_electricity
 
-        self.connectionFee = 0.5174*self.headroom*0.001-2415.7
-        self.capitalSub = 0.0 # no subsidies for capital unless specified £ / kW cap per year
-        self.discountR = 0
-        self.CFDPrice = 0 # GBP
+        self.TNUoS_charge = 0 #£/kW
+        self.connection_fee = 0 # to be defined
+        self.capacity_market_sub = 0.0 # no subsidies for capital unless specified £ / kW cap per year
+        self.discount_rate = 0
+        self.CfD_price = 0 # GBP/kWh
 
-        self.wholesaleEPrice = np.zeros(self.timeSteps)
-        self.yearlySolarFiT = np.array([]) # initialize as an empty array
+        self.yearly_solar_FiT = np.array([]) # initialize as an empty array
 
     def calculateHourlyData(self):
-        temp_arr_emissions = self.energyGenerated*self.opEmissionsPkW #kgCO2
-        temp_arr_fuelCost = self.energyGenerated*self.fuelCost
-        temp_arr_variableOM = self.energyGenerated*self.variableOandMCost
-        temp_arr_carbonCost = temp_arr_emissions/1000.0*self.curCO2Price
-        temp_arr_waste = self.energyGenerated*self.wasteCost
+        temp_arr_emissions = self.hourly_energy_generated*self.ghg_emissions_per_kWh #kgCO2
+        temp_arr_fuelCost = self.hourly_energy_generated*self.fuel_cost
+        temp_arr_variableOM = self.hourly_energy_generated*self.variable_OM_cost
+        temp_arr_carbonCost = temp_arr_emissions/1000.0*self.currrent_CO2_price
+        temp_arr_waste = self.hourly_energy_generated*self.waste_cost
         
+
         # margin cost is 0 if the current generation is 0
-        temp_arr_marginalCost = np.sum([temp_arr_fuelCost,temp_arr_waste, temp_arr_variableOM, temp_arr_carbonCost], axis=0)
-        temp_arr_marginalCost = np.divide(temp_arr_marginalCost, self.energyGenerated, out=np.zeros_like(temp_arr_marginalCost), where=self.energyGenerated!=0)
+        temp_arr_marginal_cost = np.sum([temp_arr_fuelCost, temp_arr_waste, temp_arr_variableOM, temp_arr_carbonCost], axis=0)
+        temp_arr_marginal_cost = np.divide(temp_arr_marginal_cost, self.hourly_energy_generated, out=np.zeros_like(temp_arr_marginal_cost), where=self.hourly_energy_generated != 0)
+        # if self.yearly_energy_generated > 0:
+        #     TNUoS_charges_per_hour = (self.TNUoS_charge*self.capacity*self.availability_factor)/self.yearly_energy_generated
+        # else:
+        #     TNUoS_charges_per_hour = 0
+        # temp_arr_marginal_cost = temp_arr_marginal_cost + TNUoS_charges_per_hour
 
-        temp_arr_hourlyCost = np.sum([temp_arr_fuelCost,temp_arr_waste, temp_arr_variableOM, temp_arr_carbonCost], axis=0) + self.fixedOandMCost*self.genCapacity/8760
-
-        self.yearlyCarbonCost = np.sum(temp_arr_carbonCost)
-        self.hourlyCost = temp_arr_hourlyCost
-        self.marginalCost = temp_arr_marginalCost
-        self.hourlyEmissions = temp_arr_emissions 
-        self.yearlyCost = np.sum(temp_arr_hourlyCost)
-        self.yearlyEmissions = np.sum(temp_arr_emissions)
+        temp_arr_hourly_cost = np.sum([temp_arr_fuelCost, temp_arr_waste, temp_arr_variableOM, temp_arr_carbonCost], axis=0)
+        temp_arr_hourly_cost = temp_arr_hourly_cost + (self.fixed_OM_cost+self.TNUoS_charge*self.availability_factor)*self.capacity/8760
+        
+        self.yearly_carbon_cost = np.sum(temp_arr_carbonCost)
+        self.hourly_cost = temp_arr_hourly_cost
+        self.marginal_cost = temp_arr_marginal_cost
+        self.hourly_emissions = temp_arr_emissions
+        self.yearly_cost = np.sum(temp_arr_hourly_cost)
+        self.yearly_emissions = np.sum(temp_arr_emissions)
         return True
 
-    def calcRevenue(self):
-        if(self.CFDPrice>0):
-            temp_arr_hourlyIncome = self.energyGenerated * self.CFDPrice
+    def calc_revenue(self, hourly_wholesale_price):
+        if(self.CfD_price>0):
+            temp_arr_hourly_income = self.hourly_energy_generated * self.CfD_price
         else:
             if(self.name=='Solar'):
                 y = self.year- self.BASEYEAR
-                if(y<len(self.yearlySolarFiT)):
-                    temp_arr_hourlyIncome = self.energyGenerated * self.yearlySolarFiT[y]
+                if(y<len(self.yearly_solar_FiT)):
+                    temp_arr_hourly_income = self.hourly_energy_generated * self.yearly_solar_FiT[y]
                 else:
-                    temp_arr_hourlyIncome = np.multiply(self.energyGenerated,self.wholesaleEPrice) + ((self.capitalSub*self.genCapacity)/(365*24))
+                    temp_arr_hourly_income = np.multiply(self.hourly_energy_generated, hourly_wholesale_price) + ((self.capacity_market_sub*self.capacity)/(365*24))
             else:
-                temp_arr_hourlyIncome = np.multiply(self.energyGenerated,self.wholesaleEPrice) + ((self.capitalSub*self.genCapacity)/(365*24))
+                temp_arr_hourly_income = np.multiply(self.hourly_energy_generated, hourly_wholesale_price) + ((self.capacity_market_sub*self.capacity)/(365*24))
 
-        temp_arr_hourlyProfit = np.subtract(temp_arr_hourlyIncome, self.hourlyCost)
+        temp_arr_hourly_profit = np.subtract(temp_arr_hourly_income, self.hourly_cost)
             
-        self.hourlyProfit = temp_arr_hourlyProfit
-        self.hourlyIncome = temp_arr_hourlyIncome
-        self.yearlyProfit = np.sum(temp_arr_hourlyProfit)
-        self.yearlyIncome = np.sum(temp_arr_hourlyIncome)
+        self.hourly_profit = temp_arr_hourly_profit
+        self.hourly_income = temp_arr_hourly_income
+        self.yearly_profit = np.sum(temp_arr_hourly_profit)
+        self.yearly_income = np.sum(temp_arr_hourly_income)
 
-        totalInitialInvestment = self.capitalCost*self.genCapacity + self.connectionFee
-        self.ROI = (self.yearlyProfit*(1-(1+self.discountR)**-self.lifetime)/self.discountR - totalInitialInvestment)/totalInitialInvestment
-        self.NPV = self.yearlyProfit*(1-(1+self.discountR)**-self.lifetime)/self.discountR - totalInitialInvestment
+        total_initial_investment = self.capital_cost*self.capacity + self.connection_fee
+        self.ROI = (self.yearly_profit*(1-(1+self.discount_rate)**-self.lifetime)/self.discount_rate - total_initial_investment)/total_initial_investment
+        self.NPV = self.yearly_profit*(1-(1+self.discount_rate)**-self.lifetime)/self.discount_rate - total_initial_investment
+
+        #calculate the cost of producing 1 kWh of electricity for this plant used to calculate the merit order for the next year
+        self.cost_of_generating_electricity = self.fuel_cost+self.variable_OM_cost+self.ghg_emissions_per_kWh/1000.0*self.currrent_CO2_price+self.waste_cost
 
     # update date for next year
-    def incrementYear(self, CO2Price):
-        self.yearlyProfitList.append(self.yearlyProfit)
-        if(self.age>=15):
-            self.CFDPrice = 0.0
+    def increment_year(self, CO2Price):
+        self.yearly_profit_list.append(self.yearly_profit)
+        age = self.year - self.start_year
+        if(age >= 15):
+            self.CfD_price = 0.0
         self.year = self.year + 1
-        self.age = self.age + 1
         y = self.year - self.BASEYEAR
         
-        self.curCO2Price = CO2Price
-        if not self.renewableBool:
-            self.fuelCost = self.yearlyFuelCost[y]    
-            self.energyGenerated = np.zeros(self.timeSteps)
-            self.hourlyEmissions = np.zeros(self.timeSteps)
+        self.currrent_CO2_price = CO2Price
+        if not self.renewable_flag:
+            self.fuel_cost = self.future_fuel_cost[y]/self.efficiency
+            self.hourly_energy_generated = np.zeros(self.timesteps)
+            self.hourly_emissions = np.zeros(self.timesteps)
         self.resetYearValueRecord()
         return True
 
     # reset values for next year
     def resetYearValueRecord(self):
 
-        if not self.renewableBool:
-            self.yearlyEnergyGen=0.0
-        self.yearlyCost = 0.0
-        self.yearlyProfit = 0
-        self.yearlyIncome = 0
-        self.yearlyEmissions = 0
-        self.yearlyCarbonCost = 0
+        if not self.renewable_flag:
+            self.yearly_energy_generated=0.0
+        self.yearly_cost = 0.0
+        self.yearly_profit = 0
+        self.yearly_income = 0
+        self.yearly_emissions = 0
+        self.yearly_carbon_cost = 0
         
-        self.hourlyCost = np.zeros(self.timeSteps)
-        self.marginalCost = np.zeros(self.timeSteps)
-        self.hourlyProfit = np.zeros(self.timeSteps)
+        self.hourly_cost = np.zeros(self.timesteps)
+        self.marginal_cost = np.zeros(self.timesteps)
+        self.hourly_profit = np.zeros(self.timesteps)
         self.NPV = 0
         
     def getActCapFactor(self):
-        maxEnergyGen = self.genCapacity*24*365
-        self.actualCapFac = self.yearlyEnergyGen/maxEnergyGen
+        maxEnergyGen = self.capacity*24*365
+        self.actualCapFac = self.yearly_energy_generated/maxEnergyGen
         return self.actualCapFac
 
     def estimateCfDSubsidy(self):

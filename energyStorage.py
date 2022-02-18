@@ -1,200 +1,156 @@
-import random
-from random import randint
-from collections import namedtuple
 import numpy as np
-import math
-import Utils
+from asset import asset
+from Utils import timer_func
 
-class energyStorage():
+class energyStorage(asset):
     
-    
-    def __init__(self,capacity,chargeRate,dischargeRate, year,NumBus, BASEYEAR):
+    def __init__(self, name, capacity, charge_rate, discharge_rate, year, NumBus, BASEYEAR):
 
-        self.age = 0.0
+        self.name = name
+        self.timesteps = 8760
+
         self.BASEYEAR = BASEYEAR
         self.year = year
         self.busbar = NumBus
-        self.capitalSub = 0.0 #50.0 # variable for subsidies, unit GBP per kW cap per year
-        
-        self.discountR = 0.1
-        self.opCostPkW = 0.14 # generation cost for 1kW GBP
-        self.estimatedROI = 0.0
+
+        #Economic parameters
+        self.discount_rate = 0
+        self.ROI = 0
         self.NPV = 0.0
-            
-        self.maxCapacity = capacity
-        self.curCapacity = 0.0
-        self.chargeRate = chargeRate
-        self.dischargeRate = dischargeRate
-        self.hourlyStorage = np.array(8760) # real-time SoC
-        self.hourlyEnergyExchange = np.array(8760)
-        self.name = 'Battery Storage'
-        self.capSubKWCap = 0.0 # cap market
-        self.GBmaxBuildRate = 590000.0 # kW
-        self.maxBuildRate = 590000.0/56 # 56 companies in model
 
-        self.subsNeeded = 0.0
-        self.curYearDischargeKWh = 0.0
-        self.yearlyProfit=0.0
-        self.yearlyIncome = 0.0
-        self.yearlyCost = 0.0
-        self.NYyearlyCost = 0.0
-        self.NYyearlyProfit = 0.0
-
-        self.marginalCost = np.zeros(8760)
-
-        self.yearlyCapSubs = 0.0 # also cap market
-
-        self.yearlyProfitList = list()
-        self.yearlyIncomeList = list()
-        self.yearlyCostList = list()
-        self.years = list()
-
-        CostDataFile = 'Battery/YearlyCostData.csv'
-        self.costData = Utils.readCSV(CostDataFile)
-
-        # figures based on Li-Ion Battery from 'A simple introduction to the economics of storage'
-        # - David Newbery
-        # https://ens.dk/en/our-services/projections-and-models/technology-data/technology-data-energy-storage
-
-        y = self.year - self.BASEYEAR
-        self.capitalCostInverter = self.costData['power capital cost'].iloc[y] #for discharge rate
-        self.otherCost = self.costData['other'].iloc[y]
-        self.capitalCostStorage = self.costData['energy capital cost'].iloc[y] + self.otherCost #for capacity
-        self.fixedOandMCost = self.costData['fix'].iloc[y]
-        self.variableOandMCost =  self.costData['variable'].iloc[y]
-        self.lifetime = self.costData['Lifetime'].iloc[y]
-
-        self.totalLifeCAPEX = (self.capitalCostStorage * self.maxCapacity) + (self.capitalCostInverter*self.dischargeRate)
-        self.capitalCostPerHour = self.totalLifeCAPEX/(8760.0 * self.lifetime) # GBP/hr
-        self.fixedOandMPerHour = (self.fixedOandMCost * self.dischargeRate)/(8760.0) # GBP/hr
-
-        self.wholesaleEPriceProf = np.zeros(8760)
-
-        # must also read cost data for next year to estimate ROI of future investment
-        self.updateNextYearCosts(y+1)
-
-    # update cost data for next year (need this to estimate ROI for next year when investing)
-    def updateNextYearCosts(self, indx):
-
-        if(indx>=len(self.costData['Lifetime'])):
-            indx = len(self.costData['Lifetime'])-1 #last year?
-        
-        self.NEXTYEARcapitalCostInverter = self.costData['power capital cost'].iloc[indx]
-        self.NEXTYEARotherCost = self.costData['other'].iloc[indx]
-        self.NEXTYEARcapitalCostStorage = self.costData['energy capital cost'].iloc[indx] + self.NEXTYEARotherCost
-        self.NEXTYEARfixedOandMCost = self.costData['fix'].iloc[indx]
-        self.NEXTYEARvariableOandMCost =  self.costData['variable'].iloc[indx]
-        self.NEXTYEARlifetime = self.costData['Lifetime'].iloc[indx]
-
-        self.NEXTYEARtotalLifeCAPEX = (self.NEXTYEARcapitalCostStorage * self.maxCapacity) + (self.NEXTYEARcapitalCostInverter*self.dischargeRate)
-        self.NEXTYEARcapitalCostPerHour = self.NEXTYEARtotalLifeCAPEX/(8760.0 * self.NEXTYEARlifetime) # GBP/hr
-        self.NEXTYEARfixedOandMPerHour = (self.NEXTYEARfixedOandMCost * self.dischargeRate)/(8760.0) # GBP/hr
- 
-    def setWholesaleElecPrice(self, priceProfile):
-        self.wholesaleEPriceProf = priceProfile.copy()
-        self.curWholesaleElecPrice = np.mean(self.wholesaleEPriceProf)
+        #Technical parameters
+        self.capacity = capacity # kWh
+        self.current_capacity = 0.0 # kWh 
+        self.charge_rate = charge_rate # kW
+        self.discharge_rate = discharge_rate # kW
+        self.hourly_storage = np.array(8760) # real-time SoC kWh
+        self.hourly_energy_exchange = np.array(8760) # kW
+        self.lifetime = 15
+        self.actualCapFac = (self.capacity/self.charge_rate)/24 # number of hours per cycle / 24
+        self.yearly_energy_stored = 0
+        self.availability_factor = 0
+        self.construction_time = 0
+        self.ghg_emissions_per_kWh = 0 # kg of CO2 emitted per kWh generated
+        self.start_year = 0
+        self.end_year = 0
 
 
+        #Economic parameters
+        self.yearly_income = 0.0
+        self.yearly_cost = 0.0
+        self.yearly_profit =0.0
+        self.hourly_profit = np.zeros(self.timesteps)
+        self.hourly_income = np.zeros(self.timesteps)
+        self.hourly_cost = np.zeros(self.timesteps)
+        self.marginal_cost = np.zeros(self.timesteps)
+        self.yearly_emissions = 0.0
+
+
+        self.yearly_profit_list = list() # keep track of the past profit of a plant to see if it is profitable
+
+        self.fuel_cost = 0.0 #£/kWh_electricity
+        self.current_CO2_price = 0.0 #£/tCO2
+        self.fixed_OM_cost = 0.0 #£/kW
+        self.variable_OM_Cost = 0.0 #£/kWh_electricity
+        self.capital_cost = 0.0 #£/kW
+        self.waste_cost = 0.0
+        self.cost_of_generating_electricity = 0  #£/kWh_electricity
+
+        self.connection_fee = 0 # to be defined
+        self.capacity_market_sub = 0.0 # no subsidies for capital unless specified £ / kW cap per year
+        self.discount_rate = 0
+        self.CFDPrice = 0 # GBP
+        self.TNUoS_charge = 0 #£/kW
+
+    # @timer_func # to get the execution time
     def chargingDischargingBattery(self, arr_chargeRate, arr_dischargeRate, netDemand):
-        arr_charge = arr_chargeRate*self.maxCapacity # how much we want to charge by
-        arr_charge = arr_charge.clip(max=self.chargeRate) #cap it to the max chargeRate
+        arr_charge = arr_chargeRate*self.capacity # how much we want to charge by
+        arr_charge = arr_charge.clip(max=self.charge_rate) #cap it to the max charge_rate (should not be useful)
 
-        arr_discharge = arr_dischargeRate*self.maxCapacity # how much we want to charge by
-        arr_discharge = arr_discharge.clip(max=self.dischargeRate) #cap it to the max dischargeRate
-        arr_discharge = np.min([arr_discharge, netDemand], axis=0)  # we should not discharge more than the demand
+        arr_discharge = arr_dischargeRate*self.capacity # how much we want to charge by
+        arr_discharge = arr_discharge.clip(max=self.discharge_rate) #cap it to the max discharge_rate (should not be useful)
+        arr_discharge = np.min([arr_discharge, netDemand], axis=0)  # we should not discharge more than the demand 
         
-        curCapacity = 0
+        current_capacity = 0
         list_energyStored = []
         list_curCapacity = []
         for val in np.subtract(arr_charge, arr_discharge):
             energyStored = val
-            if val>0: #charging
-                if curCapacity+val>=self.maxCapacity: # battery is full
-                    energyStored = self.maxCapacity-self.curCapacity
-                    curCapacity = self.maxCapacity
+            if val > 0: #charging
+                if current_capacity+val >= self.capacity: # battery is full
+                    energyStored = self.capacity-self.current_capacity
+                    current_capacity = self.capacity
                 else:
-                    curCapacity = curCapacity + energyStored
+                    current_capacity = current_capacity + energyStored
             else: #discharging
-                if curCapacity-val<= 0: # battery is empty
-                    energyStored = -curCapacity
-                    curCapacity = 0
+                if current_capacity-val <= 0: # battery is empty
+                    energyStored = -current_capacity
+                    current_capacity = 0
                 else:
-                    curCapacity = curCapacity + energyStored
+                    current_capacity = current_capacity + energyStored
             list_energyStored.append(energyStored)
-            list_curCapacity.append(curCapacity)
+            list_curCapacity.append(current_capacity)
 
-        self.hourlyEnergyExchange = np.array(list_energyStored) #+charging, -discharging
-        self.hourlyStorage = np.array(list_curCapacity)
+        self.hourly_energy_exchange = np.array(list_energyStored) #+charging, -discharging
+        self.hourly_storage = np.array(list_curCapacity)
+        self.yearly_energy_stored = np.sum(self.hourly_energy_exchange.clip(min=0))
          
         #return the netDemand minus what was stored in the battery and what was released from the battery
-        return np.subtract(netDemand, -self.hourlyEnergyExchange)
+        return np.subtract(netDemand, -self.hourly_energy_exchange)
 
-    def updateProfit(self, wholesaleProf=[]):
-        if len(wholesaleProf)>0:
-            self.wholesaleEPriceProf = wholesaleProf.copy()
+    def calc_revenue(self, hourly_wholesale_price):
+        hourly_variable_OM = np.absolute(self.hourly_energy_exchange) * self.variable_OM_Cost
 
-        arr_hourlyVariableOM = np.absolute(self.hourlyEnergyExchange) * self.variableOandMCost
+        hourly_income = self.hourly_energy_exchange.copy() # Income occurs when discharging the battery
+        hourly_income = -hourly_income.clip(max=0) #remove the values when the battery is charging
+        hourly_income = np.multiply(hourly_income, hourly_wholesale_price) + ((self.capacity_market_sub*self.discharge_rate)/(365*24))
 
-        arr_hourlyIncome = self.hourlyEnergyExchange.copy() # Income occurs when discharging the battery
-        arr_hourlyIncome = -arr_hourlyIncome.clip(max=0) #remove the values when the battery is charging
-        arr_hourlyIncome = np.multiply(arr_hourlyIncome, self.wholesaleEPriceProf) + ((self.capitalSub*self.dischargeRate)/(365*24))
+        hourly_cost = self.hourly_energy_exchange.copy() # Charging cost occurs when charging the battery
+        hourly_cost = hourly_cost.clip(min=0) #remove the values when the battery is discharging
+        hourly_cost = np.multiply(hourly_cost, hourly_wholesale_price)
 
-        arr_hourlyChargeCost = self.hourlyEnergyExchange.copy() # Charging cost occurs when charging the battery
-        arr_hourlyChargeCost = arr_hourlyChargeCost.clip(min=0) #remove the values when the battery is discharging
-        arr_hourlyChargeCost = np.multiply(arr_hourlyChargeCost, self.wholesaleEPriceProf)
+        hourly_cost = np.add(hourly_cost, hourly_variable_OM) + self.fixed_OM_cost*self.capacity/8760
+        hourly_profit = np.subtract(hourly_income, hourly_cost)
 
-        arr_hourlyCost = np.add(arr_hourlyChargeCost, arr_hourlyVariableOM) + self.capitalCostPerHour + self.fixedOandMPerHour
-        arr_hourlyProfit = np.subtract(arr_hourlyIncome, arr_hourlyCost)
+        self.marginal_cost = np.zeros(8760)
+        self.marginal_cost[np.where(self.hourly_energy_exchange < 0)] = self.variable_OM_Cost #hourly_energy_exchange: +charging, -discharging
+        self.hourly_profit = hourly_profit
+        self.hourly_income = hourly_income
+        self.yearly_cost = np.sum(hourly_cost)
+        self.yearly_profit = np.sum(hourly_profit)
+        self.yearly_income = np.sum(hourly_income)
 
-        arr_NYhourlyVariableOM = np.absolute(self.hourlyEnergyExchange) * self.NEXTYEARvariableOandMCost
-        arr_NYhourlyCost = np.add(arr_hourlyChargeCost, arr_NYhourlyVariableOM) + self.NEXTYEARcapitalCostPerHour + self.NEXTYEARfixedOandMPerHour
-        arr_NYhourlyProfit = np.subtract(arr_hourlyIncome, arr_NYhourlyCost)
+        total_initial_investment = self.capital_cost*self.capacity + self.connection_fee
+        self.ROI = (self.yearly_profit*(1-(1+self.discount_rate)**-self.lifetime)/self.discount_rate - total_initial_investment)/total_initial_investment
+        self.NPV = self.yearly_profit*(1-(1+self.discount_rate)**-self.lifetime)/self.discount_rate - total_initial_investment
 
-        self.marginalCost = np.zeros(8760)
-        self.marginalCost[np.where(self.hourlyEnergyExchange<0)] = self.variableOandMCost
-
-        self.runingCost = np.sum(arr_hourlyCost)
-        self.yearlyProfit = np.sum(arr_hourlyProfit)
-        self.yearlyCost = self.runingCost
-        self.yearlyIncome = np.sum(arr_hourlyIncome)
-
-        self.NYyearlyCost = np.sum(arr_NYhourlyCost)
-        self.NYyearlyProfit = np.sum(arr_NYhourlyProfit)
-
-        if(self.maxCapacity>0.00001):
-            self.estimatedROI = ((self.yearlyProfit) * self.lifetime)/(self.totalLifeCAPEX) 
-        else:
-            self.estimatedROI = 0.0
-        self.NPV = 0.0
-        for yr in range(5): # for yr in range(self.year, self.endYear):
-            self.NPV = self.NPV +  self.yearlyProfit/((1+self.discountR)**yr)
-
-        # subs/kW needed to get ROI of 0.5
-        self.subsNeeded = ((0.5*self.totalLifeCAPEX) - (self.yearlyProfit * self.lifetime))/self.chargeRate
-        if(self.maxCapacity>0.00001):
-            self.NYestimatedROI = ((self.NYyearlyProfit) * self.NEXTYEARlifetime)/(self.NEXTYEARtotalLifeCAPEX) 
-        else:
-            self.NYestimatedROI = 0.0
-        self.NYNPV = 0.0
-        for yr in range(5):
-            self.NYNPV = self.NYNPV +  self.NYyearlyProfit/((1+self.discountR)**yr)
-
-    # reset values at the end of the year
-    def resetYearValueRecord(self):
-        profWithCapSubs = self.yearlyCapSubs + self.yearlyProfit
-        
-        self.yearlyProfitList.append(profWithCapSubs)
-        self.yearlyIncomeList.append(self.yearlyIncome)
-        self.yearlyCostList.append(self.yearlyCost)
-        self.years.append(self.year)
+    # update date for next year
+    def increment_year(self):
+        self.yearly_profit_list.append(self.yearly_profit)
+        age = self.year - self.start_year
+        if(age >= 15):
+            self.CFDPrice = 0.0
         self.year = self.year + 1
-        self.age = self.age + 1
-        self.curYearDischargeKWh = 0.0
 
-        tempIndx = self.year - self.BASEYEAR
-        self.updateNextYearCosts(tempIndx)
+        self.current_CO2_price = 0
+        self.yearly_energy_stored = 0
+        self.yearly_income = 0.0
+        self.yearly_cost = 0.0
+        self.yearly_profit=0.0
+        self.hourly_profit = np.zeros(self.timesteps)
+        self.hourly_income = np.zeros(self.timesteps)
+        self.hourly_cost = np.zeros(self.timesteps)
+        self.marginal_cost = np.zeros(self.timesteps)
+        self.yearly_emissions = 0.0
+
+        return True
+
 
         
+    def getActCapFactor(self):
+        # to be updated
+        self.actualCapFac = (self.capacity/self.charge_rate)/24
+        return self.actualCapFac
     
 
 

@@ -43,7 +43,7 @@ class policyMaker():
             self.carbonIntensityTarget = 0
 
     # update values for next year
-    def incrementYear(self):
+    def increment_year(self):
         self.year = self.year + 1
         self.updateCO2Target()
 
@@ -51,7 +51,7 @@ class policyMaker():
         print('emissionsIntense from last year (gCO2/kWh)',carbonIntensity)
         print('yearCO2IntensityTarget (gCO2/kWh)',self.carbonIntensityTarget)
         BEISco2Price = self.yearlyCarbonCost[self.year-self.BASEYEAR]
-        if carbonIntensity>self.carbonIntensityTarget:
+        if carbonIntensity > self.carbonIntensityTarget:
             CO210PC = self.curCO2Price *1.1
             if CO210PC > BEISco2Price:
                 self.curCO2Price = CO210PC
@@ -59,7 +59,7 @@ class policyMaker():
                 self.curCO2Price = BEISco2Price
         else:
             curCO2 = self.curCO2Price
-            if curCO2>BEISco2Price:
+            if curCO2 > BEISco2Price:
                 self.curCO2Price = curCO2
             else:
                 self.curCO2Price = BEISco2Price
@@ -93,16 +93,16 @@ class policyMaker():
             else:
                 temp_df = temp_df.sample(frac=1) # shuffle the dataset
                 temp_df.sort_values(bidColumn, ascending=ascending, inplace=True) 
-            yearOfInstallation = temp_df["Start_Year"].mean()
+            yearOfInstallation = temp_df["start_year"].mean()
             maxBuildingRate = int(self.buildRatePerType.loc[genName,yearOfInstallation])
             print("The build rate of {0} is {1} kW in {2}".format(genName, maxBuildingRate, yearOfInstallation))
             if maxBuildingRate>0:
-                temp_df["Cumulative_Capacity_kW"] = temp_df["Capacity_kW"].cumsum()
-                temp_df = temp_df.loc[temp_df["Cumulative_Capacity_kW"]<=maxBuildingRate, :]
-                capToBeInstalled = temp_df["Capacity_kW"].sum()
+                temp_df["cumulative_capacity_kW"] = temp_df["capacity_kW"].cumsum()
+                temp_df = temp_df.loc[temp_df["cumulative_capacity_kW"]<=maxBuildingRate, :]
+                capToBeInstalled = temp_df["capacity_kW"].sum()
                 self.buildRatePerType.loc[genName,yearOfInstallation] = maxBuildingRate - capToBeInstalled
                 frames.append(temp_df)
-        if len(frames)>0:
+        if len(frames) > 0:
             newBids = pd.concat(frames)
         else:
             newBids = pd.DataFrame()
@@ -112,7 +112,7 @@ class policyMaker():
     def capacityAuction(self, timeHorizon, currentPeak,  boolEnergyStorage, busheadroom):
         print('---------------------- Capacity Auction Method ---------------------')
         demandYear = self.year+timeHorizon
-        capSubsisdy = 75 #£/kW include cap of 75£/kW as per BRAIN paper for the bids
+        cap_subsidy = 0 #£/kW include cap of 75£/kW as per BRAIN paper for the bids
         scaleACS = 1.09 # The value of ACS accounts for a potential 9% increase in peak demand that could be experienced during a cold winter
         # Book: Ter-Gazarian, A.G., Energy Storage for Power Systems, Page 18
         estPeakD = (self.projectedPeakDemand(demandYear)* scaleACS)
@@ -121,7 +121,7 @@ class policyMaker():
         print('Estimated Peak Demand ', estPeakD)
         print('Estimated Derated Capacity ', estDeRCap)
         
-        if(estPeakD>estDeRCap):
+        if estPeakD > estDeRCap:
             print('---------------------- Holding Capacity Auction ---------------------')
             capShortFall = estPeakD - estDeRCap
 
@@ -132,33 +132,34 @@ class policyMaker():
             allBids = pd.concat(framesBids)
             allBids.to_csv(self.path_save+"All_CapacityMarket_bids_"+str(self.year)+".csv")
             #removed based that do not comply with the building rate of plants
-            allBids = self.capBuildRate(allBids, "Bid_Price_GBP/kW")
-            allBids.sort_values(["Bid_Price_GBP/kW"], ascending=True, inplace=True)
-            allBids["Cumulative_DeRated_Capacity_kW"] = allBids["DeRated_Capacity_kW"].cumsum()
-            
-            # Allocate cap subsidies until demand is met
-            allBids.loc[allBids["Bid_Price_GBP/kW"]>capSubsisdy, "Bid_Price_GBP/kW"] = capSubsisdy
-            unsuccessfulBids = allBids.loc[allBids["Cumulative_DeRated_Capacity_kW"]>capShortFall, :].index
-            successfulBids = allBids.loc[~allBids.index.isin(unsuccessfulBids), :] 
+            allBids = self.capBuildRate(allBids, "bid_price_GBP/kW")
+            if len(allBids) > 0:
+                allBids.sort_values(["bid_price_GBP/kW"], ascending=True, inplace=True)
+                allBids["cumulative_derated_capacity_kW"] = allBids["derated_capacity_kW"].cumsum()
+                
+                # Allocate cap subsidies until demand is met
+                if cap_subsidy > 0:
+                    allBids.loc[allBids["bid_price_GBP/kW"] > cap_subsidy, "bid_price_GBP/kW"] = cap_subsidy
+                unsuccessfulBids = allBids.loc[allBids["cumulative_derated_capacity_kW"] > capShortFall, :].index
+                successfulBids = allBids.loc[~allBids.index.isin(unsuccessfulBids), :]
 
-            if len(successfulBids)>0: #there are successful bids
-                successfulBids.to_csv(self.path_save+"Successful_CapacityMarket_Bids"+str(self.year)+".csv")
-                for genName, row in successfulBids.iterrows(): # Add eligible plants to the construction queue
-                    eGCName = row["Generation_Company"]
-                    capacitykW = row["Capacity_kW"]
-                    startYear = row["Start_Year"]
-                    tcapSub = row["Bid_Price_GBP/kW"]
-                    cfdBool = False
-                    capMarketBool = True
-                    busbar = row["Busbar"]
-                    eGC = Utils.getGenerationCompany(eGCName, self.elecGenCompanies)
-                    eGC.addToConstructionQueue(genName, capacitykW, startYear, tcapSub, cfdBool, capMarketBool, busbar)
+                if len(successfulBids) > 0: #there are successful bids
+                    successfulBids.to_csv(self.path_save+"Successful_CapacityMarket_Bids"+str(self.year)+".csv")
+                    for genName, row in successfulBids.iterrows(): # Add eligible plants to the construction queue
+                        eGCName = row["generation_company"]
+                        capacitykW = row["capacity_kW"]
+                        start_year = row["start_year"]
+                        end_year = row["end_year"]
+                        capacity_market_sub = row["bid_price_GBP/kW"]
+                        CfD_price = 0
+                        busbar = row["busbar"]
+                        eGC = Utils.getGenerationCompany(eGCName, self.elecGenCompanies)
+                        eGC.addToConstructionQueue(genName, capacitykW, start_year, end_year, capacity_market_sub, CfD_price, busbar)
         else:
             print(' ----------------- No capacity auction ----------------------')
         return estPeakD, estDeRCap
 
 
-            
     # method to hold CfD auction
     def cfdAuction(self, capYears, commisCap, timeHorizon, busheadroom, avgElectricityPrice):
         # check if commissioning year
@@ -175,29 +176,29 @@ class policyMaker():
             if len(frames)>0:
                 # Merge the bids together and select the accepted bids
                 allBids = pd.concat(frames)
-                allBids = allBids.loc[allBids["Capacity_kW"]>0].copy()
-                allBids = self.capBuildRate(allBids, 'Strike_Price_GBP/kWh')
+                allBids = allBids.loc[allBids["capacity_kW"]>0].copy()
+                allBids = self.capBuildRate(allBids, 'strike_price_GBP/kWh')
 
-                allBids.sort_values(by=['Strike_Price_GBP/kWh'], inplace=True)
+                allBids.sort_values(by=['strike_price_GBP/kWh'], inplace=True)
                 allBids.to_csv(self.path_save+"All_CfD_bids_"+str(self.year)+".csv")
                 print("Average electricity price {0}".format(avgElectricityPrice))
-                allBids = allBids.loc[allBids['Strike_Price_GBP/kWh']>avgElectricityPrice, :]
-                allBids["Cumulative_capacity_kW"] = allBids["Capacity_kW"].cumsum()
-                successfulBids = allBids.loc[allBids["Cumulative_capacity_kW"]<=commisCap, :] #accepted bids
+                allBids = allBids.loc[allBids['strike_price_GBP/kWh']>avgElectricityPrice, :]
+                allBids["cumulative_capacity_kW"] = allBids["capacity_kW"].cumsum()
+                successfulBids = allBids.loc[allBids["cumulative_capacity_kW"]<=commisCap, :] #accepted bids
 
-                if len(successfulBids)>0:
+                if len(successfulBids) > 0:
                     successfulBids.to_csv(self.path_save+"Successful_CfD_bids_"+str(self.year)+".csv")
 
                     for genName, row in successfulBids.iterrows(): # Add eligible plant to the construction queue
-                        eGCName = row["Generation_Company"]
-                        capacitykW = row["Capacity_kW"]
-                        startYear = row["Start_Year"]
-                        tcapSub = -(avgElectricityPrice-row['Strike_Price_GBP/kWh'])
-                        cfdBool = True
-                        capMarketBool = False
-                        busbar = row["Busbar"]
+                        eGCName = row["generation_company"]
+                        capacitykW = row["capacity_kW"]
+                        start_year = row["start_year"]
+                        end_year = row["end_year"]
+                        CfD_price = -(avgElectricityPrice-row['strike_price_GBP/kWh'])
+                        capacity_market_sub = 0
+                        busbar = row["busbar"]
                         eGC = Utils.getGenerationCompany(eGCName, self.elecGenCompanies)
-                        eGC.addToConstructionQueue(genName, capacitykW, startYear, tcapSub, cfdBool, capMarketBool, busbar)
+                        eGC.addToConstructionQueue(genName, capacitykW, start_year, end_year, capacity_market_sub, CfD_price, busbar)
         else:
             print('++++++++++++++++++ No CfD auction +++++++++++++++++++++++')
 

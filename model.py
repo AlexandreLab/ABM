@@ -2,86 +2,98 @@ import random
 import numpy as np
 import pandas as pd
 import Utils
-import os
-from customerGroup import customerGroup
-from customer import customer
+from customer import Customer
+from customerGroup import CustomerGroup
 from renewableGenerator import renewableGenerator
-
 from generationCompany import generationCompany
 from policyMaker import policyMaker
-import TransmissionNetworkOwner as TNO
 
 
 class ABM():
     
-    def __init__(self, params, BASEYEAR,boolEnergyStorage , timesteps = 8760):
+    def __init__(self, params, BASEYEAR,boolEnergyStorage, timesteps = 8760):
 
         self.params = params
         self.BASEYEAR = BASEYEAR
         self.year = self.BASEYEAR
         self.boolEnergyStorage = boolEnergyStorage 
         self.timesteps = timesteps
-        
-
         self.numberCustomers = 1 #Number of energy consumers set to 1 by default
+        self.number_eC_with_batteries = 1
 
         self.energyCustomers = list()
         self.policyMaker = None
         self.elecGenCompanies = list()
-        self.elecGenCompaniesNames = list()
+        self.eGC_names = list()
         self.distributedGenCompany = None # part of elecGenCompanies
-        self.genTechList = list(params["technical_parameters"].index) # list of the technologies used in the model
+        tech_df = params["technical_parameters"]
+        self.gen_tech_list = params["gen_tech_list"] # list of the generation technologies used in the model
+        self.storage_tech_list = params["storage_tech_list"] # list of the generation technologies used in the model
+
+        tradGen = tech_df.loc[(tech_df['Dispatch_Before_Storage'] == False) & (tech_df['Renewable_Flag'] == 0) & (tech_df['Storage_Flag'] == 0), :].copy()
+        tradGen = tradGen.sort_values(by='Initial_Merit_Order', ascending=True)
+        self.merit_order = list(tradGen.index) #merit order of the traditional technologies to be dispatched after RE+Nuclear+batteries
 
         # variable to store the results
         self.customerNLs = pd.DataFrame() #list of a number of customers, each customer has 8760 hour data
-        self.peakDemand = 0 #store the peak demand of the year
-        self.buildRatePerType = pd.DataFrame(index = self.genTechList,columns=np.arange(self.year, self.year+100))
+        self.peak_demand = 0 #store the peak demand of the year
+        self.buildRatePerType = pd.DataFrame(index = self.gen_tech_list,columns=np.arange(self.year, self.year+100))
         self.buildRatePerType.fillna(0, inplace=True)
 
         self.capacityInstalledMW = pd.DataFrame() # capacity installed in 2010
-        self.OneYearHeadroom = []
 
-        self.capacityPerTypePerBus = pd.DataFrame()
-        self.capacityPerCompanies = pd.DataFrame()
+        self.gen_cap_per_type_per_bus = pd.DataFrame()
+        self.gen_cap_per_companies = pd.DataFrame()
+        self.storage_cap_per_type_per_bus = pd.DataFrame()
+        self.storage_cap_per_companies = pd.DataFrame()
+
         self.allGenPerCompany = pd.DataFrame()
         self.allGenPerTechnology = pd.DataFrame()
         self.summaryEnergyDispatch = pd.DataFrame()
         self.hourlyNetDemand = np.zeros(self.timesteps) # include the total demand of the customers as well as the demand after renewable dispatch, tradggen dispatch, etc.
         self.hourlyCurtail = np.zeros(self.timesteps)
 
+        self.TNUoS_charges = pd.DataFrame()
+
     def initResultsVariables(self):
         # need to be initialised after generation companies are created and after every year to be reset to 0
         idx_8760 = np.arange(0, 8760)
-        self.allGenPerCompany = pd.DataFrame(columns=self.elecGenCompaniesNames, index=idx_8760) # df of total hourly renewable generation all year           
+        self.allGenPerCompany = pd.DataFrame(columns=self.eGC_names, index=idx_8760) # df of total hourly renewable generation all year           
         self.allGenPerCompany.fillna(0, inplace=True)
-        self.allGenPerTechnology = pd.DataFrame(columns=self.genTechList, index=idx_8760)  # df showing the hourly generation for the renewable technologies
+        self.allGenPerTechnology = pd.DataFrame(columns=self.gen_tech_list, index=idx_8760)  # df showing the hourly generation for the renewable technologies
         self.allGenPerTechnology.fillna(0, inplace=True)
 
-        temp_cols = [x+'_Derated_Capacity_kW' for x in self.genTechList] + [x+'_Capacity_kW' for x in self.genTechList]
-        self.capacityPerCompanies = pd.DataFrame(columns=temp_cols , index=self.elecGenCompaniesNames) # store the capacity by technology type for each companies
-        self.capacityPerCompanies.fillna(0, inplace=True)
+        temp_cols = [x+'_Derated_Capacity_kW' for x in self.gen_tech_list] + [x+'_Capacity_kW' for x in self.gen_tech_list]
+        self.gen_cap_per_companies = pd.DataFrame(columns=temp_cols, index=self.eGC_names) # store the capacity by technology type for each companies
+        self.gen_cap_per_companies.fillna(0, inplace=True)
+
+        temp_cols = [x+'_Capacity_kWh' for x in self.storage_tech_list]
+        self.storage_cap_per_companies = pd.DataFrame(columns=temp_cols, index=self.eGC_names) # store the capacity by technology type for each companies
+        self.storage_cap_per_companies.fillna(0, inplace=True)
+
         self.hourlyNetDemand = np.zeros(self.timesteps)
         self.summaryEnergyDispatch = pd.DataFrame()
         self.hourlyCurtail = np.zeros(self.timesteps)
-        self.peakDemand = 0
+        self.peak_demand = 0
         return True
     
     def createEnergyCustomers(self, numberCustomers):
         self.numberCustomers = numberCustomers
         energyCustomers = list()
-        if numberCustomers==30:
-            self.OneYearHeadroom = [-32212711.56,-32067843.49,-31767613.28,-28212832.94,-28021373.43,-29166767.52,-28040878.71,-30277254.05,-31222433.48,-31615902.27,-35658351.5,-38698275.52,-39831850.5,-36304364.7,-40756536.12,-33969231.94,-43217107.73,-46674012.56,-44359251.32,-42836333.58,-41055681.71,-36877967.42,-35329923.93,-29181850.14,-31686007.01,-29468773.98,-28935821.38,-31005560.87,-30411533.39,-29371379.89]
-
+        if numberCustomers == 30:
             #Create 30 customers representing the 30 bus bars
-            for busbar in range(1,numberCustomers+1):
-                cust = customerGroup(self.timesteps, self.BASEYEAR, busbar)
-                cust.updateLoadProfile()
+            for busbar in range(1, numberCustomers+1):
+                cust = CustomerGroup(self.timesteps, self.BASEYEAR, busbar)
+                cust.update_load_profile()
                 energyCustomers.append(cust)
+                self.number_eC_with_batteries = 5
         else: #default mode has only one customer
-            cust = customer(self.timesteps, self.BASEYEAR, 0)
+            cust = Customer(self.timesteps, self.BASEYEAR, 0)
             energyCustomers.append(cust)
         self.energyCustomers = energyCustomers
-        return True  
+
+        self.TNUoS_charges = pd.DataFrame(index=["TNUoS_charges_GBP/kW", "Derated_capacity_kW", "Derated_capacity_margin_perc", "Headroom_kW", "Peak_demand_kW"], columns=np.arange(1, numberCustomers+1))
+        return True
 
     def createPolicyMaker(self):
         # must be created before energy companies to give them the carbon price
@@ -94,7 +106,7 @@ class ABM():
         if(self.BASEYEAR == 2018):
             totalBatteryPower = 700000.0 # 700 MW in 2018
         elif(self.BASEYEAR == 2010):
-            totalBatteryPower = 10000.0 #0 MW in 2010 (set at 10MW for test purposes)
+            totalBatteryPower = 100000.0 #0 MW in 2010 (set at 100MW for test purposes)
 
         # FES Two Degrees scenario says 3.59 GW batteries in 2018 and 22.512 GW in 2050
         # http://fes.nationalgrid.com/media/1409/fes-2019.pdf page 133
@@ -102,10 +114,21 @@ class ABM():
         totalFinalBatteryPower = 10000000.0#22512000.0 #10000000.0 # 10 GW in 2050
         totalStartBatteryPower = totalBatteryPower
 
-        temprand=random.randint(1,30) # allocate the battery to a random busbar
-        batteryPowerPerCompany = totalBatteryPower/len(self.elecGenCompanies)
-        for eGC in self.elecGenCompanies:
-            eGC.addBattery(batteryPowerPerCompany, temprand)
+        # allocate battery capacity to a selected number of energy companies to randomly selected busbars
+        random_eC = [x for x in range(1, self.numberCustomers+1)]
+        random.shuffle(random_eC)
+        name = "Li-Battery"
+        batteryPowerPerCompany = totalBatteryPower/self.number_eC_with_batteries
+        for idx in random_eC[:self.number_eC_with_batteries]:
+            eGC = self.elecGenCompanies[idx]
+            busbar = random.randint(1, 30) # allocate the battery to a random busbar
+            print("Added {0} kW battery to {1}.".format(batteryPowerPerCompany, eGC.name))
+            CfD_price = 0
+            capacity_market_sub = 0
+            start_year = self.year
+            end_year = start_year + int(self.params["technical_parameters"].loc[name, 'Lifetime_Years'])
+            eGC.add_unit(name, batteryPowerPerCompany, start_year, end_year, capacity_market_sub, CfD_price, busbar)
+
         return True
 
     def createGenerationCompanies(self):
@@ -127,7 +150,7 @@ class ABM():
         for i in range(len(GBGenPlantsOwners['Station Name'])):
             tempName = GBGenPlantsOwners['Fuel'].iloc[i] #raw
             tempbus = int(GBGenPlantsOwners['Bus'].iloc[i])
-            if(not (tempbus == 0) and tempName in self.genTechList):
+            if(not (tempbus == 0) and tempName in self.gen_tech_list):
                 curCompName = GBGenPlantsOwners['Company Name'].iloc[i]
                 if(not (curCompName in elecGenCompNAMESONLY)):
                     print(curCompName)
@@ -142,7 +165,7 @@ class ABM():
         # --------- Add plants for main companies -------------
 
         capacityInstalledMW = {}
-        for tech in self.genTechList:
+        for tech in self.gen_tech_list:
             capacityInstalledMW[tech] = 0 # initialisation
 
         print('Adding Plants')
@@ -150,85 +173,80 @@ class ABM():
         for i in range(len(GBGenPlantsOwners['Station Name'])): # data from 2018 dukes report
             tempName = GBGenPlantsOwners['Fuel'].iloc[i]
             tempbus = int(GBGenPlantsOwners['Bus'].iloc[i])
-            if (tempbus > 0) and tempName in self.genTechList: # Bus > 0 ==> the plant is for northern ireland
+            if (tempbus > 0) and tempName in self.gen_tech_list: # Bus > 0 ==> the plant is for northern ireland
                 curCompName = GBGenPlantsOwners['Company Name'].iloc[i]
                 for eGC in elecGenCompanies:
                     if(eGC.name == curCompName):
                         tempName = GBGenPlantsOwners['Fuel'].iloc[i]
-                        tempCapKW = GBGenPlantsOwners['Installed Capacity(MW)'].iloc[i]*1000
-                        capacityInstalledMW[tempName] = capacityInstalledMW[tempName] + tempCapKW/1000
+                        temp_cap_kW = GBGenPlantsOwners['Installed Capacity(MW)'].iloc[i]*1000
+                        capacityInstalledMW[tempName] = capacityInstalledMW[tempName] + temp_cap_kW/1000
                         lifetime = int(technology_technical_df.loc[tempName, 'Lifetime_Years'])
-                        tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
-                        subsidy = 0
-                        cfdBool = int(technology_technical_df.loc[tempName, 'CfD_Flag'])
-                        capMarketBool = False
+                        capacity_market_sub = 0
+                        CfD_price = 0
 
-                        if tempName == 'Wind Offshore':
-                            genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
-                            renGen = renewableGenerator('Wind Offshore', genTypeID, tempCapKW, lifetime, 0.0,1,self.OneYearHeadroom[tempbus-1], self.BASEYEAR) # temporary generator to estimate the annual costs
-                            subsidy = renGen.estimateCfDSubsidy()
+                        temp_start_year = int(GBGenPlantsOwners['StartYear'].iloc[i])
+                        temp_end_year = temp_start_year + lifetime
+                        if(temp_end_year < self.BASEYEAR):
+                            temp_end_year = random.randint(2018, 2025)
 
-                        tempStartYear = int(GBGenPlantsOwners['StartYear'].iloc[i])
-                        tempEndYear = tempStartYear + lifetime
-                        if(tempEndYear<self.BASEYEAR):
-                            tempEndYear = random.randint(2018, 2025)
-
-                        tempAge = tempStartYear - self.BASEYEAR
-                        eGC.addGeneration(tempName, tempRen, tempCapKW, lifetime ,tempStartYear, tempEndYear, tempAge, subsidy, cfdBool, capMarketBool, tempbus, self.OneYearHeadroom[tempbus-1])
+                        eGC.add_unit(tempName, temp_cap_kW, temp_start_year, temp_end_year, capacity_market_sub, CfD_price, tempbus)
     
-
         # Add plants to the construction queue of the distributed generation company
 
-        windOnPlantsFile = 'OtherDocuments/OperationalWindOnshore2017test_wOwner.csv'
-        GBWindOnPlants = pd.read_csv(windOnPlantsFile)
-        GBWindOnPlants.fillna(0, inplace=True)
+        # windOnPlantsFile = 'OtherDocuments/OperationalWindOnshore2017test_wOwner.csv'
+        # GBWindOnPlants = pd.read_csv(windOnPlantsFile)
+        # GBWindOnPlants.fillna(0, inplace=True)
 
-        windOffPlantsFile = 'OtherDocuments/OperationalWindOffshore2017test_wOwner.csv'
-        GBWindOffPlants = pd.read_csv(windOffPlantsFile)
-        GBWindOffPlants.fillna(0, inplace=True)
-        print('Adding Additional Distributed Generation')
+        # windOffPlantsFile = 'OtherDocuments/OperationalWindOffshore2017test_wOwner.csv'
+        # GBWindOffPlants = pd.read_csv(windOffPlantsFile)
+        # GBWindOffPlants.fillna(0, inplace=True)
+        # print('Adding Additional Distributed Generation')
 
-        for i in range(len(GBWindOffPlants['Name'])): # Adding in offshore plants already under construction that are due to come online soon
-            tempName = 'Wind Offshore'
-            genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
-            tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
-            sYear = GBWindOffPlants['StartYear'].iloc[i]
-            tempbus = int(GBWindOffPlants['Bus'].iloc[i])
+        # for i in range(len(GBWindOffPlants['Name'])): # Adding in offshore plants already under construction that are due to come online soon
+        #     tempName = 'Wind Offshore'
+        #     genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
+        #     tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
+        #     sYear = GBWindOffPlants['StartYear'].iloc[i]
+        #     tempbus = int(GBWindOffPlants['Bus'].iloc[i])
 
-            if tempbus>0: #the plant is not in Northern Ireland
-                if(sYear>2010 and sYear<2014):
-                    tempName = GBWindOffPlants['Type'].iloc[i]
-                    tempCapKW = GBWindOffPlants['Capacity(kW)'].iloc[i]
-                    eYear = GBWindOffPlants['EndYear'].iloc[i]
+        #     if tempbus>0: #the plant is not in Northern Ireland
+        #         if(sYear>2010 and sYear<2014):
+        #             tempName = GBWindOffPlants['Type'].iloc[i]
+        #             temp_cap_kW = GBWindOffPlants['Capacity(kW)'].iloc[i]
+        #             eYear = GBWindOffPlants['EndYear'].iloc[i]
                     
-                    lifetime = eYear - sYear
-                    renGen = renewableGenerator(tempName, genTypeID, tempCapKW, lifetime, 0.0,1, self.OneYearHeadroom[tempbus-1], self.BASEYEAR)
-                    cfdSubsidy = renGen.estimateCfDSubsidy()
-                    distGenCompany.addGeneration(tempName, tempRen, tempCapKW, lifetime ,sYear, 2052, 0, cfdSubsidy, True, False, tempbus, self.OneYearHeadroom[tempbus-1])
+        #             lifetime = eYear - sYear
+        #             renGen = renewableGenerator(tempName, genTypeID, temp_cap_kW, lifetime, 0.0,1, self.BASEYEAR)
+        #             cfdSubsidy = renGen.estimateCfDSubsidy()
+        #             distGenCompany.addGeneration(tempName, tempRen, temp_cap_kW, lifetime ,sYear, 2052, 0, cfdSubsidy, True, False, tempbus)
     
                 
-        for i in range(len(GBWindOnPlants['Name'])): # Adding in onshore plants already under construction that are due to come online soon
-            tempName = 'Wind Onshore'
-            genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
-            tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
-            sYear = GBWindOnPlants['StartYear'].iloc[i]
-            tempbus = GBWindOnPlants['Bus'].iloc[i]
-            if tempbus>0: #the plant is not in Northern Ireland
-                if(sYear>2010 and sYear<2013):
-                    tempName = GBWindOnPlants['Type'].iloc[i]
-                    cap = GBWindOnPlants['Capacity(kW)'].iloc[i]
-                    eYear = GBWindOnPlants['EndYear'].iloc[i]
-                    lifetime = eYear - sYear
-                    distGenCompany.addGeneration(tempName, tempRen, tempCapKW, lifetime ,sYear, eYear, 0, 0, False, False, tempbus, self.OneYearHeadroom[tempbus-1])
+        # for i in range(len(GBWindOnPlants['Name'])): # Adding in onshore plants already under construction that are due to come online soon
+        #     tempName = 'Wind Onshore'
+        #     genTypeID = int(technology_technical_df.loc[tempName, "TypeID"])
+        #     tempRen = int(technology_technical_df.loc[tempName, 'Renewable_Flag'])
+        #     sYear = GBWindOnPlants['StartYear'].iloc[i]
+        #     tempbus = GBWindOnPlants['Bus'].iloc[i]
+        #     if tempbus>0: #the plant is not in Northern Ireland
+        #         if(sYear>2010 and sYear<2013):
+        #             tempName = GBWindOnPlants['Type'].iloc[i]
+        #             cap = GBWindOnPlants['Capacity(kW)'].iloc[i]
+        #             eYear = GBWindOnPlants['EndYear'].iloc[i]
+        #             lifetime = eYear - sYear
+        #             distGenCompany.addGeneration(tempName, tempRen, temp_cap_kW, lifetime ,sYear, eYear, 0, 0, False, False, tempbus)
 
         print(capacityInstalledMW)
         self.capacityInstalledMW = capacityInstalledMW
         self.elecGenCompanies = elecGenCompanies
         self.distributedGenCompany = distGenCompany
-        self.elecGenCompaniesNames = elecGenCompNAMESONLY
+        self.eGC_names = elecGenCompNAMESONLY
+
+        
+        if self.boolEnergyStorage:
+            self.addEnergyStorage()
 
         self.policyMaker.elecGenCompanies = elecGenCompanies #add record of the generation companies to the Policy Maker object
-        Utils.initBuildRate(self.genTechList, self.buildRatePerType, technology_technical_df) # Initialise the building rate for all the companies and technologies on year 0
+        Utils.initBuildRate(self.gen_tech_list, self.buildRatePerType, technology_technical_df) # Initialise the building rate for all the companies and technologies on year 0
         self.policyMaker.buildRatePerType = self.buildRatePerType
 
         return True
@@ -236,56 +254,24 @@ class ABM():
     def addDistributedGeneration(self):
 
         busbarConstraints = self.params["busbar_constraints"]
-        technology_technical_df = self.params["technical_parameters"]
+        tech_df = self.params["technical_parameters"]
 
         # --------- Add generation from smaller distributed generation -------------
-        
-        pvPlantsFile = 'OtherDocuments/OperationalPVs2017test_wOwner.csv' # these records are for end of 2017
-        GBPVPlants = pd.read_csv(pvPlantsFile)
-        GBPVPlants.fillna(0, inplace=True)
+        distributed_technologies = list(tech_df.loc[tech_df['DER_Capacity_Installed_'+str(self.BASEYEAR)+'_MW'] > 0, :].index)
 
-        windOnPlantsFile = 'OtherDocuments/OperationalWindOnshore2017test_wOwner.csv'
-        GBWindOnPlants = pd.read_csv(windOnPlantsFile)
-        GBWindOnPlants.fillna(0, inplace=True)
-
-        windOffPlantsFile = 'OtherDocuments/OperationalWindOffshore2017test_wOwner.csv'
-        GBWindOffPlants = pd.read_csv(windOffPlantsFile)
-        GBWindOffPlants.fillna(0, inplace=True)
-        print('Adding Additional Distributed Generation')
-
-            ## Add distributed electricity resources
-        if(self.BASEYEAR==2018):
-            avgPVStartYear = int(round(GBPVPlants['StartYear'].mean()))
-            avgWindOnStartYear = int(round(GBWindOnPlants['StartYear'].mean()))
-            avgWindOffStartYear =int(round(GBWindOffPlants['StartYear'].mean()))
-        else:
-            avgPVStartYear = self.BASEYEAR - 1
-            avgWindOnStartYear = self.BASEYEAR - 1
-            avgWindOffStartYear = self.BASEYEAR - 1
-        
-        solarCapMWBASEYEAR = technology_technical_df.loc['Solar', 'DER_Capacity_Installed_'+str(self.BASEYEAR)+'_MW']
-        windOnshoreCapMWBASEYEAR = technology_technical_df.loc['Wind Onshore', 'DER_Capacity_Installed_'+str(self.BASEYEAR)+'_MW']
-        windOffshoreCapMWBASEYEAR = technology_technical_df.loc['Wind Offshore', 'DER_Capacity_Installed_'+str(self.BASEYEAR)+'_MW']
-
-        sCapkW = (solarCapMWBASEYEAR - self.capacityInstalledMW['Solar'])*1000.0
-        wOnCapkW = (windOnshoreCapMWBASEYEAR - self.capacityInstalledMW['Wind Onshore'])*1000.0
-        wOffCapkW = (windOffshoreCapMWBASEYEAR - self.capacityInstalledMW['Wind Offshore'])*1000.0  #actual data- recod large plant=distributed
-
-        tempBus=random.randint(1,30)
-        lifetime = int(technology_technical_df.loc['Solar', 'Lifetime_Years'])
-        self.distributedGenCompany.addGeneration('Solar', 1, sCapkW, lifetime,avgPVStartYear, 2052, (avgPVStartYear-self.BASEYEAR), 0, False, False, tempBus, self.OneYearHeadroom[tempBus-1])
-
-        tempBus=random.randint(1,30)
-        lifetime = int(technology_technical_df.loc['Wind Onshore', 'Lifetime_Years'])
-        self.distributedGenCompany.addGeneration('Wind Onshore', 1, wOnCapkW, lifetime, avgWindOnStartYear, 2052, (avgWindOnStartYear-self.BASEYEAR), 0.0, False,  False, tempBus, self.OneYearHeadroom[tempBus-1])
-
-        tempBus = random.choice(list(busbarConstraints[busbarConstraints['Wind Offshore']>0].index))
-        genTypeID = int(technology_technical_df.loc['Wind Offshore', "TypeID"])
-        lifetime = int(technology_technical_df.loc['Wind Offshore', 'Lifetime_Years'])
-        renGen = renewableGenerator('Wind Offshore', genTypeID,  wOffCapkW, lifetime, 0.0,1,self.OneYearHeadroom[tempBus-1], self.BASEYEAR)  # temporary generator to estimate the annual costs, for cfd
-        
-        cfdSubsidy = renGen.estimateCfDSubsidy()
-        self.distributedGenCompany.addGeneration('Wind Offshore', 1, wOffCapkW, lifetime, avgWindOffStartYear, 2052, (avgWindOffStartYear-self.BASEYEAR), cfdSubsidy, True, False,tempBus, self.OneYearHeadroom[tempBus-1])
+        self.numberCustomers
+        for gen_name in distributed_technologies:
+            baseyear_installed_capacity = tech_df.loc[gen_name, 'DER_Capacity_Installed_'+str(self.BASEYEAR)+'_MW']
+            capacity_remaining = (baseyear_installed_capacity - self.capacityInstalledMW[gen_name])*1000.0
+            lifetime = int(tech_df.loc[gen_name, 'Lifetime_Years'])
+            eligible_busbars = list(busbarConstraints[busbarConstraints[gen_name]>0].index)
+            avg_start_year = self.BASEYEAR - lifetime/2
+            avg_end_year = avg_start_year + lifetime
+            capacity_market_sub = 0
+            CfD_price = 0
+            for busbar in eligible_busbars:
+                capacit_to_install = capacity_remaining/len(eligible_busbars)
+                self.distributedGenCompany.add_unit(gen_name, capacit_to_install, avg_start_year, avg_end_year, capacity_market_sub, CfD_price, busbar)
         return True
 
 
@@ -296,44 +282,46 @@ class ABM():
         for eGC in self.elecGenCompanies:
             tempListTechnology = []
             installedTech = []
-            for genName in eGC.listTechnologyPortfolio:
+            for genName in eGC.list_technology_portfolio:
                 installedTech.append(genName)
                 sameFamilyTechnologies = list(technologyFamilies[technologyFamilies[genName]>0].index)
-                tempListTechnology= tempListTechnology + sameFamilyTechnologies
-            eGC.listTechnologyPortfolio = list(set(tempListTechnology))
+                sameFamilyTechnologies = [x for x in sameFamilyTechnologies if x in self.gen_tech_list]
+
+                tempListTechnology = tempListTechnology + sameFamilyTechnologies
+            eGC.list_technology_portfolio = list(set(tempListTechnology))
             print("list technologies")
-            print(eGC.name, eGC.listTechnologyPortfolio)
+            print(eGC.name, eGC.list_technology_portfolio)
             print(set(installedTech))
         return True
 
-    def getCapacityInstalled(self):
+    def get_capacity_installed(self):
         # Get the capacity installed for each technology type, by companies, and by bus
+        frames_gen_cap = []
+        frames_storage_cap = []
 
-        temp_cols = [x+'_Derated_Capacity_kW' for x in self.genTechList] + [x+'_Capacity_kW' for x in self.genTechList]
-        
-        frames_capacityPerTypePerBus = []
         for eGC in self.elecGenCompanies: #all companies have been added at the beginning
-            eGC.calculateCapacityByType(self.genTechList, [eC.busbar for eC in self.energyCustomers])
-            temp_capacityPerTypePerBus = eGC.capacityPerTypePerBus.copy()
-            self.capacityPerCompanies.loc[eGC.name, temp_cols] = temp_capacityPerTypePerBus[temp_cols].sum().values
-            frames_capacityPerTypePerBus.append(temp_capacityPerTypePerBus.reset_index())
-            
-        self.capacityPerTypePerBus = pd.concat(frames_capacityPerTypePerBus).groupby("Busbars").sum()
-        
+            eGC.calculateCapacityByType(self.gen_tech_list, self.storage_tech_list, [eC.busbar for eC in self.energyCustomers])
+            self.gen_cap_per_companies.loc[eGC.name, :] = eGC.gen_cap_per_type_per_bus.sum().values
+            self.storage_cap_per_companies.loc[eGC.name, :] =  eGC.storage_cap_per_type_per_bus.sum().values
+            frames_gen_cap.append(eGC.gen_cap_per_type_per_bus.reset_index())
+            frames_storage_cap.append(eGC.storage_cap_per_type_per_bus.reset_index())
+
+        self.gen_cap_per_type_per_bus = pd.concat(frames_gen_cap).groupby("Busbars").sum()
+        self.storage_cap_per_type_per_bus = pd.concat(frames_storage_cap).groupby("Busbars").sum()
         return True
 
 
     def getCustomerElectricityDemand(self):
         
         for eC in self.energyCustomers:
-            curCustNL = eC.runSim() # sim energy consumption each hour
+            curCustNL = eC.run_sim() # sim energy consumption each hour
             self.customerNLs[eC.busbar] = curCustNL
 
         #------------- get total customer electricity demand -------------
         totalCustDemand = np.array(self.customerNLs.sum(axis=1).values)
         self.hourlyNetDemand = totalCustDemand
         self.summaryEnergyDispatch['TotalCustomerCons'] = self.hourlyNetDemand.copy()
-        self.peakDemand = np.max(totalCustDemand)
+        self.peak_demand = np.max(totalCustDemand)
         return True
 
 
@@ -369,18 +357,19 @@ class ABM():
         print("End of dispatchRenewables")
         return True
 
-
     def dispatchTradGen(self, dispatchBeforeStorage):
         netDemand = self.hourlyNetDemand.copy()
         hourlyCurtail = self.hourlyCurtail.copy()
         dfTech = self.params["technical_parameters"]
-        tradGen = dfTech.loc[(dfTech['Dispatch_Before_Storage']==dispatchBeforeStorage) & (dfTech['Renewable_Flag']==0), :].copy()
-        tradGen = tradGen.sort_values(by='MeritOrder', ascending=True)
-        temp_cols = [x+'_Derated_Capacity_kW' for x in self.genTechList] + [x+'_Capacity_kW' for x in self.genTechList]
+        if dispatchBeforeStorage:
+            tradGen = dfTech.loc[(dfTech['Dispatch_Before_Storage']==dispatchBeforeStorage) & (dfTech['Renewable_Flag']==0) & (dfTech['Storage_Flag']==0), :].copy()
+        else:
+            tradGen = dfTech.loc[self.merit_order, :].copy()
+        temp_cols = [x+'_Derated_Capacity_kW' for x in self.gen_tech_list] + [x+'_Capacity_kW' for x in self.gen_tech_list]
         tempNetD = netDemand.copy()
-        capacityPerType = self.capacityPerTypePerBus[temp_cols].sum()
+        capacityPerType = self.gen_cap_per_type_per_bus[temp_cols].sum()
         print('Dispatch of {0}'.format(list(tradGen.index)))
-        tempNetD, tempHourlyCurtail = Utils.dispatchTradGen(netDemand, self.elecGenCompanies, tradGen,capacityPerType, self.capacityPerCompanies, self.allGenPerTechnology,self.allGenPerCompany, self.year)
+        tempNetD, tempHourlyCurtail = Utils.dispatchTradGen(netDemand, self.elecGenCompanies, tradGen,capacityPerType, self.gen_cap_per_companies, self.allGenPerTechnology,self.allGenPerCompany, self.year)
         self.hourlyCurtail  = np.add(hourlyCurtail,tempHourlyCurtail)
         self.hourlyNetDemand = tempNetD
 
@@ -395,21 +384,35 @@ class ABM():
     def dispatchBatteries(self):
         netDemand = self.hourlyNetDemand.copy()
         if self.boolEnergyStorage:
-            print('Charging/Discharging of batteries...')
+            print('Charging/Discharging of batteries {0}...'.format(self.storage_tech_list))
+
             tNetDemand = netDemand.copy()
-            for eGC in self.elecGenCompanies:
-                tNetDemand = eGC.chargeDischargeBatteryTime(tNetDemand)
+            for battery_cat in self.storage_tech_list:
+                installed_capacity = self.storage_cap_per_type_per_bus[battery_cat+'_Capacity_kWh'].sum()
+                print("Dispatch of {0} (capacity installed {1} MWh)".format(battery_cat, installed_capacity/1000))
+                for eGC in self.elecGenCompanies:
+                    tNetDemand = eGC.chargeDischargeBatteryTime(tNetDemand, battery_cat)
+
             netDemand = tNetDemand # final net demand after account for all companies
             self.summaryEnergyDispatch['TotalCustomerConsAfterBattery'] = netDemand
         return True
 
 
     def getWholeSalePrice(self):
-
         # calculating wholesale electricity price from marginal cost of each generator
-        wholesaleEPrice, nuclearMarginalCost = Utils.getWholesaleEPrice(self.elecGenCompanies)
+        wholesaleEPrice = np.zeros(8760) # init at 0
+        nuclearMarginalCost = list()
+        for eGC in self.elecGenCompanies:
+            for gen in eGC.renewable_gen + eGC.traditional_gen:
+                gen.calculateHourlyData()
+                if len(gen.marginal_cost) > 0:
+                    wholesaleEPrice = np.max([wholesaleEPrice, gen.marginal_cost], axis=0)
+
+                if gen.name == 'Nuclear':
+                    nuclearMarginalCost = gen.marginal_cost.copy()
+
         for k in range(len(wholesaleEPrice)): #8760
-            if self.hourlyCurtail[k]>0:
+            if self.hourlyCurtail[k] > 0:
                 wholesaleEPrice[k] = 0 - nuclearMarginalCost[k]
         return wholesaleEPrice
 
@@ -419,80 +422,129 @@ class ABM():
         # update the current wholesaleEPrice to calculate the profit made by each plant 
         yearlyEmissions = 0.0
         for eGC in self.elecGenCompanies:
-            eGC.calcRevenue(wholesaleEPrice) #return the ROI and NPV of all the plants owned by this generator company
+            eGC.calc_revenue(wholesaleEPrice) #return the ROI and NPV of all the plants owned by this generator company
             yearlyEmissions += eGC.calcEmissions() #kgCO2
         return yearlyEmissions
 
 
     def exportPlantsEconomics(self):
-        # Extract NPV values of all the plants
+        # generation plants economics
         npv_dict = {}
         
         for eGC in self.elecGenCompanies:
-            for i,gen in enumerate(eGC.renewableGen+eGC.traditionalGen):
+            for i,gen in enumerate(eGC.renewable_gen+eGC.traditional_gen):
                 gbp_kwh = 0
-                if gen.yearlyEnergyGen>0:
-                    gbp_kwh = gen.yearlyIncome/gen.yearlyEnergyGen
-                npv_dict[(eGC.name, gen.name, str(i))] = [gen.yearlyIncome, gen.yearlyCost, gen.NPV, gen.ROI, gen.getActCapFactor(), gbp_kwh, gen.capitalSub, gen.CFDPrice]
-        fileOut = self.params["path_save"] + 'PlantsEconomics_'+str(self.year)+'.csv'        
-        pd.DataFrame(npv_dict, index=["Income_GBP", "Cost_GBP", "NPV_GBP", "ROI", "Capacity_Factor", "Income_GBP/kWh", "Capital_Subsidy_GBP/kW", "CfD_Subsidy_GBP/kWh" ]).to_csv(fileOut)
+                if gen.yearly_energy_generated > 0:
+                    gbp_kwh = gen.yearly_income/gen.yearly_energy_generated
+                npv_dict[(eGC.name, gen.name, str(i))] = [gen.cost_of_generating_electricity, gen.yearly_income, gen.yearly_cost, gen.NPV, gen.ROI, gen.getActCapFactor(), gbp_kwh, gen.capacity_market_sub, gen.CfD_price, gen.TNUoS_charge*gen.capacity*gen.availability_factor/8760, gen.capacity*gen.availability_factor, gen.busbar, gen.yearly_energy_generated]
+        fileOut = self.params["path_save"] + 'gen_plants_economics_'+str(self.year)+'.csv'        
+        plants_ecomomics_df = pd.DataFrame(npv_dict, index=["Cost_of_Electricity_GBP/kWh", "Income_GBP", "Cost_GBP", "NPV_GBP", "ROI", "Capacity_Factor", "Income_GBP/kWh", "Capital_Subsidy_GBP/kW", "CfD_Subsidy_GBP/kWh", "TNUoS_charges_GBP/h", "Derated_capacity_kW", "Busbar", "Electricity_generated_kWh"])
+        plants_ecomomics_df.to_csv(fileOut)
+
+        # Update the merit order of the system
+        fileOut = self.params["path_save"] + 'Merit_Order_'+str(self.year)+'.csv'   
+        merit_order_df = plants_ecomomics_df.T.groupby(level=[1]).mean()["Cost_of_Electricity_GBP/kWh"].to_frame()
+        merit_order_df.sort_values(["Cost_of_Electricity_GBP/kWh"], ascending=True, inplace=True)
+        self.merit_order = [x for x in merit_order_df.index if x in self.merit_order]
+
+        # storage plants economics
+        npv_dict = {}
+        for eGC in self.elecGenCompanies:
+            for i, st in enumerate(eGC.energy_stores):
+
+                if st.yearly_energy_stored > 0:
+                    gbp_kwh = st.yearly_income/st.yearly_energy_stored
+                npv_dict[(eGC.name, st.name, str(i))] = [st.yearly_income, st.yearly_cost, st.NPV, st.ROI, st.getActCapFactor(), gbp_kwh, st.capacity_market_sub, st.CfD_price, st.busbar]
+        fileOut = self.params["path_save"] + 'storage_plants_economics_'+str(self.year)+'.csv'        
+        plants_ecomomics_df = pd.DataFrame(npv_dict, index=["Income_GBP", "Cost_GBP", "NPV_GBP", "ROI", "Capacity_Factor", "Income_GBP/kWh", "Capital_Subsidy_GBP/kW", "CfD_Subsidy_GBP/kWh", "Busbar"])
+        plants_ecomomics_df.to_csv(fileOut)
+
         return True
 
 
     def installNewCapacity(self, wholesaleEPrice):
-
-        capacityPerBusValues = self.capacityPerTypePerBus.T.sum().values
-        self.OneYearHeadroom = TNO.EvaluateHeadRoom(capacityPerBusValues,self.summaryEnergyDispatch['TotalCustomerCons'] )
-
-        # cfd auction
-        self.policyMaker.cfdAuction(3, 6000000, 20, self.OneYearHeadroom, np.mean(wholesaleEPrice)) # 3 years, 6 GW to be commissioned, max 20 years construction time
-
-        # Capacity auction
-        estPeakD, estDeRCap = self.policyMaker.capacityAuction(4, self.peakDemand, False, self.OneYearHeadroom,)
-
+        #sort the busbars based on TNUoS charges from smaller to higher
+        priority_busbars = self.TNUoS_charges.sort_values("TNUoS_charges_GBP/kW", axis=1).columns  
         # Capacity built by each company individually without the help of subsidies
         print("Companies investments...")
         frames = []
         for eGC in self.elecGenCompanies:
-            temp_df = eGC.nextInvestment()
+            temp_df = eGC.nextInvestment(priority_busbars)
             frames.append(temp_df)
 
-        fileOut = self.params["path_save"] + 'ROINPV_'+str(self.year)+'.csv'
+        fileOut = self.params["path_save"] + 'Profitable_tech_to_be_built_'+str(self.year)+'.csv'
         newCapacity = pd.concat(frames, axis=0) #Capacity that companies want to build
-        newCapacity = self.policyMaker.capBuildRate(newCapacity, "ROI", False) #Capacity that will be built after removing capping the amount of technology of each type
+        newCapacity = self.policyMaker.capBuildRate(newCapacity, "ROI", False) #Capacity that will be built after removing capped technology
         if len(newCapacity)>0:
             newCapacity.to_csv(fileOut)
-
-            for genName, row in newCapacity.iterrows():
-                eGCName = row["Generation_Company"]
+            for unit_name, row in newCapacity.iterrows():
+                eGCName = row["generation_company"]
                 eGC = Utils.getGenerationCompany(eGCName, self.elecGenCompanies)
-                capacitykW = row["Capacity_kW"]
-                startYear = row["Start_Year"]
-                tcapSub = 0
-                cfdBool = False
-                capMarketBool = False
-                busbar = row["Busbar"]
-                eGC.addToConstructionQueue(genName, capacitykW, startYear, tcapSub, cfdBool, capMarketBool, busbar)
+                capacitykW = row["capacity_kW"]
+                start_year = row["start_year"]
+                end_year = row["end_year"]
+                capacity_market_sub = 0
+                CfD_price = 0
+                busbar = row["busbar"]
+                #["name", "capacity_kW", "start_year", "end_year", "capacity_market_sub_GBP/kW", "CfD_price_GBP/kWh", "busbar"]
+                eGC.addToConstructionQueue(unit_name, capacitykW, start_year, end_year, capacity_market_sub, CfD_price, busbar)
+
+        # cfd auction
+        self.policyMaker.cfdAuction(3, 6000000, 20, priority_busbars, np.mean(wholesaleEPrice)) # 3 years, 6 GW to be commissioned, max 20 years construction time
+
+        # Capacity auction
+        estPeakD, estDeRCap = self.policyMaker.capacityAuction(4, self.peak_demand, False, priority_busbars)
 
         return estPeakD, estDeRCap
 
 
-    def incrementYear(self, carbonIntensity):
-        self.policyMaker.incrementYear()
+    def increment_year(self, carbonIntensity):
+        self.policyMaker.increment_year()
         # update CO2 Price for next year
         newCO2Price = self.policyMaker.getNextYearCO2Price(carbonIntensity) #carbon intensity in gCO2/kWh input
 
         # Update CO2 Price and check the construction queue to build plants
         for eGC in self.elecGenCompanies:
-            eGC.incrementYear(self.OneYearHeadroom, newCO2Price)
+            eGC.increment_year(newCO2Price)
 
         # demand elasticity
         for eC in self.energyCustomers:
-            demandChangePC = eC.incrementYear(0.0) #
+            eC.increment_year() #
 
         self.initResultsVariables()
         self.year = self.year + 1
 
+    def update_TNUoS_charges(self):
+        total_TNUoS = 375000000 # In 2020, 70 GW generation assets in total paid £375m
+        derated_cap_cols = [x+'_Derated_Capacity_kW' for x in self.gen_tech_list]
+
+        for eC in self.energyCustomers:
+            busbar = eC.busbar
+            peak_demand = np.max(eC.load_profile)
+            
+            derated_cap = self.gen_cap_per_type_per_bus.loc[busbar, derated_cap_cols].to_numpy().sum()
+            derated_cap_margin = (derated_cap-peak_demand)/peak_demand
+            # print(f"busbar {busbar} has a peak demand of {peak_demand} and deratedcapacity margin {derated_cap_margin}")
+            self.TNUoS_charges.loc["Peak_demand_kW", busbar] = peak_demand
+            self.TNUoS_charges.loc["Derated_capacity_margin_perc", busbar] = derated_cap_margin
+            self.TNUoS_charges.loc["Derated_capacity_kW", busbar] = derated_cap
+        min_derated_cap_margin = self.TNUoS_charges.loc["Derated_capacity_margin_perc", :].min()
+
+        self.TNUoS_charges.loc["Headroom_kW", :] = self.TNUoS_charges.loc["Derated_capacity_kW", :] - self.TNUoS_charges.loc["Peak_demand_kW", :]
+
+        self.TNUoS_charges.loc["TNUoS_charges_GBP/kW", :] = self.TNUoS_charges.loc["Derated_capacity_margin_perc", :]-min_derated_cap_margin
+        # self.TNUoS_charges.loc["Percentage of the charge", :] = self.TNUoS_charges.loc["TNUoS_charges_GBP/kW", :]/self.TNUoS_charges.loc["TNUoS_charges_GBP/kW", :].to_numpy().sum()
+        self.TNUoS_charges.loc["TNUoS_charges_GBP/kW", :] = self.TNUoS_charges.loc["TNUoS_charges_GBP/kW", :]/self.TNUoS_charges.loc["TNUoS_charges_GBP/kW", :].to_numpy().sum()*total_TNUoS
+        self.TNUoS_charges.loc["TNUoS_charges_GBP/kW", :] = self.TNUoS_charges.loc["TNUoS_charges_GBP/kW", :]/self.TNUoS_charges.loc["Derated_capacity_kW", :]
+        fileOut = self.params["path_save"] + 'TNUOS_charges_'+str(self.year)+'.csv'
+        self.TNUoS_charges.to_csv(fileOut)
+
+        for eGC in self.elecGenCompanies:
+            for gen in eGC.renewable_gen+eGC.traditional_gen:
+                gen_busbar = gen.busbar
+                gen.TNUoS_charge = self.TNUoS_charges.loc["TNUoS_charges_GBP/kW", gen_busbar]
+
+        return True
 
 
 
@@ -516,14 +568,14 @@ if __name__ == '__main__':
     idx_year = np.arange(BASEYEAR, BASEYEAR+maxYears)
     params = Utils.getParams()
     technology_technical_df = params["technical_parameters"]
-    genTechList = list(technology_technical_df.index)
+    gen_tech_list = list(technology_technical_df.index)
     
 
 
     list_tgen = list(technology_technical_df.loc[technology_technical_df['Renewable_Flag']==0, :].index)
     list_rgen = list(technology_technical_df.loc[technology_technical_df['Renewable_Flag']==1, :].index)
 
-    temp_cols = [x+'_Derated_Capacity_kW' for x in genTechList] + [x+'_Capacity_kW' for x in genTechList]
+    temp_cols = [x+'_Derated_Capacity_kW' for x in gen_tech_list] + [x+'_Capacity_kW' for x in gen_tech_list]
 
     # Components where results are stored
     capacityPerType = pd.DataFrame(columns=temp_cols, index=idx_year) # store the capacity by technology type for each year of the simulation
@@ -544,4 +596,4 @@ if __name__ == '__main__':
 
 
     for eGC in ABMmodel.elecGenCompanies:
-        print(eGC.listTechnologyPortfolio)
+        print(eGC.list_technology_portfolio)

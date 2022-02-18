@@ -1,17 +1,11 @@
 import numpy as np
-from csv import reader
-import random
 import pandas as pd
 import os
-import os.path
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
-import matplotlib.ticker as tkr
+
 from random import randint
 from timeit import default_timer as timer
 
-GLOBAL_FIG_FORMAT = "png"
-GLOBAL_DPI = 1000
+
 
 #____________________________________________________________
 #
@@ -19,7 +13,16 @@ GLOBAL_DPI = 1000
 # These methods are all fairly self explanitory
 #____________________________________________________________
 
-
+def timer_func(func):
+    # This function shows the execution time of 
+    # the function object passed
+    def wrap_func(*args, **kwargs):
+        t1 = timer()
+        result = func(*args, **kwargs)
+        t2 = timer()
+        print(f'Function {func.__name__!r} executed in {(t2-t1):.4f}s')
+        return result
+    return wrap_func
 
 def loadTextFile(file):
         f = open(file, 'r')
@@ -34,7 +37,7 @@ def loadFuelCostFile(genName, FILEPATH):
     
     if(genName=="Coal"): # coal
         fileIN = fileIN/1000 # tonnes to kg
-        fileIN = fileIN/2.46 # 1 kg of coal produces 2.46 kWh
+        fileIN = fileIN/8.141 # 1 kg of coal produces 8.141 kWh
         fileIN = fileIN*0.77 # USD to GBP
     elif(genName=="CCGT" or genName=="OCGT"): # CCGT and OCGT
         fileIN = fileIN/100.0 # p/ therm to gbp/therm
@@ -63,21 +66,6 @@ def getPathWholesalePriceOfFuel(path, fuel, year):
                 # print(file)
                 return subdir + os.sep + file
     return False
-
-def getWholesaleEPrice(elecGenCompanies):
-    wholesaleEPrice = np.zeros(8760) # init at 0
-    nuclearMarginalCost = list()
-    for eGC in elecGenCompanies:
-        for gen in eGC.renewableGen + eGC.traditionalGen:
-            gen.calculateHourlyData()
-            if len(gen.marginalCost)>0:
-                wholesaleEPrice = np.max([wholesaleEPrice, gen.marginalCost], axis=0)
-
-            if gen.name =='Nuclear':
-                nuclearMarginalCost = gen.marginalCost.copy()
-
-    return wholesaleEPrice, nuclearMarginalCost
-
 
 # return the generationCompany object based on its name
 def getGenerationCompany(genCoName, genCompanies):
@@ -170,30 +158,42 @@ def dispatchTradGen(demand, elecGenCompanies, tradGen, capacityPerType, capacity
 
 
 
-def getParams():
+def getParams(bool_energy_storage):
     RESULTS_FILE_PATH = 'Results/2050/'
     path_technology_dataset = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Dec 2021\Code_WH'
 
     # list of generation technologies
     technoloy_dataset_fn = "technology_technical_economic_parameters.xlsx"
-    temp_df = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "technical_parameters", index_col=0)
-    technologyTechnical = temp_df.loc[temp_df["Set"]=="Current", :].copy()
+    temp_df = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name="technical_parameters", index_col=0)
+    tech_df = temp_df.loc[temp_df["Set"] == "Current", :].copy()
+    tech_df.fillna(-1, inplace=True)
 
-    temp_df = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "economic_parameters")
-    technologyEconomic = temp_df.loc[temp_df["Set"]=="Current", :].copy()
-    technologyEconomic.fillna(0, inplace=True)
 
-    busbarConstraints = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "Bus constraints", index_col=0)
+    if bool_energy_storage:
+        gen_tech_list = list(set(tech_df.index))
+        storage_tech_list = list(set(tech_df.loc[tech_df['Storage_Flag'] == 1, :].index))
+    else:
+        gen_tech_list = list(set(tech_df.loc[tech_df['Storage_Flag'] == 0, :].index))
+        storage_tech_list = []
+
+    temp_df = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name="economic_parameters_2010_2020")
+    eco_df = temp_df.loc[temp_df["Key"].isin(gen_tech_list), :].copy()
+    eco_df.fillna(-1, inplace=True)
+
+    busbarConstraints = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name="Bus constraints", index_col=0)
     busbarConstraints.fillna(0, inplace=True)
 
-    technologyFamilies = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name = "technologies_families", index_col=0)
+    technologyFamilies = pd.read_excel(path_technology_dataset+os.path.sep+technoloy_dataset_fn, sheet_name="technologies_families", index_col=0)
+    technologyFamilies = technologyFamilies.loc[gen_tech_list, gen_tech_list]
     technologyFamilies.fillna(0, inplace=True)
-
+    
     params = {}
-    params["technical_parameters"] = technologyTechnical
+    params["technical_parameters"] = tech_df
     params["technology_families"] = technologyFamilies
-    params["economic_parameters"] = technologyEconomic
+    params["economic_parameters"] = eco_df
     params["busbar_constraints"] = busbarConstraints
+    params["gen_tech_list"] = gen_tech_list
+    params["storage_tech_list"] = storage_tech_list
     params["path_save"] = RESULTS_FILE_PATH
     params["path_wholesale_fuel_price"] = r'D:\OneDrive - Cardiff University\04 - Projects\18 - ABM\01 - Code\ABM code - Jan 2022 saved\Code_WH\WholesaleEnergyPrices'
 
