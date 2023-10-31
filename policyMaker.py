@@ -109,7 +109,7 @@ class policyMaker():
         return newBids
 
     # hold capacity auction
-    def capacityAuction(self, timeHorizon, currentPeak,  boolEnergyStorage, busheadroom):
+    def capacityAuction(self, timeHorizon, sorted_TNUoS_charges):
         print('---------------------- Capacity Auction Method ---------------------')
         demandYear = self.year+timeHorizon
         cap_subsidy = 0 #£/kW include cap of 75£/kW as per BRAIN paper for the bids
@@ -127,7 +127,7 @@ class policyMaker():
 
             framesBids =[]
             for eGC in self.elecGenCompanies:
-                temp_dfBids = eGC.getCapAuctionBid(timeHorizon, busheadroom)
+                temp_dfBids = eGC.getCapAuctionBid(timeHorizon, sorted_TNUoS_charges)
                 framesBids.append(temp_dfBids)
             allBids = pd.concat(framesBids)
             allBids.to_csv(self.path_save+"All_CapacityMarket_bids_"+str(self.year)+".csv")
@@ -161,7 +161,7 @@ class policyMaker():
 
 
     # method to hold CfD auction
-    def cfdAuction(self, capYears, commisCap, timeHorizon, busheadroom, avgElectricityPrice):
+    def cfdAuction(self, capYears, commisCap, timeHorizon, sorted_TNUoS_charges, avgElectricityPrice):
         # check if commissioning year
         y = self.year - self.BASEYEAR
         allBids = pd.DataFrame()
@@ -171,7 +171,7 @@ class policyMaker():
             frames = []
             for eGC in self.elecGenCompanies:
                 # print(eGC.name)
-                temp_bids_df = eGC.getCFDAuctionBid(timeHorizon, busheadroom)
+                temp_bids_df = eGC.getCFDAuctionBid(timeHorizon, sorted_TNUoS_charges)
                 frames.append(temp_bids_df)   
             if len(frames)>0:
                 # Merge the bids together and select the accepted bids

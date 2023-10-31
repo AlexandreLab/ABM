@@ -69,7 +69,6 @@ class electricityGenerator(asset):
         temp_arr_carbonCost = temp_arr_emissions/1000.0*self.currrent_CO2_price
         temp_arr_waste = self.hourly_energy_generated*self.waste_cost
         
-
         # margin cost is 0 if the current generation is 0
         temp_arr_marginal_cost = np.sum([temp_arr_fuelCost, temp_arr_waste, temp_arr_variableOM, temp_arr_carbonCost], axis=0)
         temp_arr_marginal_cost = np.divide(temp_arr_marginal_cost, self.hourly_energy_generated, out=np.zeros_like(temp_arr_marginal_cost), where=self.hourly_energy_generated != 0)
@@ -116,6 +115,8 @@ class electricityGenerator(asset):
 
         #calculate the cost of producing 1 kWh of electricity for this plant used to calculate the merit order for the next year
         self.cost_of_generating_electricity = self.fuel_cost+self.variable_OM_cost+self.ghg_emissions_per_kWh/1000.0*self.currrent_CO2_price+self.waste_cost
+        
+        return True
 
     # update date for next year
     def increment_year(self, CO2Price):

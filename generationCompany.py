@@ -34,7 +34,9 @@ class generationCompany():
         self.current_CO2_price = currentCarbonPrice
 
     #function that looks at the profitability of plants and choose what will be the next investment of company
-    def nextInvestment(self, priority_busbars):
+    def nextInvestment(self, sorted_TNUoS_charges):
+
+        priority_busbars = sorted_TNUoS_charges.columns
         genROIandNPV = pd.DataFrame(columns=["object_ID", "generation_company", "busbar", "capacity_kW", "start_year", "end_year", "ROI", "NPV"])
         genROIandNPV.index.name = "Technology"
         for gen in self.traditional_gen+self.renewable_gen+self.energy_stores:
@@ -152,7 +154,6 @@ class generationCompany():
     def checkConstructionQueue(self):
         units_to_build = self.construction_queue.loc[self.construction_queue["start_year"] == self.year, :]
         self.construction_queue = self.construction_queue.loc[self.construction_queue["start_year"] > self.year, :]
-
         if len(units_to_build) > 0:
             for idx, row in units_to_build.iterrows():
                 unit_name = row["name"]
@@ -163,10 +164,7 @@ class generationCompany():
                 CfD_price = row["CfD_price_GBP/kWh"]
                 busbar = row["busbar"]
                 self.add_unit(unit_name, capacity, start_year, end_year, capacity_market_sub, CfD_price, busbar)
-
         return True
-
-
 
     # method to remove old capacity whos age>lifetime
     def removeOldCapacity(self):
@@ -174,8 +172,10 @@ class generationCompany():
             if gen.end_year <= self.year:
                 if gen in self.traditional_gen:
                     self.traditional_gen.remove(gen)
-                else:
+                elif gen in self.renewable_gen:
                     self.renewable_gen.remove(gen)
+                else:
+                    self.energy_stores.remove(gen)
         return True
         
     # method to remove unprofitable generation plants
@@ -187,30 +187,31 @@ class generationCompany():
         random.shuffle(shuffled_list)
 
         for idx in shuffled_list:
-            count=0
+            count = 0
             if not removed:
                 gen = (self.traditional_gen+self.renewable_gen+self.energy_stores)[idx]
-                for yProfit in reversed (gen.yearly_profit_list): # loop through yearly profits from most recent
+                for yProfit in reversed(gen.yearly_profit_list): # loop through yearly profits from most recent
                     if yProfit < 0:
-                        count +=1
+                        count += 1
                     # if not profitable for x years and no plant has been removed yet
-                    if count == yearsWait: 
+                    if count == yearsWait:
                         if gen in self.traditional_gen:
                             self.traditional_gen.remove(gen)
                         elif gen in self.renewable_gen:
                             self.renewable_gen.remove(gen)
                         else:
-                            self.energy_stores(gen)
+                            self.energy_stores.remove(gen)
                         removed = True
                         break
         return True
 
-    def calculateStrikePrice(self, unit_name, capacity, totalGen):
+    def calculateStrikePrice(self, unit_name, capacity, TNUoS_charge, totalGen):
 
         #add a try/catch to raise error
         # load parameters to calculate the strike price for this technology
         economic_param_df = self.params["economic_parameters"]
         renewableFlag = int(self.params["technical_parameters"].loc[unit_name, 'Renewable_Flag'])
+        availability_factor = float(self.params["technical_parameters"].loc[unit_name, 'Availability_Factor'])
         lifetime = int(self.params["technical_parameters"].loc[unit_name, "Lifetime_Years"]) # years
         capital_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="CAPEX"), self.year].values[0]/1000*capacity
         fixed_OM_cost = economic_param_df.loc[(economic_param_df["Key"]==unit_name) & (economic_param_df["Cost Type"]=="OPEX"), self.year].values[0]/1000*capacity
@@ -229,7 +230,7 @@ class generationCompany():
 
         totalVariableOandMCost = (variable_OM_cost+ghg_emissions_per_kWh/1000*self.current_CO2_price+ wasteCost+fuelCost)*totalGen #GBP/kWh
 
-        NPV_total_cost = (fixed_OM_cost + totalVariableOandMCost)*(1-(1+self.discount_rate)**-lifetime)/self.discount_rate + capital_cost
+        NPV_total_cost = (fixed_OM_cost + TNUoS_charge*availability_factor+ totalVariableOandMCost)*(1-(1+self.discount_rate)**-lifetime)/self.discount_rate + capital_cost
         NPV_electricity_generated = (totalGen)*(1-(1+self.discount_rate)**-lifetime)/self.discount_rate
         strikePrice = NPV_total_cost/NPV_electricity_generated #GBP/kWh
         return strikePrice
@@ -247,12 +248,12 @@ class generationCompany():
         return busbar
 
     # method to get bid for CFD auction
-    def getCFDAuctionBid(self, timeHorizon, priority_busbars):
-
-        dfStrikePrices = pd.DataFrame(index = self.list_technology_portfolio, columns=["strike_price_GBP/kWh", "busbar", "capacity_kW", "start_Year", "end_year", "generation_company"]) #store the strike prices of the technologies 
+    def getCFDAuctionBid(self, timeHorizon, sorted_TNUoS_charges):
+        priority_busbars = sorted_TNUoS_charges.columns
+        dfStrikePrices = pd.DataFrame(index=self.list_technology_portfolio, columns=["strike_price_GBP/kWh", "busbar", "capacity_kW", "start_Year", "end_year", "generation_company"]) #store the strike prices of the technologies 
         dfStrikePrices.fillna(0, inplace=True)
 
-        # Calculating the bid for each technology 
+        # Calculating the bid for each technology
         for unit_name in self.list_technology_portfolio:
             market_readiness = int(self.params["technical_parameters"].loc[unit_name, "Expected_Market_Ready_Time"]) # when is the technology market ready
             
@@ -261,6 +262,7 @@ class generationCompany():
                     #Select a busbar where the technology can be built
 
                     busbar = self.get_busbar(unit_name, priority_busbars)
+                    TNUoS_charge = sorted_TNUoS_charges.loc["TNUoS_charges_GBP/kW", busbar]
                     construction_time = int(self.params["technical_parameters"].loc[unit_name, "Construction_Time_Years"]) # years
                     lifetime = int(self.params["technical_parameters"].loc[unit_name, "Lifetime_Years"]) # years
                     start_year = construction_time + self.year
@@ -277,7 +279,7 @@ class generationCompany():
                             totalGen = capacity_factor * capacityBid
 
                         if construction_time<=timeHorizon: # The construction time is equal or below the construction time required by the CfD auction
-                            strikePrice = self.calculateStrikePrice(unit_name, capacityBid, totalGen)
+                            strikePrice = self.calculateStrikePrice(unit_name, capacityBid, TNUoS_charge, totalGen)
                             dfStrikePrices.loc[unit_name, "strike_price_GBP/kWh"] = strikePrice
                             dfStrikePrices.loc[unit_name, "busbar"] = busbar
                             dfStrikePrices.loc[unit_name, "capacity_kW"] = capacityBid
@@ -288,7 +290,8 @@ class generationCompany():
         return dfStrikePrices
 
     # method to get cap auction bid
-    def getCapAuctionBid(self, timeHorizon, priority_busbars):
+    def getCapAuctionBid(self, timeHorizon, sorted_TNUoS_charges):
+        priority_busbars = sorted_TNUoS_charges.columns
         dfCapacityAuctionBids = pd.DataFrame(columns=["bid_price_GBP/kW", "busbar", "capacity_kW", "derated_capacity_kW", "start_year", "end_year", "generation_company"])
         for unit in self.traditional_gen+self.energy_stores:
             unit_name = unit.name
@@ -394,6 +397,7 @@ class generationCompany():
                 discharge_rate = capacity # kW
                 
                 unit = energyStorage(unit_name, capkWh, charge_rate, discharge_rate, self.year, busbar, self.BASEYEAR)
+                unit.degradation_rate = float(self.params["technical_parameters"].loc[unit_name, "Degradation_rate_perc"])
                 self.energy_stores.append(unit)
             else:
                 if renewable_flag:

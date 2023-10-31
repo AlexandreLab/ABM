@@ -33,7 +33,7 @@ class energyStorage(asset):
         self.ghg_emissions_per_kWh = 0 # kg of CO2 emitted per kWh generated
         self.start_year = 0
         self.end_year = 0
-
+        self.degradation_rate = 0 # %per year
 
         #Economic parameters
         self.yearly_income = 0.0
@@ -44,7 +44,6 @@ class energyStorage(asset):
         self.hourly_cost = np.zeros(self.timesteps)
         self.marginal_cost = np.zeros(self.timesteps)
         self.yearly_emissions = 0.0
-
 
         self.yearly_profit_list = list() # keep track of the past profit of a plant to see if it is profitable
 
@@ -64,6 +63,7 @@ class energyStorage(asset):
 
     # @timer_func # to get the execution time
     def chargingDischargingBattery(self, arr_chargeRate, arr_dischargeRate, netDemand):
+        self.current_capacity = self.capacity/2 # the current capacity of the battery is initialised
         arr_charge = arr_chargeRate*self.capacity # how much we want to charge by
         arr_charge = arr_charge.clip(max=self.charge_rate) #cap it to the max charge_rate (should not be useful)
 
@@ -128,15 +128,17 @@ class energyStorage(asset):
     def increment_year(self):
         self.yearly_profit_list.append(self.yearly_profit)
         age = self.year - self.start_year
-        if(age >= 15):
+        if age >= 15:
             self.CFDPrice = 0.0
         self.year = self.year + 1
+        # Degradation of the storage system
+        self.capacity = self.capacity*(1-self.degradation_rate)
 
         self.current_CO2_price = 0
         self.yearly_energy_stored = 0
         self.yearly_income = 0.0
         self.yearly_cost = 0.0
-        self.yearly_profit=0.0
+        self.yearly_profit = 0.0
         self.hourly_profit = np.zeros(self.timesteps)
         self.hourly_income = np.zeros(self.timesteps)
         self.hourly_cost = np.zeros(self.timesteps)
@@ -145,27 +147,7 @@ class energyStorage(asset):
 
         return True
 
-
-        
     def getActCapFactor(self):
         # to be updated
         self.actualCapFac = (self.capacity/self.charge_rate)/24
         return self.actualCapFac
-    
-
-
-
-
-    
-    
-
-
-
-
-
-
-
-
-
-        
-        

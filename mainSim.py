@@ -17,7 +17,7 @@ if __name__ == '__main__':
     BASEYEAR = 2010
     MAXYEARS = 11 #11 = 2020, 16 = 2025 #9=2018 #  25 = 2034, 41 = 2050
     timesteps = 8760
-    bool_energy_storage = False
+    bool_energy_storage = True
     bool_linear_battery_growth = True
 
     # Initialisation of variables

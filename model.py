@@ -464,12 +464,13 @@ class ABM():
 
     def installNewCapacity(self, wholesaleEPrice):
         #sort the busbars based on TNUoS charges from smaller to higher
-        priority_busbars = self.TNUoS_charges.sort_values("TNUoS_charges_GBP/kW", axis=1).columns  
+        sorted_TNUoS_charges = self.TNUoS_charges.sort_values("TNUoS_charges_GBP/kW", axis=1).copy()
+
         # Capacity built by each company individually without the help of subsidies
         print("Companies investments...")
         frames = []
         for eGC in self.elecGenCompanies:
-            temp_df = eGC.nextInvestment(priority_busbars)
+            temp_df = eGC.nextInvestment(sorted_TNUoS_charges)
             frames.append(temp_df)
 
         fileOut = self.params["path_save"] + 'Profitable_tech_to_be_built_'+str(self.year)+'.csv'
@@ -490,10 +491,10 @@ class ABM():
                 eGC.addToConstructionQueue(unit_name, capacitykW, start_year, end_year, capacity_market_sub, CfD_price, busbar)
 
         # cfd auction
-        self.policyMaker.cfdAuction(3, 6000000, 20, priority_busbars, np.mean(wholesaleEPrice)) # 3 years, 6 GW to be commissioned, max 20 years construction time
+        self.policyMaker.cfdAuction(3, 6000000, 20, sorted_TNUoS_charges, np.mean(wholesaleEPrice)) # 3 years, 6 GW to be commissioned, max 20 years construction time
 
         # Capacity auction
-        estPeakD, estDeRCap = self.policyMaker.capacityAuction(4, self.peak_demand, False, priority_busbars)
+        estPeakD, estDeRCap = self.policyMaker.capacityAuction(4, sorted_TNUoS_charges)
 
         return estPeakD, estDeRCap
 
